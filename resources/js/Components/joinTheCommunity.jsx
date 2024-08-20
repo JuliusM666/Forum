@@ -18,7 +18,7 @@ export default function Sidebar(){
             </ol>
             <h1 className='text-slate-600 text-sm mt-2'> and much more.</h1>
             <h1 className='text-slate-600 font-semibold text-sm mt-1'>Registration takes only ~30 sec. And is completely free. </h1>
-            <div className='grid grid-cols-3 sm:grid-cols-1 justify-items-center items-center mt-2'>
+            <div className='grid grid-cols-3  justify-items-center items-center mt-2'>
                 <div className='justify-self-start'>
                     <Button>Login</Button>
                 </div>

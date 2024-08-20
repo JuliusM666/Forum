@@ -17,10 +17,10 @@ export default function UserStatistics(){
                     <div className='h-10 w-10 mr-2'>
                     <UserImage/>
                     </div>
-                    <div className="text-sm text-slate-600">
+                    <div className="text-sm max-sm:text-xs text-slate-600 ">
                         <h1>NEWEST USER</h1>
                         <h1>Cakys</h1>
-                        <h1>Regsitered 2h ago</h1>
+                        <h1>Registered 2h ago</h1>
                     </div>
                 </div>
            </div>

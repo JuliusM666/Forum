@@ -3,7 +3,7 @@ import Button from '../Components/button';
 import SearchBar from '../Components/searchBar';
 import ToolTip from '../Components/tooltip';
 import MobileLinks from '../Components/mobileLinks';
-export default function Header({handleRegistrationClick,handleLoginClick}){
+export default function Header({handleRegistrationClick,handleLoginClick,handleSmallSearchClick,handleMenuClick}){
     
     
     return(
@@ -13,7 +13,7 @@ export default function Header({handleRegistrationClick,handleLoginClick}){
                     <h1 className="text-5xl font-semibold text-transparent bg-gradient-to-r from-blue-200 to-blue-300 bg-clip-text">Forum</h1>
                 </div>
                 <div className='md:hidden'>
-                    <MobileLinks/>
+                    <MobileLinks handleSmallSearchClick={handleSmallSearchClick} handleMenuClick={handleMenuClick}/>
                 </div>
                 <div className='flex items-center gap-2 max-md:hidden'>
                     

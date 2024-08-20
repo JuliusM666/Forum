@@ -1,7 +1,8 @@
 import Card from '../Components/card'
 import { useState } from 'react'
 import UserImage from '../Components/userImage'
-import Button from './button';
+import Button from '../Components/button';
+import Points from '../Components/points'
 export default function PopularUsers(){
     const [active, setActive] = useState(0);
     
@@ -45,7 +46,7 @@ function User({image="",name,points,number}){
                     </div>
                     <div  className='cols-span-4'>
                         <h1 className='text-md font-semibold text-slate-600'>{name}</h1>
-                        <span className='text-xs text-green-400'><i className="fa-solid fa-plus" style={{color: "#63E6BE"}}/>{points}</span>
+                        <Points points={points}/>
                              
                         
                     </div>
