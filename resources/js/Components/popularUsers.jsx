@@ -1,6 +1,6 @@
 import Card from '../Components/card'
 import { useState } from 'react'
-import UserImage from '../Components/userImage'
+import UserImage from './userPicture'
 import Button from '../Components/button';
 import Points from '../Components/points'
 export default function PopularUsers(){

@@ -25,7 +25,8 @@ class ThemeController extends Controller
                 ])->get(),
             'theme' => $theme,
             'user' => Auth::user(),
-            'topic' => $topic
+            'topic' => $topic,
+            'topics' => Topic::with('themes')->get(),
         ]);
     }
 }

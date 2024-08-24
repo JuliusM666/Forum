@@ -4,15 +4,18 @@ import Footer from '../Components/footer';
 import RegistrationModal from '../Components/registrationModal';
 import LoginModal from '../Components/loginModal';
 import SearchModal from '../Components/searchModal';
+import UserSettingsModal from '../Components/userSettingsModal';
 import MenuModal from '../Components/menuModal';
 import EmailModal from '../Components/emailModal';
 import UserMenu from '../Components/userMenu';
-import { useState } from 'react';
+import { useEffect, useState} from 'react';
+import {SettingsContext} from '../Components/Context/settingsContext'
 export default function Layout({children,breadcrumbs,isEmailVerify=false,user}){
     const [isShowRegistration,setIsShowRegistration]=useState(false)
     const [isShowLogin,setIsShowLogin]=useState(false)
     const [isShowSmallSearch,setIsShowSmallSearch]=useState(false)
     const [isShowMenu,setIsShowMenu]=useState(false)
+    const [isShowSettings,setIsShowSettings]=useState(false)
     const [isShowEmail,setIsShowEmail]=useState(isEmailVerify)
     function outsideClickHandler(){
         if(isShowRegistration){
@@ -30,7 +33,12 @@ export default function Layout({children,breadcrumbs,isEmailVerify=false,user}){
         if(isShowEmail){
             setIsShowEmail(false)
         }
+        if(isShowSettings){
+           setIsShowSettings(false)
+        }
+      
     }
+  
     return(
         
         
@@ -39,8 +47,9 @@ export default function Layout({children,breadcrumbs,isEmailVerify=false,user}){
             <LoginModal isVisible={isShowLogin} setIsShowLogin={setIsShowLogin} isShowLogin={isShowLogin}/>
             <EmailModal isVisible={isShowEmail} handleCloseClick={()=>setIsShowEmail(false)}/>
             <SearchModal isVisible={isShowSmallSearch} handleCloseClick={()=>setIsShowSmallSearch(false)}/>
+            <UserSettingsModal user={user} isVisible={isShowSettings} setIsShowSettings={setIsShowSettings} isShowSettings={isShowSettings}/>
             <MenuModal isVisible={isShowMenu} handleCloseClick={()=>setIsShowMenu(false)}/>
-                <div onClick={()=>outsideClickHandler()} style={{opacity:isShowRegistration||isShowLogin||isShowSmallSearch||isShowMenu||isShowEmail?0.2:1}}>
+                <div onClick={()=>outsideClickHandler()} style={{opacity:isShowRegistration||isShowLogin||isShowSmallSearch||isShowMenu||isShowEmail||isShowSettings?0.2:1}}>
             <Header 
                 handleRegistrationClick={()=>setIsShowRegistration(true)}
                 handleLoginClick={()=>setIsShowLogin(true)}
@@ -55,9 +64,11 @@ export default function Layout({children,breadcrumbs,isEmailVerify=false,user}){
 
             )}
             
+            <SettingsContext.Provider value={{"setIsShowSettings":setIsShowSettings}}>
+                {children}
+            </SettingsContext.Provider>
             
             
-            {children}
             
             <Footer/>
             </div>

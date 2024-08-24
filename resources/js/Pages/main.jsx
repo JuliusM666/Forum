@@ -14,7 +14,7 @@ export default function Main({breadcrumbs,isEmailVerify,user,topics}){
                         <div>
                             <h1 className='text-2xl font-semibold max-sm:ml-2'>Forum</h1>
                         </div>
-                        <AddNewPostButton/>
+                        <AddNewPostButton topics={topics}/>
                     </div>
                     {
                         Object.keys(topics).map(function(keyName, keyIndex) {

@@ -2,16 +2,69 @@ import Layout from '../Layouts/layout'
 import SideBar from '../Components/sidebar'
 import UserBanner from '../Components/userBanner'
 import Card from '../Components/card'
-export default function User({breadcrumbs,user}){
+import PageCard from '../Components/pageCard'
+import UserPicture from '../Components/userPicture'
+import moment from 'moment'
+export default function User({breadcrumbs,user,userProfile,pagination}){
+    let arr=[]
     return(
         <Layout breadcrumbs={breadcrumbs} user={user}>
+          
             <div className='grid md:grid-cols-4 sm:grid-cols-1' name="content_block">
             <div name="main_block" className='md:col-span-3 sm:col-span-2 mt-5'>
-            <UserBanner user={user}/>
-            <Card name={"Recent activity"}></Card>
+            <UserBanner userProfile={userProfile} user={user}/>
+            <Card name={"Recent activity"}>
+                <PageCard  pagination={pagination} filter={false} rounded={""}>
+                <div className='bg-slate-100 rounded-b-lg p-2'>
+                    {pagination.data.map((message,index)=>{
+                        return (<Message key={index} message={message} user={user}/>)
+                    })} 
+                   
+                </div>
+                </PageCard>
+            </Card>
             </div>
                 <SideBar/>
             </div>
         </Layout>
+    )
+}
+
+function Message({message,user}){
+    return(
+        <div className='border-slate-300 border-t-2 p-2 '>
+        <div className="rounded-t-lg flex text-slate-700 items-center gap-2">
+            <div className="w-10 h-10 max-xl:hidden">
+                <UserPicture user={user}/>
+            </div>
+            <div className='flex items-center max-lg:grid grid-cols-1 gap-2'>
+                <a href={route('post',[message.topic,message.theme,message.post])}><div className='flex  gap-1 max-lg:rounded-md items-center bg-blue-300 hover:bg-blue-200 p-2 text-white rounded-full'>
+                {message.title}
+                    {message.is_post == false && <i className="fa-regular fa-comment"/>}
+                    {message.is_post && <i className="fa-regular fa-comments"/>}
+                  
+                </div></a>
+                <div className='max-lg:p-2'>
+                    <a href={route('user.show',[user])}>{user.name}</a> posted in <a href={route('theme',[message.topic,message.theme])}>{message.theme.title}</a>
+                </div>
+               
+            </div>
+           
+        </div>
+        <div className="text-slate-700 px-12 max-lg:px-2">
+            <p className="py-4">{message.message}</p>
+           
+           <div className='flex justify-start items-center gap-4'>
+            <span><i className="fa-regular fa-clock"/> {moment(message.created_at).fromNow()}</span>
+            {message.replies.replies_count>0 && 
+            <a href={message.is_post?route('post',[message.topic,message.theme,message.post]):route('reply',[message.topic,message.theme,message.post,message.id])
+
+            }><span><i className="fa-solid fa-comment"/> {message.replies.replies_count} </span></a>
+            }
+            </div> 
+        </div>
+        
+            
+        </div>
     )
 }

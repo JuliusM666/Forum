@@ -1,11 +1,24 @@
-import UserPicture from "../Components/userImage"
+import UserPicture from "./userPicture"
 import Points from "../Components/points"
 import Reply from "../Components/reply"
 import { useState } from "react"
 import moment from "moment"
-export default function Comment({id,isPost=false,replyLevel=0,activeReply,setActiveReply,reply}){
+export default function Comment({id,routeData,isPost=false,replyLevel=0,activeReply,setActiveReply,reply}){
     const [showReplies,setShowReplies]=useState(false)
     const bgColors=["#93c5fd","#bfdbfe","#dbeafe"]
+    function loadReplies(){
+        if(replyLevel<2){
+            setShowReplies(!showReplies)
+        }
+        else if(reply.replies.length>0){
+            window.location.href=route('reply',[
+                routeData.topic_id,
+                routeData.theme_id,
+                routeData.post_id,
+                reply.id
+            ])
+        }
+    }
     return(
         <div className="">
         <div className="w-full mt-2 shadow-md">
@@ -27,7 +40,7 @@ export default function Comment({id,isPost=false,replyLevel=0,activeReply,setAct
         <div className="bg-slate-100 text-slate-700">
             <p className="p-4">{reply.message}</p>
             <div className="border border-t-2 border-slate-200 flex justify-between p-2">
-                <button disabled={isPost||!reply.hasOwnProperty('replies')} onClick={()=>setShowReplies(!showReplies)} className="flex gap-2 items-center"  ><i className="fa-solid fa-circle-plus"/>
+                <button disabled={isPost||!reply.hasOwnProperty('replies')} onClick={()=>loadReplies()} className="flex gap-2 items-center"  ><i className="fa-solid fa-circle-plus"/>
                 {reply.hasOwnProperty('replies')?reply.replies.length+" more replies":"no replies"}
                 </button>
                 <button onClick={()=>setActiveReply(activeReply!=id?id:null)} ><i className="fa-solid fa-reply"/></button>
@@ -38,11 +51,11 @@ export default function Comment({id,isPost=false,replyLevel=0,activeReply,setAct
             <Reply name={"User"} points={10} to={reply.user.name} replyId={isPost?null:reply.id} setActiveReply={setActiveReply}/>
         }
         <div className="flex justify-end">
-        {showReplies && replyLevel<2 && 
+        {showReplies  &&
             <div className="w-11/12">
              {Object.keys(reply.replies).map(function(keyName, keyIndex) {
                             return(
-                                <Comment replyLevel={replyLevel+1} key={keyIndex+1} activeReply={activeReply} setActiveReply={setActiveReply} id={id+keyName} reply={reply.replies[keyName]}></Comment>
+                                <Comment routeData={routeData} replyLevel={replyLevel+1} key={keyIndex+1} activeReply={activeReply} setActiveReply={setActiveReply} id={id+keyName} reply={reply.replies[keyName]}></Comment>
                             )
                         })}
             </div>

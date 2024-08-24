@@ -24,17 +24,23 @@ class PostController extends Controller
 
 
             'post' => $post->load([
-                'user',
+
                 'replies' => function (Builder $query) {
                     $query->where('reply_id', null);
                     $query->with([
                         'user',
                         'replies.user',
                         'replies.replies.user',
+                        'replies.replies.replies'
                     ]);
 
-                }
+                },
+
             ]),
+            'main_post' => $post->load('user'),
+            'theme' => $theme,
+            'topics' => Topic::with('themes')->get(),
+            'topic' => $topic,
             'user' => Auth::user(),
 
         ]);
@@ -44,13 +50,14 @@ class PostController extends Controller
         $request->validate([
             'title' => 'required|min:10|max:50',
             'message' => 'required|min:10|max:500',
+            'theme_id' => 'exists:themes,id',
         ]);
 
         Post::create([
             'title' => $request->title,
             'message' => $request->message,
             'user_id' => Auth::user()->id,
-            'theme_id' => 1,
+            'theme_id' => $request->theme_id,
         ]);
 
     }

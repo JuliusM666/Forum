@@ -2,19 +2,20 @@
 
 ## About
 
-Forum is a forum website made with Laravel|React.
+#### Forum is a forum website made with Laravel|React.
 
 ## Showcase
 
-    ![presentation](public/presentation/presentation_1.gif)
-    ![presentation](public/presentation/presentation_2.gif)
+![presentation](public/presentation/presentation_1.gif)
 
 ## Features
 
--   user functions
+-   User functions
 -   Nested messages
--   email notifications
+-   Email notifications
+
+![presentation](public/presentation/presentation_2.gif)
 
 ## Responsive design
 
-    ![presentation](public/presentation/presentation_3.gif)
+![presentation](public/presentation/presentation_3.gif)

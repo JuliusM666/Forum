@@ -4,7 +4,7 @@ import SideBar from '../Components/sidebar'
 import AddNewPostButton from '../Components/addNewPostButton'
 import Followers from '../Components/followers'
 import PageCard from '../Components/pageCard'
-export default function Theme({breadcrumbs,user,posts,theme,topic}){
+export default function Theme({breadcrumbs,user,posts,theme,topic,topics}){
     return(
         <Layout breadcrumbs={breadcrumbs} user={user}>
            
@@ -20,8 +20,8 @@ export default function Theme({breadcrumbs,user,posts,theme,topic}){
                         </div>
                         
                     </div>
-                    <AddNewPostButton/>
-                    <PageCard>
+                    <AddNewPostButton topics={topics}/>
+                    {/* <PageCard> */}
                     {Object.keys(posts).map(function(keyName, keyIndex) {
                             return(
                                 <PostElement key={keyIndex} topic={topic} theme={theme} post={posts[keyName]}/>
@@ -29,7 +29,7 @@ export default function Theme({breadcrumbs,user,posts,theme,topic}){
                         })}
                     
                  
-                    </PageCard>
+                    {/* </PageCard> */}
                     
                     
                     

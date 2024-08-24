@@ -44,11 +44,11 @@ Route::get('/topic/{topic}', function (Topic $topic) {
 
 Route::get('/topic/{topic}/{theme}', [ThemeController::class, 'show'])->name('theme');
 Route::get('/topic/{topic}/{theme}/{post}', [PostController::class, 'show'])->name('post');
-
+Route::get('/topic/{topic}/{theme}/{post}/{reply}', [ReplyController::class, 'show'])->name('reply');
 Route::post('/post', [PostController::class, 'store'])->middleware('auth', 'verified');
 Route::post('/reply', [ReplyController::class, 'store'])->middleware('auth', 'verified');
 Route::post('/login', [UserController::class, 'login']);
-Route::resource('/user', UserController::class)->only(['store', 'show']);
+Route::resource('/user', UserController::class)->only(['store', 'show', 'update']);
 Route::post('/logout', [UserController::class, 'logout']);
 
 

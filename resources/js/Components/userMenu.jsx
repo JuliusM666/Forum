@@ -1,19 +1,20 @@
-import UserPicture from "../Components/userImage"
+import UserPicture from "./userPicture"
 import { useState } from "react"
+import useComponentVisible from "./Hooks/useComponentVisible";
 import { useForm } from "@inertiajs/react"
 export default function UserMenu({user}){
-    const [isShow,setIsShow]=useState(false)
+    const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
     const { post } = useForm()
 
     return(
-        <div className="flex justify-end max-md:justify-center">
-        
-        <div className="w-10 h-10 mt-2 max-md:w-20 max-md:h-20" onClick={()=>setIsShow(!isShow)}>
-            <UserPicture/>
+        <div  className="flex justify-end max-md:justify-center">
+        <div ref={ref}>
+        <div className="w-10 h-10 mt-2 max-md:w-20 max-md:h-20" onClick={()=>setIsComponentVisible(!isComponentVisible)}>
+            <UserPicture isLink={false} user={user}/>
         </div>
-        {isShow && (
-            <div className="absolute mt-10 max-md:mt-20">
-                <div className="border border-slate-400 shadow-2xl bg-white rounded-md mt-2 text-slate-400">
+        {isComponentVisible && (
+            <div className="absolute z-10 ">
+                <div className="border border-slate-400 shadow-2xl bg-white rounded-md  text-slate-400">
                    <ul className="text-slate-600 font-md font-semibold">
                     <li className="block px-4 rounded-md py-2 hover:bg-slate-200 hover:text-slate-500">
                        <a href={route('user.show',user)}>Profile</a> 
@@ -27,6 +28,7 @@ export default function UserMenu({user}){
                 </div>
             </div>
         )}
+        </div>
         </div>
     )
 }

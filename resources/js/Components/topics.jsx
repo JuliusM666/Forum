@@ -37,8 +37,11 @@ function Theme({theme,topic}){
                          <h1 className="text-sm">Posts</h1>
                     </div>
                     <div className="text-sm text-left mr-7">
-                         <h1>{theme.posts[0].title.substring(0,15)+"..."}</h1>
-                         <span>{theme.posts[0].user.name}, {moment(theme.posts[0].created_at).fromNow()}</span>
+                         { theme.posts.length>0 && <>
+                           <h1>{theme.posts[0].title.substring(0,15)+"..."}</h1>
+                           <span>{theme.posts[0].user.name}, {moment(theme.posts[0].created_at).fromNow()}</span></>
+                         }
+                       
                     </div>
                     
                </div>

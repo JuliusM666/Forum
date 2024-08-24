@@ -1,4 +1,4 @@
-import UserImage from '../Components/userImage'
+import UserImage from './userPicture'
 import Card from '../Components/card'
 export default function UserStatistics(){
     return(

@@ -1,4 +1,4 @@
-import UserPicture from "../Components/userImage"
+import UserPicture from "./userPicture"
 import Points from "../Components/points"
 import TextEditor from "../Components/textEditor"
 import AddNewCommentButton from "../Components/addNewCommentButton"
@@ -11,7 +11,7 @@ export default function Reply({to,replyId,setActiveReply}){
     const { data, setData, post, processing, errors,clearErrors,reset } = useForm({
         message:'',
         reply_id: replyId,
-        post_id: context.post.id,
+        post_id: context.post_id,
     })
     function clearForm(){
         clearErrors()
