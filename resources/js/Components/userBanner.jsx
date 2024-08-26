@@ -3,7 +3,7 @@ import Points from "../Components/points"
 import moment from "moment"
 import { SettingsContext } from "./Context/settingsContext"
 import { useContext } from "react"
-export default function UserBanner({user,userProfile}){
+export default function UserBanner({user=null,userProfile}){
     const {setIsShowSettings}=useContext(SettingsContext)
     return(
     
@@ -29,7 +29,7 @@ export default function UserBanner({user,userProfile}){
                 <h1 className="text-slate-100 font-semibold">Messages</h1>
                 <h1 className="text-slate-200">{userProfile.replies_count+userProfile.posts_count}</h1>
             </div>
-            <div className="border-blue-200 border-r-2 grid justify-center">
+            <div className="border-blue-200 border-r-2 grid justify-center text-center">
                 <h1 className="text-slate-100 font-semibold">Registered</h1>
                 <h1 className="text-slate-200">{moment(userProfile.created_at).fromNow()}</h1>
             </div>
@@ -39,10 +39,10 @@ export default function UserBanner({user,userProfile}){
             </div>
             <div className="grid justify-center">
                 <h1 className="text-slate-100 font-semibold ">Points</h1>
-                <h1 className="text-slate-200"><Points points={userProfile.points_count}/></h1>
+                <h1 className="text-slate-200"><Points points={userProfile.points_count} user={userProfile}/></h1>
             </div>
             <div className="text-slate-700 max-xl:hover:text-4xl hover:text-2xl pr-2 text-xl max-xl:right-1 max-xl:text-3xl col-span-2 max-lg: flex justify-end max-xl:absolute max-xl:top-2/4">
-            {user.id==userProfile.id &&
+            {user!=null && user.id==userProfile.id &&
             <i onClick={()=>{setIsShowSettings(true),window.scrollTo(0,0)}} className="fa-solid fa-gear"/>
             }
             </div>

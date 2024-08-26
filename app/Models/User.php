@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-class User extends Authenticatable implements MustVerifyEmail
+use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Auth\Passwords\CanResetPassword as ResetPasswordTrait;
+class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, ResetPasswordTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -58,4 +60,5 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Points::class);
     }
+
 }

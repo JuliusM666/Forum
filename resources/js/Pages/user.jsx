@@ -5,19 +5,22 @@ import Card from '../Components/card'
 import PageCard from '../Components/pageCard'
 import UserPicture from '../Components/userPicture'
 import moment from 'moment'
-export default function User({breadcrumbs,user,userProfile,pagination}){
-    let arr=[]
+import { Head } from '@inertiajs/react'
+import { usePage } from "@inertiajs/react"
+export default function User({breadcrumbs,userProfile,pagination}){
+    const { auth } = usePage().props
     return(
-        <Layout breadcrumbs={breadcrumbs} user={user}>
-          
+        
+        <Layout breadcrumbs={breadcrumbs}>
+            <Head title={userProfile.name} />
             <div className='grid md:grid-cols-4 sm:grid-cols-1' name="content_block">
             <div name="main_block" className='md:col-span-3 sm:col-span-2 mt-5'>
-            <UserBanner userProfile={userProfile} user={user}/>
+            <UserBanner userProfile={userProfile} user={auth.user}/>
             <Card name={"Recent activity"}>
                 <PageCard  pagination={pagination} filter={false} rounded={""}>
                 <div className='bg-slate-100 rounded-b-lg p-2'>
                     {pagination.data.map((message,index)=>{
-                        return (<Message key={index} message={message} user={user}/>)
+                        return (<Message key={index} message={message} user={userProfile}/>)
                     })} 
                    
                 </div>
@@ -37,6 +40,7 @@ function Message({message,user}){
             <div className="w-10 h-10 max-xl:hidden">
                 <UserPicture user={user}/>
             </div>
+            <div className='grid grid-cols-1'>
             <div className='flex items-center max-lg:grid grid-cols-1 gap-2'>
                 <a href={route('post',[message.topic,message.theme,message.post])}><div className='flex  gap-1 max-lg:rounded-md items-center bg-blue-300 hover:bg-blue-200 p-2 text-white rounded-full'>
                 {message.title}
@@ -49,9 +53,17 @@ function Message({message,user}){
                 </div>
                
             </div>
+            { message.is_post == false &&
+                <div className='max-xl:px-2'>
+                Reply to: <a href={route('user.show',[message.reply_to])}>{message.reply_to.name}</a>
+                </div>
+            }
+            
+            </div>
            
         </div>
-        <div className="text-slate-700 px-12 max-lg:px-2">
+        
+        <div className="text-slate-700 px-12 max-xl:px-2">
             <p className="py-4">{message.message}</p>
            
            <div className='flex justify-start items-center gap-4'>

@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Inertia\Inertia;
+use Storage;
 class UserController extends Controller
 {
     public function __construct()
@@ -47,14 +49,18 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
             'password_confirmation' => 'required',
 
+
         ]);
         $user = User::create([
             'name' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'user_img' => Storage::url('user_profile_pictures/user.png'),
+            'banner_img' => Storage::url('user_banners/banner.jpg'),
         ]);
         event(new Registered($user));
         Auth::login($user);
+        return redirect()->route('home');
     }
     public function login(Request $request)
     {
@@ -88,6 +94,7 @@ class UserController extends Controller
             'created_at' => $reply->created_at,
             'post' => $reply->post->id,
             'is_post' => false,
+            'reply_to' => $reply->reply != null ? $reply->reply->user : $reply->post->user,
 
         ]);
         $posts = $user->posts()->get()->map(fn($post) => [
@@ -100,6 +107,7 @@ class UserController extends Controller
             'created_at' => $post->created_at,
             'post' => $post->id,
             'is_post' => true,
+            'reply_to' => null,
 
         ]);
 
@@ -109,7 +117,15 @@ class UserController extends Controller
                 1 => ["name" => $user->name, "route" => route('user.show', $user)]
             ],
             'user' => Auth::user(),
-            'userProfile' => $user->loadCount('replies')->loadCount('posts')->loadCount('points'),
+            'userProfile' => $user->loadCount('replies')->loadCount('posts')->loadCount('points')->load([
+                'points' => function (Builder $query) {
+                    if (Auth::user()) {
+                        $query->where('points.voter_id', Auth::user()->id)->get();
+                    } else {
+                        return null;
+                    }
+                }
+            ]),
             'pagination' => collect()->merge($replies)->merge($posts)->sortDesc()->paginate(10),
         ]);
     }

@@ -4,6 +4,11 @@ use App\Http\Controllers\TopicController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReplyController;
+use App\Http\Controllers\PointsController;
+use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\RulesController;
+use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\MembershipController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -42,6 +47,9 @@ Route::get('/topic/{topic}', function (Topic $topic) {
     ]);
 })->name('topic');
 
+Route::get('rules', [RulesController::class, 'index'])->name('rules');
+Route::get('activity', [ActivityController::class, 'index'])->name('activity');
+Route::get('membership', [MembershipController::class, 'index'])->name('membership');
 Route::get('/topic/{topic}/{theme}', [ThemeController::class, 'show'])->name('theme');
 Route::get('/topic/{topic}/{theme}/{post}', [PostController::class, 'show'])->name('post');
 Route::get('/topic/{topic}/{theme}/{post}/{reply}', [ReplyController::class, 'show'])->name('reply');
@@ -50,12 +58,15 @@ Route::post('/reply', [ReplyController::class, 'store'])->middleware('auth', 've
 Route::post('/login', [UserController::class, 'login']);
 Route::resource('/user', UserController::class)->only(['store', 'show', 'update']);
 Route::post('/logout', [UserController::class, 'logout']);
+Route::post('/vote', [PointsController::class, 'store'])->middleware('auth', 'verified');
 
 
 
-
-
-
+# Password reset link request form 
+Route::get('/forgot-password', [ResetPasswordController::class, 'showEmailForm'])->middleware('guest')->name('password.request');
+Route::post('/forgot-password', [ResetPasswordController::class, 'handleEmailForm'])->middleware('guest')->name('password.email');
+Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showPasswordForm'])->middleware('guest')->name('password.reset');
+Route::post('/reset-password', [ResetPasswordController::class, 'handlePasswordForm'])->middleware('guest')->name('password.update');
 
 # Verification handler
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
@@ -75,6 +86,7 @@ Route::get('/email/verify', function () {
             0 => ["name" => "Home", "route" => route('home')],
 
         ],
+        'topics' => TopicController::index()->get(),
         'isEmailVerify' => true
     ]);
 })->middleware('auth')->name('verification.notice');

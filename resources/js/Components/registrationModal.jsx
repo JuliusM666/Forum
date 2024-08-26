@@ -64,7 +64,7 @@ export default function RegistrationModal({setIsShowEmail,isVisible,setIsShowReg
                             <FormInput errors={errors.username} title={"Username"} name="username" value={data.username} setData={setData} required={true} type={"text"}/>
                             <FormInput errors={errors.email} title={"Email"} name="email" value={data.email} setData={setData} required={true} type={"email"}/>
                             <FormInput errors={errors.password} title={"Password"} name="password" value={data.password} setData={setData} required={true} type={"password"}/>
-                            <FormInput errors={errors.password_confirmation} title={"Comfirm Password"} name="password_confirmation" value={data.password_confirmation} setData={setData} required={true} type={"password"}/>
+                            <FormInput errors={errors.password_confirmation} title={"Confirm Password"} name="password_confirmation" value={data.password_confirmation} setData={setData} required={true} type={"password"}/>
                         </div>
                         <div className='p-6 border border-b-slate-300'>
                             <CheckBox errors={errors.rules} value={data.rules} setData={setData} title={"I have met and agree with sites rules."} name={"rules"} required={true}/>

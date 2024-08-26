@@ -5,9 +5,9 @@ export default function SideBar(){
     return(
         <div className='md:ml-4 max-sm:mx-4  sm:col-span-2 md:col-span-1'>
         <JoinTheCommunity/>
-        <NewHotTopics title={"New posts"}/>
+        {/* <NewHotTopics title={"New posts"}/>
         <NewHotTopics title={"Hot posts"}/>
-        <PopularUsers/>
+        <PopularUsers/> */}
         </div>
     )
 }

@@ -9,6 +9,7 @@ import Button from '../Components/button';
 import CheckBox from '../Components/checkbox';
 import { useForm } from '@inertiajs/react'
 import { useEffect } from 'react';
+import Link from '../Components/link';
 export default function LoginModal({isVisible,isShowLogin,setIsShowLogin}){
     const { data, setData, post, processing, errors,clearErrors,reset } = useForm({
         username:'',
@@ -51,6 +52,7 @@ export default function LoginModal({isVisible,isShowLogin,setIsShowLogin}){
                             <FormInput errors={errors.password} value={data.password} setData={setData} name={"password"}  type={"password"} title={"Password"}/>
                             <CheckBox setData={setData} value={data.remember} name={"remember"} title={"Remember me"}/>
                             <Button disabled={processing} width={"w-full"}>Login</Button>
+                            <Link href={route('password.request')}>Forgot your password?</Link>
                         </div>
                         </form>
                     </div>

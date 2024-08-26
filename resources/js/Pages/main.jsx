@@ -4,9 +4,9 @@ import ActiveUsers from '../Components/activeUsers'
 import UserStatistics from '../Components/userStatistics'
 import SideBar from '../Components/sidebar'
 import AddNewPostButton from '../Components/addNewPostButton'
-export default function Main({breadcrumbs,isEmailVerify,user,topics}){
+export default function Main({breadcrumbs,isEmailVerify,isResetPasswordEmail,isResetPassword,token,user,topics}){
    return(
-        <Layout breadcrumbs={breadcrumbs} user={user} isEmailVerify={isEmailVerify}>
+        <Layout activeLink={"home"} breadcrumbs={breadcrumbs} user={user} isResetPassword={isResetPassword} token={token} isResetPasswordEmail={isResetPasswordEmail} isEmailVerify={isEmailVerify}>
            
             <div className='grid md:grid-cols-4 sm:grid-cols-1' name="content_block">
                 <div name="main_block" className='md:col-span-3 sm:col-span-2 mt-5'>
