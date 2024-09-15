@@ -11,6 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Auth\Passwords\CanResetPassword as ResetPasswordTrait;
+use App\Notifications\ResetPasswordNotification;
 class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 {
     use HasApiTokens, HasFactory, Notifiable, ResetPasswordTrait;
@@ -59,6 +60,13 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     public function Points(): HasMany
     {
         return $this->hasMany(Points::class);
+    }
+    public function sendPasswordResetNotification($token): void
+    {
+        #http://127.0.0.1:8000/reset-password/f754f0b4b48b1783bd3728aa9660ee25ad0128f3dc729a8dbdc71d3f1eef65f4?email=nogojob849%40nastyx.com
+        $url = route('password.reset', ['token' => $token]);
+
+        $this->notify(new ResetPasswordNotification($url));
     }
 
 }
