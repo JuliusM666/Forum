@@ -13,16 +13,24 @@ class PointsController extends Controller
     {
 
         $voter = Auth::user();
-        $user = $request->user['id'];
-        if (Auth::user() && $voter->id != $user) {
-            $vote = User::find($user)->points()->where('points.voter_id', $voter->id)->first();
+        $user_id = $request->userId;
+        if (Auth::user() && $voter->id != $user_id) {
+            $vote = User::find($user_id)->points()->where('points.voter_id', '=', $voter->id)->first();
 
             if ($vote == null) {
-                Points::create(['user_id' => $user, 'voter_id' => $voter->id]);
+                Points::create(['user_id' => $user_id, 'voter_id' => $voter->id]);
             } else {
                 Points::destroy($vote->id);
             }
         }
 
+    }
+    public static function getVotesArray(Request $request)
+    {
+        $arr = array();
+        foreach ($request->user()->votes as $vote) {
+            $arr[$vote->user_id] = true;
+        }
+        return $arr;
     }
 }

@@ -28,6 +28,9 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'user_img',
         'banner_img',
         'last_seen',
+        'facebook_id',
+        'google_id',
+        'linkedin_id',
     ];
 
     /**
@@ -60,6 +63,10 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     public function Points(): HasMany
     {
         return $this->hasMany(Points::class);
+    }
+    public function Votes(): HasMany
+    {
+        return $this->hasMany(Points::class, "voter_id");
     }
     public function sendPasswordResetNotification($token): void
     {

@@ -17,12 +17,13 @@ class ResetPasswordController extends Controller
 
     public function showEmailForm()
     {
+
         return Inertia::render('main', [
             'breadcrumbs' => [0 => ["name" => "Home", "route" => route('home')]],
-            'user' => Auth::user(),
             'topics' => TopicController::index()->get(),
-            'isResetPasswordEmail' => true,
+            'isPasswordResetEmail' => true,
         ]);
+
     }
     public function handleEmailForm(Request $request)
     {
@@ -42,7 +43,6 @@ class ResetPasswordController extends Controller
             'breadcrumbs' => [0 => ["name" => "Home", "route" => route('home')]],
             'user' => Auth::user(),
             'topics' => TopicController::index()->get(),
-            'isResetPassword' => true,
             'token' => $token
         ]);
     }

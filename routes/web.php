@@ -9,12 +9,14 @@ use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\RulesController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\MembershipController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use \App\Models\Topic;
 use \App\Models\Theme;
+use \App\Http\Controllers\Auth\SocialiteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,14 +29,7 @@ use \App\Models\Theme;
 |
 */
 
-Route::get('/', function () {
-    return Inertia::render('main', [
-        'breadcrumbs' => [0 => ["name" => "Home", "route" => route('home')]],
-        'user' => Auth::user(),
-        'topics' => TopicController::index()->get(),
 
-    ]);
-})->name('home');
 
 Route::get('/topic/{topic}', function (Topic $topic) {
     return Inertia::render('topic', [
@@ -47,6 +42,8 @@ Route::get('/topic/{topic}', function (Topic $topic) {
     ]);
 })->name('topic');
 
+Route::get('/', [TopicController::class, 'index'])->name('home');
+Route::get('search/{query?}', [SearchController::class, 'index'])->name('search');
 Route::get('rules', [RulesController::class, 'index'])->name('rules');
 Route::get('activity', [ActivityController::class, 'index'])->name('activity');
 Route::get('membership', [MembershipController::class, 'index'])->name('membership');
@@ -57,7 +54,7 @@ Route::post('/post', [PostController::class, 'store'])->middleware('auth', 'veri
 Route::post('/reply', [ReplyController::class, 'store'])->middleware('auth', 'verified');
 Route::post('/login', [UserController::class, 'login']);
 Route::resource('/user', UserController::class)->only(['store', 'show', 'update']);
-Route::post('/logout', [UserController::class, 'logout']);
+Route::post('/logout', [UserController::class, 'logout'])->middleware('auth');
 Route::post('/vote', [PointsController::class, 'store'])->middleware('auth', 'verified');
 
 
@@ -81,12 +78,16 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 # Verify notice
 Route::get('/email/verify', function () {
-    return Inertia::render('main', [
-        'breadcrumbs' => [
-            0 => ["name" => "Home", "route" => route('home')],
-
-        ],
-        'topics' => TopicController::index()->get(),
-        'isEmailVerify' => true
-    ]);
+    return Inertia::location(route('home'));
 })->middleware('auth')->name('verification.notice');
+
+# Socialite routes
+Route::middleware('guest')->group(function () {
+    // ...
+    Route::get('auth/{provider}/redirect', [SocialiteController::class, 'loginSocial'])
+        ->name('socialite.auth');
+
+    Route::get('auth/{provider}/callback', [SocialiteController::class, 'callbackSocial'])
+        ->name('socialite.callback');
+});
+// ...

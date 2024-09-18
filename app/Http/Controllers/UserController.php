@@ -170,6 +170,31 @@ class UserController extends Controller
     {
         //
     }
+    public static function popularUsers()
+    {
+        return [
+            'week' => User::select(['name', 'id', 'user_img'])->withCount([
+                'points AS week_points_count' => function (Builder $query) {
+                    $query->whereBetween('created_at', [now()->subDays(6), now()]);
+                },
+                'points'
+            ])->orderByDesc('week_points_count')->limit(10)->get(),
+            'month' => User::select(['name', 'id', 'user_img'])->withCount([
+                'points AS month_points_count' => function (Builder $query) {
+                    $query->whereBetween('created_at', [now()->subMonth(), now()]);
+                },
+                'points'
+            ])->orderByDesc('month_points_count')->limit(10)->get(),
+            'year' => User::select(['name', 'id', 'user_img'])->withCount([
+                'points AS year_points_count' => function (Builder $query) {
+                    $query->whereBetween('created_at', [now()->subYear(), now()]);
+                },
+                'points'
+            ])->orderByDesc('year_points_count')->limit(10)->get(),
+            'allTime' => User::select(['name', 'id', 'user_img'])->withCount(['points'])->orderByDesc('points_count')->limit(10)->get(),
+
+        ];
+    }
     public function logout()
     {
         Auth::logout();

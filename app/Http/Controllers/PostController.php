@@ -41,7 +41,7 @@ class PostController extends Controller
             'theme' => $theme,
             'topics' => Topic::with('themes')->get(),
             'topic' => $topic,
-            'user' => Auth::user(),
+
 
         ]);
     }
@@ -60,5 +60,13 @@ class PostController extends Controller
             'theme_id' => $request->theme_id,
         ]);
 
+    }
+    public static function newPosts(Request $request)
+    {
+        return Post::with('user', 'theme')->withCount('replies')->latest()->limit(5)->get();
+    }
+    public static function popularPosts(Request $request)
+    {
+        return Post::with('user', 'theme')->withCount('replies')->orderByDesc('replies_count')->limit(5)->get();
     }
 }

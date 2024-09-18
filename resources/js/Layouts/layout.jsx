@@ -6,92 +6,69 @@ import LoginModal from '../Components/loginModal';
 import SearchModal from '../Components/searchModal';
 import UserSettingsModal from '../Components/userSettingsModal';
 import MenuModal from '../Components/menuModal';
-import EmailModal from '../Components/emailModal';
+import VerificationModal from '../Components/verificationModal';
 import ResetPasswordEmailModal from '../Components/resetPasswordEmailModal';
 import UserMenu from '../Components/userMenu';
-import ResetPasswordModal from '@/Components/resetPasswordModal';
-import { useState} from 'react';
-import {SettingsContext} from '../Components/Context/settingsContext'
-import { usePage } from "@inertiajs/react"
-export default function Layout({children,breadcrumbs,token="",activeLink,isResetPassword=false,isEmailVerify=false,isResetPasswordEmail=false}){
-    const [isShowRegistration,setIsShowRegistration]=useState(false)
-    const [isShowLogin,setIsShowLogin]=useState(false)
-    const [isShowSmallSearch,setIsShowSmallSearch]=useState(false)
-    const [isShowMenu,setIsShowMenu]=useState(false)
-    const [isShowSettings,setIsShowSettings]=useState(false)
-    const [isShowEmail,setIsShowEmail]=useState(isEmailVerify)
-    const [isShowResetEmail,setIsShowResetEmail]=useState(isResetPasswordEmail)
-    const [isShowReset,setIsShowReset]=useState(isResetPassword)
-    const { auth,flash } = usePage().props
-    function outsideClickHandler(){
-        if(isShowRegistration){
-            setIsShowRegistration(false)
+import SideBar from '../Components/sidebar';
+import ResetPasswordModal from '../Components/resetPasswordModal';
+import Message from '../Components/message';
+import { SettingsContext } from '../Components/Context/settingsContext'
+import useModalVisible from '../Components/Hooks/useModalVisible';
+import { useEffect } from 'react';
+export default function Layout({ children, breadcrumbs, token = "", isPasswordResetEmail = false }) {
+    const [registrationRef, showRegistration, setShowRegistration] = useModalVisible(false);
+    const [loginRef, showLogin, setShowLogin] = useModalVisible(false);
+    const [menuRef, showMenu, setShowMenu] = useModalVisible(false);
+    const [searchRef, showSearch, setShowSearch] = useModalVisible(false);
+    const [settingsRef, showSettings, setShowSettings] = useModalVisible(false);
+    const [resetPasswordEmailRef, showResetPasswordEmail, setShowResetPasswordEmail] = useModalVisible(false);
+    const [resetPasswordRef, showResetPassword, setShowResetPassword] = useModalVisible(false);
+    useEffect(() => {
+        setShowResetPasswordEmail(isPasswordResetEmail)
+        if (token != "") {
+            setShowResetPassword(true)
         }
-        if(isShowLogin){
-            setIsShowLogin(false)
-        }
-        if(isShowSmallSearch){
-            setIsShowSmallSearch(false)
-        }
-        if(isShowMenu){
-            setIsShowMenu(false)
-        }
-        if(isShowEmail){
-            setIsShowEmail(false)
-        }
-        if(isShowSettings){
-           setIsShowSettings(false)
-        }
-        if(isShowResetEmail){
-            setIsShowResetEmail(false)
-         }
-         if(isShowReset){
-            setIsShowReset(false)
-         }
-      
-    }
-  
-    return(
-        
-        
-        <div  className='min-w-screen min-h-screen bg-gradient-to-r from-slate-100 to-blue-100'>
-            <RegistrationModal setIsShowEmail={setIsShowEmail} isVisible={isShowRegistration} isShowRegistration={isShowRegistration} setIsShowRegistration={setIsShowRegistration}/>
-            <LoginModal isVisible={isShowLogin} setIsShowLogin={setIsShowLogin} isShowLogin={isShowLogin}/>
-            <EmailModal isVisible={isShowEmail} handleCloseClick={()=>setIsShowEmail(false)}/>
-            <SearchModal isVisible={isShowSmallSearch} handleCloseClick={()=>setIsShowSmallSearch(false)}/>
-            <UserSettingsModal user={auth.user} isVisible={isShowSettings} setIsShowSettings={setIsShowSettings} isShowSettings={isShowSettings}/>
-            <MenuModal isVisible={isShowMenu} handleCloseClick={()=>setIsShowMenu(false)}/>
-            <ResetPasswordEmailModal isVisible={isShowResetEmail} setIsShowEmail={setIsShowResetEmail} />
-            <ResetPasswordModal isVisible={isShowReset} setIsShowReset={setIsShowReset} token={token}/>
-                <div onClick={()=>outsideClickHandler()} style={{opacity:isShowRegistration||isShowLogin||isShowSmallSearch||isShowMenu||isShowEmail||isShowSettings||isShowResetEmail||isResetPassword?0.2:1}}>
-            <Header 
-                handleRegistrationClick={()=>setIsShowRegistration(true)}
-                handleLoginClick={()=>setIsShowLogin(true)}
-                handleSmallSearchClick={()=>setIsShowSmallSearch(true)}
-                handleMenuClick={()=>setIsShowMenu(true)}
-                activeLink={activeLink}
-             />
-            
-            <div className='md:mx-16 sm:mx-0'>
-            <Breadcrumb breadcrumbs={breadcrumbs}/>
-            {flash.message &&
-                <div className='w-full mt-1 p-2 rounded-lg bg-green-300 text-slate-700 text-lg'>{flash.message}</div>
-            }
-            {auth.user && (
-                <UserMenu user={auth.user}/>
 
-            )}
-            
-            <SettingsContext.Provider value={{"setIsShowSettings":setIsShowSettings}}>
-                {children}
-            </SettingsContext.Provider>
-            
-            
-            
-            <Footer/>
-            </div>
+    }, [])
+    return (
+
+
+        <div className='min-w-screen flex min-h-screen bg-gradient-to-r from-slate-100 to-blue-100'>
+            <RegistrationModal isVisible={showRegistration} componentRef={registrationRef} close={() => setShowRegistration(false)} />
+            <LoginModal isVisible={showLogin} componentRef={loginRef} close={() => setShowLogin(false)} />
+            <MenuModal handleRegistrationClick={() => setShowRegistration(true)} handleLoginClick={() => setShowLogin(true)} isVisible={showMenu} componentRef={menuRef} close={() => setShowMenu(false)} />
+            <SearchModal isVisible={showSearch} componentRef={searchRef} close={() => setShowSearch(false)} />
+            <UserSettingsModal isVisible={showSettings} componentRef={settingsRef} close={() => setShowSettings(false)} />
+            <VerificationModal />
+            <ResetPasswordEmailModal isVisible={showResetPasswordEmail} componentRef={resetPasswordEmailRef} close={() => setShowResetPasswordEmail(false)} />
+            <ResetPasswordModal isVisible={showResetPassword} componentRef={resetPasswordRef} close={() => setShowResetPassword(false)} token={token} />
+            <div id="layout">
+                <Header
+                    handleRegistrationClick={() => setShowRegistration(true)}
+                    handleLoginClick={() => setShowLogin(true)}
+                    handleSmallSearchClick={() => setShowSearch(true)}
+                    handleMenuClick={() => setShowMenu(true)}
+                />
+
+                <div className='md:mx-16 sm:mx-0'>
+                    <Breadcrumb breadcrumbs={breadcrumbs} />
+                    <Message />
+                    <UserMenu />
+
+
+                    <SettingsContext.Provider value={{ "setIsShowSettings": setShowSettings }}>
+                        <div className='grid lg:grid-cols-4 md:grid-cols-1' name="content_block">
+                            {children}
+                            <SideBar handleLoginClick={() => setShowLogin(true)} handleRegisterClick={() => setShowRegistration(true)} />
+                        </div>
+                    </SettingsContext.Provider>
+
+
+
+                    <Footer />
+                </div>
             </div>
         </div>
-        
+
     )
 }

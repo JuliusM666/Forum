@@ -2,9 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
-
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\PointsController;
 class HandleInertiaRequests extends Middleware
 {
     /**
@@ -42,7 +44,16 @@ class HandleInertiaRequests extends Middleware
             ],
             'auth' => [
                 'user' => $request->user(),
+                'votes' => $request->user() == null ? null : PointsController::getVotesArray($request),
+
             ],
+            'verified' => $request->user() == null ? null : $request->user()->hasVerifiedEmail(),
+            'sidebar' => [
+                'newPosts' => PostController::newPosts($request),
+                'popularPosts' => PostController::popularPosts($request),
+                'popularUsers' => UserController::popularUsers(),
+            ],
+
         ]);
     }
 }
