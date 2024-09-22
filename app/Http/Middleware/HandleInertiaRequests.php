@@ -43,7 +43,7 @@ class HandleInertiaRequests extends Middleware
                 'message' => fn() => $request->session()->get('message')
             ],
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user()->loadCount('points'),
                 'votes' => $request->user() == null ? null : PointsController::getVotesArray($request),
 
             ],

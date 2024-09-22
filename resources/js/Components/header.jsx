@@ -27,7 +27,7 @@ export default function Header({ handleRegistrationClick, handleLoginClick, hand
                     </div>
                 </div>
             </div>
-            <nav className="mt-0 sticky top-0 flex justify-between items-center  max-lg:hidden  bg-slate-100 min-w-screen rounded-sm max-md:px-3 md:px-16  py-2">
+            <nav className="mt-0 sticky top-0 z-10 flex justify-between items-center  max-lg:hidden  bg-slate-100 min-w-screen rounded-sm max-md:px-3 md:px-16  py-2">
                 <div className='inline-flex items-center gap-2'>
 
                     <LinkComponent href={route('home')} page={"main"}>Forum</LinkComponent>

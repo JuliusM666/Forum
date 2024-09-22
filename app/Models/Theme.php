@@ -21,6 +21,9 @@ class Theme extends Model
 
         return $this->hasMany(Post::class);
     }
-
+    public function Followers(): HasMany
+    {
+        return $this->hasMany(Follower::class);
+    }
 
 }

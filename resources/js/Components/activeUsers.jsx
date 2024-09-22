@@ -1,15 +1,31 @@
 import Card from '../Components/card'
-export default function ActiveUsers(){
-    return(
-        <Card name={"Active Users"}>
-        <div className="bg-slate-100 px-7 py-4">
-            <p className="text-sm text-slate-600 font-semibold text-justify">
+import { Link } from '@inertiajs/react'
+export default function ActiveUsers({ activeUsers }) {
+    return (
+        <Card name={"Active Users"} SubName={<SubName activeUsers={activeUsers} />}>
+            <div className="bg-slate-100 px-7 py-4 text-sm text-slate-600 font-semibold justify-items-center items-center flex flex-wrap">
 
-6yt1s Vileikis vienetas JurgisDiamondz sydzei DavidH deuce nix AGhost Fiureris apci dainiux Kosmo90 milvexs shwiesele antler sukysa fnnand Mas MisterRokis Nius Ziggy mindaugas505 
 
-</p>
-        </div>
+                {
+                    Object.keys(activeUsers).map(function (keyName, keyIndex) {
+                        return (
+                            <Link className='flex w-fit' href={route('user.show', activeUsers[keyName].id)} preserveState key={keyIndex}>
+                                <h1 className='hover:opacity-70 whitespace-nowrap'>{activeUsers[keyName].name}</h1>
+                                <h1> {keyIndex + 1 < Object.keys(activeUsers).length ? "," : ""}&nbsp;</h1>
+                            </Link>
+                        )
+                    })
+                }
+
+            </div>
         </Card>
     )
-    
+
+}
+
+function SubName({ activeUsers }) {
+
+    return (
+        <h1 className='text-sm text-slate-100'>{Object.keys(activeUsers).length} users</h1>
+    )
 }

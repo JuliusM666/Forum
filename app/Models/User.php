@@ -68,6 +68,10 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     {
         return $this->hasMany(Points::class, "voter_id");
     }
+    public function Subscriptions(): HasMany
+    {
+        return $this->hasMany(Follower::class);
+    }
     public function sendPasswordResetNotification($token): void
     {
         #http://127.0.0.1:8000/reset-password/f754f0b4b48b1783bd3728aa9660ee25ad0128f3dc729a8dbdc71d3f1eef65f4?email=nogojob849%40nastyx.com

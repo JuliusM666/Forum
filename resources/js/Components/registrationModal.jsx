@@ -1,7 +1,9 @@
 import Modal from '../Components/modal';
 import Card from '../Components/card';
 import CloseButton from '../Components/closeButton';
-import GoogleLink from './googleLink';
+import LinkedinButton from './linkedinLink';
+import FacebookButton from './facebookLink';
+import GoogleButton from './googleLink';
 import FormInput from '../Components/forminput';
 import Button from '../Components/button';
 import CheckBox from '../Components/checkbox';
@@ -54,7 +56,9 @@ export default function RegistrationModal({ isVisible, componentRef, close }) {
                                     <h1 className='text-xl text-slate-600 font-semibold mb-2'>
                                         Create your account faster
                                     </h1>
-                                    <GoogleLink />
+                                    <FacebookButton />
+                                    <LinkedinButton />
+                                    <GoogleButton />
                                 </div>
                             </div>
 

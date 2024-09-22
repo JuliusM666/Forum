@@ -18,7 +18,7 @@ class ReplyController extends Controller
             'message' => 'required|min:5|max:500',
         ]);
         Reply::create([
-            'message' => strip_tags($request->message),
+            'message' => $request->message,
             'user_id' => Auth::user()->id,
             'post_id' => $request->post_id,
             'reply_id' => $request->reply_id,
@@ -39,24 +39,16 @@ class ReplyController extends Controller
             ],
 
 
-            'post' => $reply->load([
-                'user',
-                'replies' => function (Builder $query) {
-                    $query->with([
-                        'user',
-                        'replies.user',
-                        'replies.replies.user',
-                        'replies.replies.replies'
-                    ]);
-
-                },
-
-            ]),
-            'main_post' => $post->load('user'),
+            'post' => $reply->load(['user' => fn(Builder $query) => $query->withCount('points')]),
             'theme' => $theme,
+            'pagination' => $reply->replies()->where('reply_id', null)->with([
+                'user' => fn(Builder $query) => $query->withCount('points'),
+                'replies.user' => fn(Builder $query) => $query->withCount('points'),
+                'replies.replies.user' => fn(Builder $query) => $query->withCount('points'),
+                'replies.replies.replies'
+            ])->latest('replies.created_at')->paginate(10),
             'topics' => Topic::with('themes')->get(),
             'topic' => $topic,
-            'user' => Auth::user(),
 
 
         ]);

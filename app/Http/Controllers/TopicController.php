@@ -3,45 +3,61 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
-use Illuminate\Http\Request;
 use \App\Models\Topic;
+use \App\Models\User;
+use \App\Http\Controllers\PostController;
+use \App\Http\Controllers\UserController;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+
 class TopicController extends Controller
 {
-    public static function index()
+    public function index()
     {
+        $topics = Topic::with([
+            'themes' => function (Builder $query) {
+                $query->withCount('posts');
+            }
+        ])->get();
+        $posts = PostController::latestPosts();
+        foreach ($topics as $topic) {
+            foreach ($topic["themes"] as $theme) {
+                $theme['post'] = $posts[$theme['id'] - 1];
+            }
+        }
         return Inertia::render('main', [
             'breadcrumbs' => [0 => ["name" => "Home", "route" => route('home')]],
-            'topics' => Topic::with(
-                [
+            'topics' => $topics,
+            'activeUsers' => User::all()->whereBetween('last_seen', [now()->subMinute(), now()])->select('id', 'name'),
+            // 'activeUsers' => User::all()->select('id', 'name'),
+            'userStatistics' => [
+                'userCount' => User::all()->count(),
+                'latestUser' => User::latest()->first(),
+            ]
+        ]);
+    }
+    public function show(Topic $topic)
+    {
 
-                    'themes' => function (Builder $query) {
+        $topic = $topic->load([
+            'themes' => function (Builder $query) {
+                $query->withCount('posts');
+            }
+        ]);
 
-                        $query->withCount('posts');
-
-
-
-                    },
-                    'themes.posts' => function (Builder $query) {
-
-                        $query->groupBy('theme_id')->orderByDesc('posts.created_at')->get();
-
-
-                    },
-                    'themes.posts.user'
-
-
-                ]
-            )->get(),
-
+        $posts = PostController::latestPosts();
+        foreach ($topic["themes"] as $theme) {
+            $theme['post'] = $posts[$theme['id'] - 1];
+        }
+        return Inertia::render('topic', [
+            'breadcrumbs' => [
+                0 => ["name" => "Home", "route" => route('home')],
+                1 => ["name" => $topic->title, "route" => route('topic', $topic)]
+            ],
+            'topic' => $topic,
+            'topics' => Topic::with('themes')->get(),
 
 
         ]);
 
-
-    }
-    public static function show(Topic $topic)
-    {
-        return self::index()->where('id', $topic->id)->get();
     }
 }

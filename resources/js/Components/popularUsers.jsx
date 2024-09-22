@@ -26,7 +26,7 @@ export default function PopularUsers({ data }) {
                 {
                     Object.keys(data[active]).map(function (keyName, keyIndex) {
                         return (
-                            <User key={keyIndex} user_img={data[active][keyName].user_img} user_id={data[active][keyName].id} name={data[active][keyName].name} points={data[active][keyName].points_count} number={keyIndex + 1} />
+                            <User key={keyIndex} index={keyIndex + 1} data={data[active][keyName]} />
 
                         )
                     })
@@ -36,22 +36,22 @@ export default function PopularUsers({ data }) {
         </Card>
     )
 }
-function User({ user_img, name, points, number, user_id }) {
+function User({ data, index }) {
     return (
         <div className="odd:bg-slate-100 even:bg-slate-200 text-slate-600 text-sm m-2">
             <div className="grid grid-cols-6 py-2 lg:max-xl:grid-cols-2">
                 <div className='flex items-center justify-center text-lg font-semibold'>
-                    {number}
+                    {index}
                 </div>
                 <div className='flex justify-center items-center'>
                     <div className='w-8 h-8'>
-                        <UserImage user_id={user_id} user_img={user_img} />
+                        <UserImage user_id={data.id} user_img={data.user_img} />
                     </div>
                 </div>
                 <div className='col-span-4 text-start lg:max-xl:text-center'>
-                    <Link href={route('user.show', { user: user_id })}> <h1 className='text-md  font-semibold text-slate-600'>{name}</h1> </Link>
+                    <Link href={route('user.show', { user: data.id })}> <h1 className='text-md  font-semibold text-slate-600'>{data.name}</h1> </Link>
 
-                    <Points user_id={user_id} points={points} />
+                    <Points user_id={data.id} points={data.points_count} />
 
 
 

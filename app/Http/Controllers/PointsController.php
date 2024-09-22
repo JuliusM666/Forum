@@ -13,10 +13,9 @@ class PointsController extends Controller
     {
 
         $voter = Auth::user();
-        $user_id = $request->userId;
-        if (Auth::user() && $voter->id != $user_id) {
+        $user_id = $request->userID;
+        if ($voter && $voter->id != $user_id) {
             $vote = User::find($user_id)->points()->where('points.voter_id', '=', $voter->id)->first();
-
             if ($vote == null) {
                 Points::create(['user_id' => $user_id, 'voter_id' => $voter->id]);
             } else {

@@ -6,18 +6,18 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-
-class ResetPasswordNotification extends Notification implements ShouldQueue
+use App\Models\Post;
+class Subscription extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    private $url;
-    public function __construct($url)
+    private $post;
+    public function __construct(Post $post)
     {
-        $this->url = $url;
+        $this->post = $post;
     }
 
     /**
@@ -36,10 +36,11 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->greeting('Hello, ' . $notifiable->name . '  you have requested password reset.')
-            ->subject('Reset Password')
-            ->line('Click the button below to Reset your password. If you haven\'t requested password reset, please do nothing.')
-            ->action('Reset your password', $this->url);
+            ->greeting('Hello, ' . $notifiable->name . '  you are subscribed to ' . $this->post->theme->title . ' theme.')
+            ->subject('Subscription notification')
+            ->line('User ' . $this->post->user->name . " has created new post " . $this->post->title)
+            ->line('Click the button below to see the Post.')
+            ->action('Show Post', route('post', [$this->post->theme->topic, $this->post->theme, $this->post]));
     }
 
     /**

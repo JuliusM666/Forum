@@ -116,17 +116,8 @@ class UserController extends Controller
                 0 => ["name" => "Home", "route" => route('home')],
                 1 => ["name" => $user->name, "route" => route('user.show', $user)]
             ],
-            'user' => Auth::user(),
-            'userProfile' => $user->loadCount('replies')->loadCount('posts')->loadCount('points')->load([
-                'points' => function (Builder $query) {
-                    if (Auth::user()) {
-                        $query->where('points.voter_id', Auth::user()->id)->get();
-                    } else {
-                        return null;
-                    }
-                }
-            ]),
-            'pagination' => collect()->merge($replies)->merge($posts)->sortDesc()->paginate(10),
+            'userProfile' => $user->loadCount('replies')->loadCount('posts')->loadCount('points'),
+            'pagination' => collect()->merge($replies)->merge($posts)->sortByDesc('created_at')->paginate(10),
         ]);
     }
 
@@ -144,7 +135,7 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         if (Auth::user()->id != $user->id) {
-            return back()->with('error', 'Error');
+            return back()->with('message', 'Error');
         }
         $request->validate([
             'user_img' => 'required_without:banner_img|nullable|sometimes|mimes:jpg,bmp,png,webp|max:1000',
@@ -160,7 +151,7 @@ class UserController extends Controller
         }
 
 
-        return back()->with('error', 'File upload failed');
+        return back()->with('message', 'Files uploaded successfully');
     }
 
     /**
