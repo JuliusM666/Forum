@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Models\Post;
-class Subscription extends Notification implements ShouldQueue
+class ThemeSubscription extends Notification implements ShouldQueue
 {
     use Queueable;
 

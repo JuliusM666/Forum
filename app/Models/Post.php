@@ -23,4 +23,8 @@ class Post extends Model
     {
         return $this->hasMany(Reply::class);
     }
+    public function Followers(): HasMany
+    {
+        return $this->hasMany(PostFollower::class);
+    }
 }

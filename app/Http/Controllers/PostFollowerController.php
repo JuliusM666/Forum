@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Follower;
+use App\Models\PostFollower;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
-class FollowerController extends Controller
+class PostFollowerController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -29,15 +28,14 @@ class FollowerController extends Controller
      */
     public function store(Request $request)
     {
-
         $user = Auth::user();
-        $theme_id = $request->theme_id;
+        $post_id = $request->id;
         if ($user) {
-            $subscription = $user->subscriptions()->where('theme_id', $theme_id)->first();
+            $subscription = $user->fallowedPosts()->where('post_id', $post_id)->first();
             if ($subscription == null) {
-                Follower::create(['user_id' => $user->id, 'theme_id' => $theme_id]);
+                PostFollower::create(['user_id' => $user->id, 'post_id' => $post_id]);
             } else {
-                Follower::destroy($subscription->id);
+                PostFollower::destroy($subscription->id);
             }
         }
     }
@@ -45,7 +43,7 @@ class FollowerController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Follower $follower)
+    public function show(PostFollower $postFollower)
     {
         //
     }
@@ -53,7 +51,7 @@ class FollowerController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Follower $follower)
+    public function edit(PostFollower $postFollower)
     {
         //
     }
@@ -61,7 +59,7 @@ class FollowerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Follower $follower)
+    public function update(Request $request, PostFollower $postFollower)
     {
         //
     }
@@ -69,7 +67,7 @@ class FollowerController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Follower $follower)
+    public function destroy(PostFollower $postFollower)
     {
         //
     }

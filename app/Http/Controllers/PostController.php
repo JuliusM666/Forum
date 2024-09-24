@@ -9,12 +9,19 @@ use \App\Models\Post;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use App\Notifications\Subscription;
+use App\Notifications\ThemeSubscription;
 class PostController extends Controller
 {
     public function show(Topic $topic, Theme $theme, Post $post)
     {
 
+        $paginator = $post->replies()->where('reply_id', null)->with([
+            'user' => fn(Builder $query) => $query->withCount('points'),
+            'replies.user' => fn(Builder $query) => $query->withCount('points'),
+            'replies.replies.user' => fn(Builder $query) => $query->withCount('points'),
+            'replies.replies.replies'
+        ])->orderBy('replies.created_at')->get()->paginate(10);
+        $paginator = $paginator->onEachSide($paginator->lastPage());
         return Inertia::render('post', [
             'breadcrumbs' => [
                 0 => ["name" => "Home", "route" => route('home')],
@@ -24,17 +31,12 @@ class PostController extends Controller
             ],
 
 
-            'post' => $post->load(['user' => fn(Builder $query) => $query->withCount('points')]),
+            'post' => $post->load(['user' => fn(Builder $query) => $query->withCount('points')])->loadCount('followers'),
             'theme' => $theme,
-            'pagination' => $post->replies()->where('reply_id', null)->with([
-                'user' => fn(Builder $query) => $query->withCount('points'),
-                'replies.user' => fn(Builder $query) => $query->withCount('points'),
-                'replies.replies.user' => fn(Builder $query) => $query->withCount('points'),
-                'replies.replies.replies'
-            ])->orderBy('replies.created_at')->paginate(10),
+            'pagination' => $paginator,
             'topics' => Topic::with('themes')->get(),
             'topic' => $topic,
-
+            'isFollowing' => Auth::user() == null || Auth::user()->fallowedPosts()->where('post_id', $post->id)->first() == null ? false : true,
 
         ]);
     }
@@ -56,7 +58,7 @@ class PostController extends Controller
         $followers = Theme::find($request->theme_id)->followers;
         foreach ($followers as $follower) {
             if ($follower->user->id != Auth::user()->id) {
-                $follower->user->notify(new Subscription($post));
+                $follower->user->notify(new ThemeSubscription($post));
             }
         }
 

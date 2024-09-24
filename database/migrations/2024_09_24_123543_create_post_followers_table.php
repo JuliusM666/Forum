@@ -10,10 +10,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('theme_followers', function (Blueprint $table) {
+        Schema::create('post_followers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
-            $table->foreignId('theme_id');
+            $table->foreignId('post_id');
             $table->timestamps();
         });
     }
@@ -23,6 +23,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('followers');
+        Schema::dropIfExists('post_followers');
     }
 };

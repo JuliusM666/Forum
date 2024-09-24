@@ -23,7 +23,7 @@ class Theme extends Model
     }
     public function Followers(): HasMany
     {
-        return $this->hasMany(Follower::class);
+        return $this->hasMany(ThemeFollower::class);
     }
 
 }

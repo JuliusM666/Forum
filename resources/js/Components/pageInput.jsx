@@ -1,9 +1,17 @@
 import useComponentVisible from "./Hooks/useComponentVisible";
 import { useState } from "react";
-import { Link } from "@inertiajs/react";
+import { useForm } from "@inertiajs/react";
 export default function PageInput({ children, pagination }) {
     const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
-    const [page, setPage] = useState(pagination.current_page)
+    const { data, setData, get, processing, errors, clearErrors, reset } = useForm({
+        page: pagination.current_page
+    })
+    function submit(e) {
+        e.preventDefault()
+        get(pagination.links[data.page].url, {
+            preserveScroll: true,
+        })
+    }
     return (
         <div ref={ref}>
             <button onClick={() => setIsComponentVisible(!isComponentVisible)}>
@@ -13,15 +21,15 @@ export default function PageInput({ children, pagination }) {
                 </span>
             </button>
             {isComponentVisible && (
-                <div className="absolute">
+                <div className="absolute z-10">
                     <div className="border border-slate-400 shadow-2xl bg-white rounded-md mt-2">
-                        <form action="" onSubmit={(e) => e.preventDefault()}>
+                        <form onSubmit={(e) => submit(e)}>
                             <div className="grid grid-cols-1 p-4 gap-2">
-                                <input min={1} max={pagination.last_page} value={page} onChange={(e) => setPage(e.target.value)} className="w-44 rounded-lg" type="number" />
-                                <Link preserveScroll preserveState href={pagination.links[page].url} className="bg-blue-300 rounded-3xl hover:bg-opacity-80  py-2 px-4 text-center w-full font-semibold max-h-fit text-slate-200">Show</Link>
+                                <input min={1} max={pagination.last_page} value={data.page} onChange={(e) => setData('page', e.target.value)} className="w-44 rounded-lg" type="number" />
+                                <button className="bg-blue-300 rounded-3xl hover:bg-opacity-80  py-2 px-4 text-center w-full font-semibold max-h-fit text-slate-200">Show</button>
                             </div>
-
                         </form>
+
                     </div>
                 </div>
             )}

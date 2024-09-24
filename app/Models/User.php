@@ -68,9 +68,13 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     {
         return $this->hasMany(Points::class, "voter_id");
     }
-    public function Subscriptions(): HasMany
+    public function FallowedThemes(): HasMany
     {
-        return $this->hasMany(Follower::class);
+        return $this->hasMany(ThemeFollower::class);
+    }
+    public function FallowedPosts(): HasMany
+    {
+        return $this->hasMany(PostFollower::class);
     }
     public function sendPasswordResetNotification($token): void
     {

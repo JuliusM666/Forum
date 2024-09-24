@@ -1,7 +1,7 @@
 import PageInput from "../Components/pageInput"
-import PageFilter from "../Components/pagefilter"
+import PageSort from "./pageSort"
 import { Link } from "@inertiajs/react"
-export default function Pagination({ filter, pagination }) {
+export default function Pagination({ sort, pagination }) {
     let arr = []
     let index = -3
     if (pagination.last_page - pagination.current_page <= 2) {
@@ -14,7 +14,7 @@ export default function Pagination({ filter, pagination }) {
                 <Page
                     key={pagination.current_page + index}
                     href={pagination.links[pagination.current_page + index].url}
-                    isActive={pagination.links[pagination.current_page + index].active}
+                    isActive={pagination.current_page + index == pagination.current_page}
                 >
 
                     {pagination.current_page + index}
@@ -50,11 +50,11 @@ export default function Pagination({ filter, pagination }) {
                     <PageInput pagination={pagination}>Page {pagination.current_page} out of {pagination.last_page} </PageInput>
                 </ul>
             </nav>
-            {filter &&
+            {sort != null &&
                 <nav className="flex max-lg:text-sm">
                     <ul>
 
-                        <PageFilter><Page><span>Sort by <i className="fa fa-caret-down" /></span></Page></PageFilter>
+                        <PageSort sort={sort} />
                     </ul>
                 </nav>
             }

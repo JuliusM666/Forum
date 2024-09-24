@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use App\Notifications\PostSubscription;
 class ReplyController extends Controller
 {
     public function store(Request $request)
@@ -17,18 +18,31 @@ class ReplyController extends Controller
         $request->validate([
             'message' => 'required|min:5|max:500',
         ]);
-        Reply::create([
+        $reply = Reply::create([
             'message' => $request->message,
             'user_id' => Auth::user()->id,
             'post_id' => $request->post_id,
             'reply_id' => $request->reply_id,
         ]);
-
+        session()->flash("message", "Reply created successfully");
+        $followers = Post::find($request->post_id)->followers;
+        foreach ($followers as $follower) {
+            if ($follower->user->id != Auth::user()->id) {
+                $follower->user->notify(new PostSubscription($reply));
+            }
+        }
 
 
     }
     public function show(Topic $topic, Theme $theme, Post $post, Reply $reply)
     {
+        $paginator = $reply->replies()->with([
+            'user' => fn(Builder $query) => $query->withCount('points'),
+            'replies.user' => fn(Builder $query) => $query->withCount('points'),
+            'replies.replies.user' => fn(Builder $query) => $query->withCount('points'),
+            'replies.replies.replies'
+        ])->orderBy('replies.created_at')->get()->paginate(10);
+        $paginator = $paginator->onEachSide($paginator->lastPage());
         return Inertia::render('post', [
             'breadcrumbs' => [
                 0 => ["name" => "Home", "route" => route('home')],
@@ -39,17 +53,13 @@ class ReplyController extends Controller
             ],
 
 
-            'post' => $reply->load(['user' => fn(Builder $query) => $query->withCount('points')]),
+            'post' => $post->load(['user' => fn(Builder $query) => $query->withCount('points')])->loadCount('followers'),
             'theme' => $theme,
-            'pagination' => $reply->replies()->where('reply_id', null)->with([
-                'user' => fn(Builder $query) => $query->withCount('points'),
-                'replies.user' => fn(Builder $query) => $query->withCount('points'),
-                'replies.replies.user' => fn(Builder $query) => $query->withCount('points'),
-                'replies.replies.replies'
-            ])->latest('replies.created_at')->paginate(10),
+            'pagination' => $paginator,
             'topics' => Topic::with('themes')->get(),
             'topic' => $topic,
-
+            'isFollowing' => Auth::user() == null || Auth::user()->fallowedPosts()->where('post_id', $post->id)->first() == null ? false : true,
+            'reply' => $reply,
 
         ]);
     }

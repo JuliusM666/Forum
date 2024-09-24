@@ -33,7 +33,9 @@ function NewTopic({ data }) {
                     </div>
                 </div>
                 <div className='col-span-4'>
-                    <h1 className='hover:opacity-70'><Link href={route('post', { topic: data.theme.topic_id, theme: data.theme.id, post: data.id })}>{data.title}</Link></h1>
+                    <h1 className='hover:opacity-70 truncate'><Link href={route('post', { topic: data.theme.topic_id, theme: data.theme.id, post: data.id })}>
+                        {data.title}</Link>
+                    </h1>
                     <h1><Link href={route('user.show', { user: data.user.id })} className='font-semibold'>{data.user.name}</Link></h1>
                     <h1>{moment(data.created_at).fromNow()}</h1>
                 </div>

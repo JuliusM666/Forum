@@ -10,13 +10,12 @@ use App\Http\Controllers\RulesController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\SearchController;
-use App\Http\Controllers\FollowerController;
+use App\Http\Controllers\ThemeFollowerController;
+use App\Http\Controllers\PostFollowerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use \App\Models\Topic;
-use \App\Models\Theme;
 use \App\Http\Controllers\Auth\SocialiteController;
 
 /*
@@ -48,8 +47,8 @@ Route::post('/login', [UserController::class, 'login'])->middleware('guest');
 Route::resource('/user', UserController::class)->only(['store', 'show', 'update']);
 Route::post('/logout', [UserController::class, 'logout'])->middleware('auth');
 Route::post('/vote', [PointsController::class, 'store'])->middleware('auth', 'verified');
-Route::post('/follow', [FollowerController::class, 'store'])->middleware('auth', 'verified');
-
+Route::post('/follow/theme', [ThemeFollowerController::class, 'store'])->middleware('auth', 'verified');
+Route::post('/follow/post', [PostFollowerController::class, 'store'])->middleware('auth', 'verified');
 
 # Password reset link request form 
 Route::get('/forgot-password', [ResetPasswordController::class, 'showEmailForm'])->middleware('guest')->name('password.request');
@@ -75,11 +74,10 @@ Route::get('/email/verify', function () {
 
 # Socialite routes
 Route::middleware('guest')->group(function () {
-    // ...
+
     Route::get('auth/{provider}/redirect', [SocialiteController::class, 'loginSocial'])
         ->name('socialite.auth');
 
     Route::get('auth/{provider}/callback', [SocialiteController::class, 'callbackSocial'])
         ->name('socialite.callback');
 });
-// ...

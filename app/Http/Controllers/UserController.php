@@ -110,14 +110,15 @@ class UserController extends Controller
             'reply_to' => null,
 
         ]);
-
+        $paginator = collect()->merge($replies)->merge($posts)->sortByDesc('created_at')->paginate(1);
+        $paginator = $paginator->onEachSide($paginator->lastPage());
         return Inertia::render('user', [
             'breadcrumbs' => [
                 0 => ["name" => "Home", "route" => route('home')],
                 1 => ["name" => $user->name, "route" => route('user.show', $user)]
             ],
             'userProfile' => $user->loadCount('replies')->loadCount('posts')->loadCount('points'),
-            'pagination' => collect()->merge($replies)->merge($posts)->sortByDesc('created_at')->paginate(10),
+            'pagination' => $paginator,
         ]);
     }
 

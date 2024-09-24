@@ -9,7 +9,6 @@ import Button from '../Components/button';
 import CheckBox from '../Components/checkbox';
 import { useEffect } from 'react';
 import { useForm } from '@inertiajs/react'
-import useComponentVisible from "./Hooks/useComponentVisible";
 export default function RegistrationModal({ isVisible, componentRef, close }) {
 
     const { data, setData, post, processing, errors, clearErrors, reset } = useForm({

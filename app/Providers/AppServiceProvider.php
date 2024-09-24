@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
                 [
                     'path' => LengthAwarePaginator::resolveCurrentPath(),
                     'pageName' => $pageName,
-                ]
+                ],
             );
         });
     }

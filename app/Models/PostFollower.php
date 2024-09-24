@@ -6,16 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Follower extends Model
+class PostFollower extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'theme_id'];
+    protected $fillable = ['user_id', 'post_id'];
     public function User(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
-    public function Theme(): BelongsTo
+    public function Post(): BelongsTo
     {
-        return $this->belongsTo(Theme::class);
+        return $this->belongsTo(Post::class);
     }
 }
