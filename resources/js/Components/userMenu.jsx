@@ -16,9 +16,11 @@ export default function UserMenu() {
                             <div className="absolute z-10 ">
                                 <div className="border border-slate-400 shadow-2xl bg-white rounded-md  text-slate-400">
                                     <ul className="text-slate-600 font-md font-semibold">
-                                        <li className="block px-4 rounded-md py-2 hover:bg-slate-200 hover:text-slate-500">
-                                            <Link preserveState preserveScroll href={route('user.show', auth.user)}>Profile</Link>
-                                        </li>
+                                        <Link preserveState preserveScroll href={route('user.show', auth.user)}>
+                                            <li className="block px-4 rounded-md py-2 hover:bg-slate-200 hover:text-slate-500">
+                                                Profile
+                                            </li>
+                                        </Link>
                                         <Link method="post" href='/logout'>
                                             <li className="text-right block px-4 rounded-md py-2 hover:bg-slate-200 hover:text-slate-500">
                                                 <i className="fa-solid fa-right-from-bracket" /> </li>

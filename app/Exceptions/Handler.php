@@ -4,7 +4,7 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
-
+use App\Models\Post;
 class Handler extends ExceptionHandler
 {
     /**
@@ -27,4 +27,19 @@ class Handler extends ExceptionHandler
             //
         });
     }
+    // public function render($request, Throwable $exception)
+    // {
+    //     if ($request->route()->hasParameter('post') && Post::withTrashed()->find($request->route()->parameter('post'))->trashed()) {
+
+    //         return redirect()->back()->with("message", "The Post is Deleted");
+    //     }
+    //     $response = parent::render($request, $exception);
+    //     return $response;
+
+
+
+
+
+
+    // }
 }

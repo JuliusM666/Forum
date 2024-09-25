@@ -17,6 +17,8 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained();
             $table->foreignId('reply_id')->nullable();
             $table->text('message');
+            $table->softDeletes();
+            $table->boolean("is_edited")->default(false);
             $table->timestamps();
         });
     }

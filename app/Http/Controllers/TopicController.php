@@ -11,7 +11,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class TopicController extends Controller
 {
-    public function index()
+    public function index(array $params = [])
     {
         $topics = Topic::with([
             'themes' => function (Builder $query) {
@@ -24,16 +24,18 @@ class TopicController extends Controller
                 $theme['post'] = $posts[$theme['id'] - 1];
             }
         }
-        return Inertia::render('main', [
+        $baseParams = [
             'breadcrumbs' => [0 => ["name" => "Home", "route" => route('home')]],
             'topics' => $topics,
             'activeUsers' => User::all()->whereBetween('last_seen', [now()->subMinute(), now()])->select('id', 'name'),
-            // 'activeUsers' => User::all()->select('id', 'name'),
             'userStatistics' => [
                 'userCount' => User::all()->count(),
                 'latestUser' => User::latest()->first(),
             ]
-        ]);
+        ];
+
+        return Inertia::render('main', array_merge($baseParams, $params));
+
     }
     public function show(Topic $topic)
     {

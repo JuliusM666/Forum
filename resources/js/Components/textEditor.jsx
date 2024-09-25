@@ -1,8 +1,9 @@
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { ClassicEditor, Bold, Essentials, Italic, Mention, Paragraph, Undo } from 'ckeditor5';
 import 'ckeditor5/ckeditor5.css';
-export default function TextEditor({ name, setData }) {
+export default function TextEditor({ name, setData, data = '' }) {
     return (
+
         <CKEditor
             onChange={(event, editor) => {
 
@@ -20,9 +21,12 @@ export default function TextEditor({ name, setData }) {
                 mention: {
                     // Mention configuration
                 },
-                initialData: '',
+                initialData: data,
+
             }}
+
         />
+
     )
 }
 

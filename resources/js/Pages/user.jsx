@@ -11,19 +11,19 @@ export default function User({ breadcrumbs, userProfile, pagination }) {
 
         <Layout breadcrumbs={breadcrumbs}>
             <Head title={userProfile.name} />
-            <div name="main_block" className='md:col-span-3 sm:col-span-2 mt-5'>
-                <UserBanner user={userProfile} />
-                <Card name={"Recent activity"}>
-                    <PageCard pagination={pagination} filter={false} rounded={""}>
-                        <div className='bg-slate-100 rounded-b-lg p-2'>
-                            {pagination.data.map((message, index) => {
-                                return (<Message key={index} message={message} user={userProfile} />)
-                            })}
 
-                        </div>
-                    </PageCard>
-                </Card>
-            </div>
+            <UserBanner user={userProfile} />
+            <Card name={"Recent activity"}>
+                <PageCard pagination={pagination} filter={false} rounded={""}>
+                    <div className='bg-slate-100 rounded-b-lg p-2'>
+                        {pagination.data.map((message, index) => {
+                            return (<Message key={index} message={message} user={userProfile} />)
+                        })}
+
+                    </div>
+                </PageCard>
+            </Card>
+
         </Layout>
     )
 }

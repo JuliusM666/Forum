@@ -14,7 +14,6 @@ class PostController extends Controller
 {
     public function show(Topic $topic, Theme $theme, Post $post)
     {
-
         $paginator = $post->replies()->where('reply_id', null)->with([
             'user' => fn(Builder $query) => $query->withCount('points'),
             'replies.user' => fn(Builder $query) => $query->withCount('points'),
@@ -63,6 +62,23 @@ class PostController extends Controller
         }
 
     }
+    public function destroy(Post $post)
+    {
+        $post->delete();
+        return redirect()->route('home')->with("message", "Post deleted successfully");
+    }
+    public function update(Request $request, Post $post)
+    {
+        $request->validate([
+            'message' => 'required|min:10|max:500',
+        ]);
+        $post->message = $request->message;
+        $post->is_edited = true;
+        $post->save();
+        $request->session()->flash("message", "Post updated successfully");
+
+    }
+
     public static function newPosts(Request $request)
     {
         return Post::with('user', 'theme')->withCount('replies')->latest()->limit(5)->get();
@@ -73,8 +89,8 @@ class PostController extends Controller
     }
     public static function latestPosts()
     {
-        return Post::selectRaw('t.*')->fromRaw('(SELECT * FROM posts ORDER BY created_at DESC) t')
-            ->groupBy('t.theme_id')->with('user')
+        return Post::selectRaw('posts.*')->fromRaw('(SELECT * FROM posts ORDER BY created_at DESC) posts')
+            ->groupBy('posts.theme_id')->with('user')
             ->get();
     }
 }

@@ -84,7 +84,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $replies = $user->replies()->get()->map(fn($reply) => [
+        $replies = $user->replies()->where('is_deleted', false)->get()->map(fn($reply) => [
             'id' => $reply->id,
             'message' => $reply->message,
             'title' => $reply->post->title,
@@ -110,14 +110,16 @@ class UserController extends Controller
             'reply_to' => null,
 
         ]);
-        $paginator = collect()->merge($replies)->merge($posts)->sortByDesc('created_at')->paginate(1);
+        $paginator = collect()->merge($replies)->merge($posts)->sortByDesc('created_at')->paginate(10);
         $paginator = $paginator->onEachSide($paginator->lastPage());
         return Inertia::render('user', [
             'breadcrumbs' => [
                 0 => ["name" => "Home", "route" => route('home')],
                 1 => ["name" => $user->name, "route" => route('user.show', $user)]
             ],
-            'userProfile' => $user->loadCount('replies')->loadCount('posts')->loadCount('points'),
+            'userProfile' => $user->loadCount('replies')->loadCount([
+                'posts' => fn(Builder $query) => $query->withTrashed()
+            ])->loadCount('points'),
             'pagination' => $paginator,
         ]);
     }

@@ -57,8 +57,10 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
 
 
                     <SettingsContext.Provider value={{ "setIsShowSettings": setShowSettings }}>
-                        <div className='grid lg:grid-cols-4 md:grid-cols-1' name="content_block">
-                            {children}
+                        <div className='grid grid-cols-4 max-lg:grid-cols-1' name="content_block">
+                            <div name="main_block" className='col-span-3 mt-5'>
+                                {children}
+                            </div>
                             <SideBar handleLoginClick={() => setShowLogin(true)} handleRegisterClick={() => setShowRegistration(true)} />
                         </div>
                     </SettingsContext.Provider>

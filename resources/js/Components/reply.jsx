@@ -58,7 +58,9 @@ export default function Reply({ to, replyId, setActiveReply }) {
                     <ValidationError errors={errors.message} />
                 </div>
                 <div className="p-2">
-                    <AddNewCommentButton disabled={processing} />
+                    <AddNewCommentButton disabled={processing}>
+                        <i className='fa-regular fa-comments mr-2' />New comment
+                    </AddNewCommentButton>
                 </div>
             </form>
 

@@ -11,18 +11,20 @@ use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-
+use App\Http\Controllers\TopicController;
 class ResetPasswordController extends Controller
 {
 
+    private $topicController;
+    public function __construct()
+    {
+        $this->topicController = new TopicController();
+    }
     public function showEmailForm()
     {
 
-        return Inertia::render('main', [
-            'breadcrumbs' => [0 => ["name" => "Home", "route" => route('home')]],
-            'topics' => TopicController::index()->get(),
-            'isPasswordResetEmail' => true,
-        ]);
+        return $this->topicController->index(['isPasswordResetEmail' => true,]);
+
 
     }
     public function handleEmailForm(Request $request)
@@ -39,12 +41,7 @@ class ResetPasswordController extends Controller
     }
     public function showPasswordForm(string $token)
     {
-        return Inertia::render('main', [
-            'breadcrumbs' => [0 => ["name" => "Home", "route" => route('home')]],
-            'user' => Auth::user(),
-            'topics' => TopicController::index()->get(),
-            'token' => $token
-        ]);
+        return $this->topicController->index(['token' => $token]);
     }
     public function handlePasswordForm(Request $request)
     {

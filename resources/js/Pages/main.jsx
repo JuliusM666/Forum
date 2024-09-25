@@ -8,29 +8,28 @@ export default function Main({ breadcrumbs, token, topics, isPasswordResetEmail,
         <Layout breadcrumbs={breadcrumbs} token={token} isPasswordResetEmail={isPasswordResetEmail}>
 
 
-            <div name="main_block" className='md:col-span-3 sm:col-span-2 mt-5'>
-                <div className='grid md:grid-cols-2 sm:grid-cols-1 items-center'>
-                    <div>
-                        <h1 className='text-2xl font-semibold max-sm:ml-2'>Forum</h1>
-                    </div>
-                    <AddNewPostButton topics={topics} defaultID={topics[0].themes[0].id} />
+
+            <div className='grid md:grid-cols-2 sm:grid-cols-1 items-center'>
+                <div>
+                    <h1 className='text-2xl font-semibold max-sm:ml-2'>Forum</h1>
                 </div>
-                {
-                    Object.keys(topics).map(function (keyName, keyIndex) {
-                        return (
-                            <Topics key={keyIndex} topic={topics[keyName]} />
-                        )
-                    })
-                }
-
-
-
-
-                <ActiveUsers activeUsers={activeUsers} />
-                <UserStatistics userStatistics={userStatistics} />
-
-
+                <AddNewPostButton topics={topics} defaultID={topics[0].themes[0].id} />
             </div>
+            {
+                Object.keys(topics).map(function (keyName, keyIndex) {
+                    return (
+                        <Topics key={keyIndex} topic={topics[keyName]} />
+                    )
+                })
+            }
+
+
+
+
+            <ActiveUsers activeUsers={activeUsers} />
+            <UserStatistics userStatistics={userStatistics} />
+
+
 
 
 

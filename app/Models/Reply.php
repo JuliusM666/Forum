@@ -10,14 +10,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Reply extends Model
 {
     use HasFactory;
-    protected $fillable = ['reply', 'user_id', 'post_id', 'reply_id', 'message'];
+    protected $fillable = ['reply', 'user_id', 'post_id', 'reply_id', 'message', 'is_edited', 'is_deleted'];
     public function User(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
     public function Post(): BelongsTo
     {
-        return $this->belongsTo(Post::class);
+        return $this->belongsTo(Post::class)->withTrashed();
     }
     public function Reply(): BelongsTo
     {

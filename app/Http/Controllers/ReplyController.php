@@ -63,4 +63,25 @@ class ReplyController extends Controller
 
         ]);
     }
+    public function update(Request $request, Reply $reply)
+    {
+        if ($reply->is_deleted) {
+            return redirect()->route('home')->with('message', "Can't update deleted reply");
+        }
+        $request->validate([
+            'message' => 'required|min:5|max:500',
+        ]);
+        $reply->message = $request->message;
+        $reply->is_edited = true;
+        $reply->save();
+        session()->flash("message", "Reply updated successfully");
+    }
+    public function destroy(Reply $reply)
+    {
+        $reply->message = "[ the message was deleted by user ]";
+        $reply->is_deleted = true;
+        $reply->is_edited = false;
+        $reply->save();
+        session()->flash("message", "Reply deleted successfully");
+    }
 }
