@@ -59,7 +59,7 @@ function Message({ message, user }) {
             </div>
 
             <div className="text-slate-700 xl:px-16 lg:px-4 px-2">
-                <div className='py-4 break-all' dangerouslySetInnerHTML={{ __html: message.message }}></div>
+                <div className='py-4 break-all' id="dangerouslySetInnerHTML" dangerouslySetInnerHTML={{ __html: message.message }}></div>
                 <div className='flex text-justify items-center gap-4'>
                     <span><i className="fa-regular fa-clock" /> {moment(message.created_at).fromNow()}</span>
                     {message.replies.replies_count > 0 &&

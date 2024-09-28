@@ -7,8 +7,8 @@ import AddNewCommentButton from '../Components/addNewCommentButton'
 import Reply from '../Components/reply'
 import Comment from '../Components/comment'
 import moment from 'moment'
-import { useState, useContext } from 'react'
-import { UserContext } from '../Components/Context/userContext'
+import { useState } from 'react'
+import { PostContext } from '../Components/Context/postContext'
 export default function Post({ breadcrumbs, post, topics, topic, theme, pagination, isFollowing, reply = null }) {
     const [activeReply, setActiveReply] = useState(null)
     const [activeEdit, setActiveEdit] = useState(null)
@@ -48,7 +48,7 @@ export default function Post({ breadcrumbs, post, topics, topic, theme, paginati
             <PageCard rounded={"rounded-lg"} pagination={pagination}>
                 <div className='my-2'>
 
-                    <UserContext.Provider value={{ "post_id": post.id }}>
+                    <PostContext.Provider value={{ "post_id": post.id }}>
                         {pagination.current_page == 1 && reply == null &&
                             <Comment key={0} routeData={routeData} isPost={true} isMain={true} activeReply={activeReply} setActiveReply={setActiveReply} edit={{ activeEdit: activeEdit, setActiveEdit: setActiveEdit }} id={"1"} reply={post}></Comment>
                         }
@@ -70,7 +70,7 @@ export default function Post({ breadcrumbs, post, topics, topic, theme, paginati
 
                             }
                         </div>
-                    </UserContext.Provider>
+                    </PostContext.Provider>
 
                 </div>
             </PageCard>

@@ -10,10 +10,12 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use App\Notifications\ThemeSubscription;
+use Illuminate\Support\Facades\Cache;
 class PostController extends Controller
 {
     public function show(Topic $topic, Theme $theme, Post $post)
     {
+        $this->increaseViews($post);
         $paginator = $post->replies()->where('reply_id', null)->with([
             'user' => fn(Builder $query) => $query->withCount('points'),
             'replies.user' => fn(Builder $query) => $query->withCount('points'),
@@ -78,7 +80,14 @@ class PostController extends Controller
         $request->session()->flash("message", "Post updated successfully");
 
     }
-
+    public function increaseViews(Post $post)
+    {
+        $key = 'post_viewed_' . $post->id;
+        if (!Cache::has($key)) {
+            $post->increment('views');
+            Cache::put($key, true, now()->addMinutes(10)); // 10 minutes
+        }
+    }
     public static function newPosts(Request $request)
     {
         return Post::with('user', 'theme')->withCount('replies')->latest()->limit(5)->get();

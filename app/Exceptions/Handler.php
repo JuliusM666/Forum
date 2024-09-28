@@ -27,19 +27,12 @@ class Handler extends ExceptionHandler
             //
         });
     }
-    // public function render($request, Throwable $exception)
-    // {
-    //     if ($request->route()->hasParameter('post') && Post::withTrashed()->find($request->route()->parameter('post'))->trashed()) {
+    public function render($request, Throwable $exception)
+    {
+        if ($request->route()->hasParameter('post') && Post::withTrashed()->find($request->route()->parameter('post'))->trashed()) {
 
-    //         return redirect()->back()->with("message", "The Post is Deleted");
-    //     }
-    //     $response = parent::render($request, $exception);
-    //     return $response;
-
-
-
-
-
-
-    // }
+            return redirect()->back()->with("message", "The Post is Deleted");
+        }
+        return parent::render($request, $exception);
+    }
 }

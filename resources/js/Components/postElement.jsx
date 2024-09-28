@@ -30,9 +30,15 @@ export default function PostElement({ post, theme, topic }) {
                               <span>Created by <Link className="font-semibold" preserveState href={route('user.show', post.user.id)}>{post.user.name} </Link>{moment(post.created_at).fromNow()}</span>
                          </div>
                     </div>
-                    <div className="text-right mr-10">
-                         <h1 className="text-sm font-semibold"> answers</h1>
-                         <h1 className="text-sm"> {post.replies_count}</h1>
+                    <div className="grid justify-items-end mr-10">
+                         <div className="flex gap-2 items-baseline">
+                              <h1 className="text-sm"> {post.replies_count}</h1>
+                              <i className="fa-regular fa-comments" />
+                         </div>
+                         <div className="flex gap-2 items-baseline">
+                              <h1 className="text-sm"> {post.views}</h1>
+                              <i className="fa-solid fa-eye" />
+                         </div>
                     </div>
                     <div className="text-sm text-left mr-7 visible max-sm:hidden">
                          {post.reply != null &&

@@ -6,3 +6,42 @@
 .ck-editor__editable {
     height: 150px;
 }
+
+
+.ck-main-container {
+	font-family: 'Lato';
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.ck-content {
+	font-family: 'Lato';
+	line-height: 1.6;
+	word-break: break-word;
+}
+
+
+.ck.ck-content ul li {
+  list-style-type: inherit;
+}
+
+.ck.ck-content ul {
+  padding-left: 40px;
+}
+
+.ck.ck-content ol,
+.ck.ck-content ol li {
+  list-style-type: decimal;
+}
+.ck.ck-content ol {
+  padding-left: 40px;
+}
+
+#dangerouslySetInnerHTML ol{
+    list-style-type: decimal;
+    padding-left: 16px;
+}
+#dangerouslySetInnerHTML ul{
+    list-style-type: disc;
+    padding-left: 16px;
+}

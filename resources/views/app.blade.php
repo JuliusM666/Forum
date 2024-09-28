@@ -7,6 +7,7 @@
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
         <!-- Icons -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+        <link rel="icon" type="image/x-icon" href="/public/icon/favicon.png">
         <!-- Tailwind -->
         @vite('resources/css/app.css')
         <!-- Scripts -->

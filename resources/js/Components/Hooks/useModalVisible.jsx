@@ -10,21 +10,6 @@ export default function useModalVisible(initialIsVisible) {
         }
     };
     useEffect(() => {
-        if (initialIsVisible) {
-            console.log(isComponentVisible)
-        }
-
-        if (isComponentVisible) {
-            document.getElementById('layout').style
-            document.getElementById('layout').style.filter = "opacity(50%)"
-
-        }
-        else {
-            document.getElementById('layout').style.filter = ""
-        }
-
-    }, [isComponentVisible])
-    useEffect(() => {
         document.addEventListener('click', handleClickOutside, true);
         return () => {
             document.removeEventListener('click', handleClickOutside, true);

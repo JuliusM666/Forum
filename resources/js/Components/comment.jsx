@@ -1,7 +1,7 @@
 import UserPicture from "./userPicture"
 import Points from "../Components/points"
 import CrudMenu from "./crudMenu"
-import { Link, router, useForm } from "@inertiajs/react"
+import { Link, router, useForm, usePage } from "@inertiajs/react"
 import Reply from "../Components/reply"
 import { useState } from "react"
 import moment from "moment"
@@ -12,6 +12,7 @@ export default function Comment({ id, routeData, isPost = false, isMain = false,
     const [showReplies, setShowReplies] = useState(false)
     const bgColors = ["#93c5fd", "#bfdbfe", "#dbeafe"]
     const updateRoute = isPost ? route('post.update', reply.id) : route('reply.update', reply.id)
+    const { auth } = usePage('auth').props
     function loadReplies() {
         if (replyLevel < 2) {
             setShowReplies(!showReplies)
@@ -47,22 +48,22 @@ export default function Comment({ id, routeData, isPost = false, isMain = false,
                             </div>
                             <div className="flex gap-2 items-baseline">
                                 <h1 className="text-md">created at {moment(reply.created_at).fromNow()}</h1>
-                                {reply.is_edited &&
+                                {reply.is_edited == true &&
                                     <h1 className="font-semibold text-sm">(edited)</h1>
                                 }
                             </div>
                         </div>
                     </div>
-                    <div>
-                        {!reply.is_deleted &&
-                            <CrudMenu item={reply} isPost={isPost} handleEdit={() => edit.setActiveEdit(edit.activeEdit == id ? null : id)} />
-                        }
 
-                    </div>
+                    {!reply.is_deleted && auth.user != null && auth.user.id == reply.user_id &&
+                        <CrudMenu item={reply} isPost={isPost} handleEdit={() => edit.setActiveEdit(edit.activeEdit == id ? null : id)} />
+                    }
+
+
 
                 </div>
                 <div className="bg-slate-100 text-slate-700">
-                    {edit.activeEdit != id && <div className='p-4 break-all' dangerouslySetInnerHTML={{ __html: reply.message }}></div>}
+                    {edit.activeEdit != id && <div id="dangerouslySetInnerHTML" className='p-4 break-all' dangerouslySetInnerHTML={{ __html: reply.message }}></div>}
                     {edit.activeEdit == id &&
                         <form onSubmit={submit}>
                             <div className="p-2">

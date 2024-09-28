@@ -31,7 +31,7 @@ export default function UserSettingsModal({ isVisible, componentRef, close }) {
         <>
             {isVisible &&
                 <div ref={componentRef}>
-                    <Modal> <Card name="User settings" shadow='' ButtonComponent={<CloseButton handleOnClick={() => close()} />}>
+                    <Modal> <Card name="User settings" ButtonComponent={<CloseButton handleOnClick={() => close()} />}>
                         <div className='bg-slate-100 rounded-b-lg h-full shadow-inherit'>
 
 

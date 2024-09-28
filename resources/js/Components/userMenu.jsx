@@ -1,8 +1,19 @@
 import useComponentVisible from "./Hooks/useComponentVisible";
 import { usePage, Link } from "@inertiajs/react"
+import Echo from 'laravel-echo'
 export default function UserMenu() {
     const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
     const { auth } = usePage().props
+
+    if (auth.user != null) {
+
+        window.Echo.private('App.Models.User.' + auth.user.id)
+            .notification((notification) => {
+                console.log(notification);
+            });
+    }
+
+
     return (
         <>
             {auth.user &&

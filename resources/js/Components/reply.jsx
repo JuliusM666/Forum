@@ -3,11 +3,11 @@ import Points from "../Components/points"
 import TextEditor from "../Components/textEditor"
 import AddNewCommentButton from "../Components/addNewCommentButton"
 import { useContext } from "react"
-import { UserContext } from "./Context/userContext"
+import { PostContext } from "./Context/postContext"
 import { useForm, usePage, Link } from '@inertiajs/react'
 import ValidationError from "../Components/validationError"
 export default function Reply({ to, replyId, setActiveReply }) {
-    const context = useContext(UserContext);
+    const context = useContext(PostContext);
     const { auth } = usePage().props;
     const { data, setData, post, processing, errors, clearErrors, reset } = useForm({
         message: '',

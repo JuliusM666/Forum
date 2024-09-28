@@ -46,6 +46,7 @@ class ThemeController extends Controller
                     "title" => route('theme', [$topic, $theme, "sortBy" => "title"]),
                     "answers" => route('theme', [$topic, $theme, "sortBy" => "answers"]),
                     "latestAnswers" => route('theme', [$topic, $theme, "sortBy" => "latestAnswers"]),
+                    "views" => route('theme', [$topic, $theme, "sortBy" => "views"]),
                 ]
             ]
         ]);
@@ -61,6 +62,8 @@ class ThemeController extends Controller
                 return $posts->sortByDesc('reply.created_at');
             case "answers":
                 return $posts->sortByDesc('replies_count');
+            case "views":
+                return $posts->sortByDesc('views');
         }
     }
 }

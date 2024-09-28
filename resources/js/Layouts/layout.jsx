@@ -8,28 +8,36 @@ import UserSettingsModal from '../Components/userSettingsModal';
 import MenuModal from '../Components/menuModal';
 import VerificationModal from '../Components/verificationModal';
 import ResetPasswordEmailModal from '../Components/resetPasswordEmailModal';
+import ConfirmModal from '@/Components/confirmModal';
 import UserMenu from '../Components/userMenu';
 import SideBar from '../Components/sidebar';
 import ResetPasswordModal from '../Components/resetPasswordModal';
 import Message from '../Components/message';
-import { SettingsContext } from '../Components/Context/settingsContext'
+import { ModalContext } from '../Components/Context/modalContext'
 import useModalVisible from '../Components/Hooks/useModalVisible';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 export default function Layout({ children, breadcrumbs, token = "", isPasswordResetEmail = false }) {
     const [registrationRef, showRegistration, setShowRegistration] = useModalVisible(false);
     const [loginRef, showLogin, setShowLogin] = useModalVisible(false);
     const [menuRef, showMenu, setShowMenu] = useModalVisible(false);
     const [searchRef, showSearch, setShowSearch] = useModalVisible(false);
     const [settingsRef, showSettings, setShowSettings] = useModalVisible(false);
-    const [resetPasswordEmailRef, showResetPasswordEmail, setShowResetPasswordEmail] = useModalVisible(false);
-    const [resetPasswordRef, showResetPassword, setShowResetPassword] = useModalVisible(false);
+    const [resetPasswordEmailRef, showResetPasswordEmail, setShowResetPasswordEmail] = useModalVisible(isPasswordResetEmail);
+    const [resetPasswordRef, showResetPassword, setShowResetPassword] = useModalVisible(token != '' ? true : false);
+    const [confirmRef, showConfirm, setShowConfrim] = useModalVisible(false);
+    const [destroyRoute, setDestroyRoute] = useState(null);
+    const modals = [showRegistration, showLogin, showMenu, showSearch, showSettings, showResetPasswordEmail, showResetPassword, showConfirm]
     useEffect(() => {
-        setShowResetPasswordEmail(isPasswordResetEmail)
-        if (token != "") {
-            setShowResetPassword(true)
+        document.getElementById('layout').style.filter = ""
+        for (let element of modals) {
+            if (element) {
+                document.getElementById('layout').style.filter = "opacity(50%)"
+                break
+            }
         }
+    }, modals)
 
-    }, [])
+
     return (
 
 
@@ -42,6 +50,7 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
             <VerificationModal />
             <ResetPasswordEmailModal isVisible={showResetPasswordEmail} componentRef={resetPasswordEmailRef} close={() => setShowResetPasswordEmail(false)} />
             <ResetPasswordModal isVisible={showResetPassword} componentRef={resetPasswordRef} close={() => setShowResetPassword(false)} token={token} />
+            <ConfirmModal isVisible={showConfirm} componentRef={confirmRef} close={() => setShowConfrim(false)} destroyRoute={destroyRoute} />
             <div id="layout">
                 <Header
                     handleRegistrationClick={() => setShowRegistration(true)}
@@ -56,14 +65,14 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
                     <UserMenu />
 
 
-                    <SettingsContext.Provider value={{ "setIsShowSettings": setShowSettings }}>
+                    <ModalContext.Provider value={{ "setIsShowSettings": setShowSettings, "setShowConfirm": setShowConfrim, "setDestroyRoute": setDestroyRoute }}>
                         <div className='grid grid-cols-4 max-lg:grid-cols-1' name="content_block">
                             <div name="main_block" className='col-span-3 mt-5'>
                                 {children}
                             </div>
                             <SideBar handleLoginClick={() => setShowLogin(true)} handleRegisterClick={() => setShowRegistration(true)} />
                         </div>
-                    </SettingsContext.Provider>
+                    </ModalContext.Provider>
 
 
 

@@ -6,13 +6,13 @@ use Inertia\Inertia;
 use \App\Models\Topic;
 use \App\Models\User;
 use \App\Http\Controllers\PostController;
-use \App\Http\Controllers\UserController;
 use Illuminate\Contracts\Database\Eloquent\Builder;
-
 class TopicController extends Controller
 {
+
     public function index(array $params = [])
     {
+
         $topics = Topic::with([
             'themes' => function (Builder $query) {
                 $query->withCount('posts');

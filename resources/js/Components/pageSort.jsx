@@ -30,6 +30,7 @@ export default function PageSort({ children, sort }) {
                             <Sort key="2" handleClick={changeSort} title={"Creation date"} value={"creationDate"} currentSort={currentSort} />
                             <Sort key="3" handleClick={changeSort} title={"Latest answers"} value={"latestAnswers"} currentSort={currentSort} />
                             <Sort key="4" handleClick={changeSort} title={"Answers"} value={"answers"} currentSort={currentSort} />
+                            <Sort key="5" handleClick={changeSort} title={"Views"} value={"views"} currentSort={currentSort} />
                         </ul>
                     </div>
                 </div>

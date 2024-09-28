@@ -1,12 +1,12 @@
 import UserPicture from "./userPicture"
 import Points from "../Components/points"
 import moment from "moment"
-import { SettingsContext } from "./Context/settingsContext"
+import { ModalContext } from "./Context/modalContext"
 import { useContext } from "react"
 import { usePage } from "@inertiajs/react"
 export default function UserBanner({ user }) {
     const { auth } = usePage().props
-    const { setIsShowSettings } = useContext(SettingsContext)
+    const { setIsShowSettings } = useContext(ModalContext)
     return (
 
 

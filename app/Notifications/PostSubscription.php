@@ -7,6 +7,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Models\Reply;
+use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\PrivateChannel;
+
 
 class PostSubscription extends Notification implements ShouldQueue
 {
@@ -28,7 +32,7 @@ class PostSubscription extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'broadcast'];
     }
 
     /**
@@ -53,4 +57,12 @@ class PostSubscription extends Notification implements ShouldQueue
             //
         ];
     }
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+
+        return new BroadcastMessage([
+            'message' => 'User ' . $this->reply->user->name . " has replied in this " . $this->reply->post->title . " post"
+        ]);
+    }
+
 }
