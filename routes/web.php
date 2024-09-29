@@ -12,6 +12,7 @@ use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ThemeFollowerController;
 use App\Http\Controllers\PostFollowerController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -50,12 +51,13 @@ Route::post('/vote', [PointsController::class, 'store'])->middleware('auth', 've
 Route::post('/follow/theme', [ThemeFollowerController::class, 'store'])->middleware('auth', 'verified');
 Route::post('/follow/post', [PostFollowerController::class, 'store'])->middleware('auth', 'verified');
 
-Route::post('/post/{post}', [PostController::class, 'destroy'])->name('post.destroy')->middleware('auth', 'isAuthor');
-Route::put('/post/{post}', [PostController::class, 'update'])->name('post.update')->middleware('auth', 'isAuthor');
-Route::post('/reply/{reply}', [ReplyController::class, 'destroy'])->name('reply.destroy')->middleware('auth', 'isAuthor');
-Route::put('/reply/{reply}', [ReplyController::class, 'update'])->name('reply.update')->middleware('auth', 'isAuthor');
+Route::post('/post/{post}', [PostController::class, 'destroy'])->name('post.destroy')->middleware('auth', 'verified', 'isAuthor');
+Route::put('/post/{post}', [PostController::class, 'update'])->name('post.update')->middleware('auth', 'verified', 'isAuthor');
+Route::post('/reply/{reply}', [ReplyController::class, 'destroy'])->name('reply.destroy')->middleware('auth', 'verified', 'isAuthor');
+Route::put('/reply/{reply}', [ReplyController::class, 'update'])->name('reply.update')->middleware('auth', 'verified', 'isAuthor');
 
-
+Route::post('/notification/{notification}', [NotificationController::class, 'destroy'])->name('notification.destroy');
+Route::post('/notification', [NotificationController::class, 'destroyAll'])->name('notification.destroyAll');
 # Password reset link request form 
 Route::get('/forgot-password', [ResetPasswordController::class, 'showEmailForm'])->middleware('guest')->name('password.request');
 Route::post('/forgot-password', [ResetPasswordController::class, 'handleEmailForm'])->middleware('guest')->name('password.email');

@@ -32,7 +32,7 @@ class PostSubscription extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'broadcast'];
+        return ['mail', 'broadcast', 'database'];
     }
 
     /**
@@ -54,15 +54,10 @@ class PostSubscription extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'title' => 'post subscription',
+            'message' => 'User ' . $this->reply->user->name . " has replied in this " . $this->reply->post->title . " post"
         ];
     }
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
 
-        return new BroadcastMessage([
-            'message' => 'User ' . $this->reply->user->name . " has replied in this " . $this->reply->post->title . " post"
-        ]);
-    }
 
 }
