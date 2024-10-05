@@ -15,11 +15,11 @@ export default function Notifications({ close, notifications }) {
                         <Link as="button" method="POST" href={route('notification.destroyAll')} preserveScroll className="text-slate-400 cursor-pointer font-semibold rounded-xl px-2 py-1  text-center hover:bg-slate-400 hover:text-slate-100">mark all as read</Link>
                     </div>
 
-                    <ul className="overflow-y-scroll max-h-80">
+                    <ul className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
                         {notifications.map((notification, index) => {
                             return (<Notification notification={notification} key={index} id={notification.id} isShowID={isShowID} setIsShowID={setIsShowID} />)
                         })}
-                        {notifications.length == 0 && <h1 className="text-right">no notifications</h1>}
+                        {notifications.length == 0 && <h1 className="text-right p-2">no notifications</h1>}
                     </ul>
                 </div>
             </Card>

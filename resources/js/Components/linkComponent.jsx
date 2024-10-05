@@ -13,8 +13,15 @@ export default function LinkComponent({ children, links = null, href, page }) {
             <div onMouseEnter={() => setIsShow(true)} onMouseLeave={() => setIsShow(false)}>
                 <button className={component === page ? activeClass : defaultClass}>{children} <i className="fa fa-caret-down" /></button>
                 {isShow && (
+
                     <div className="absolute ml-3">
-                        <div className="border border-slate-400 shadow-2xl bg-white rounded-md mt-2">
+                        <div className="w-0 h-0 ml-5
+                                    border-l-[5px] border-l-transparent
+                                    border-b-[5px] border-b-white
+                                    border-r-[5px] border-r-transparent">
+                        </div>
+
+                        <div className="shadow-2xl bg-white rounded-md">
                             <ul className="text-sm p-1   text-slate-400">
                                 {Object.keys(links).map(function (link, i) {
                                     return (

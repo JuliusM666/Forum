@@ -2,16 +2,14 @@ import Modal from '../Components/modal'
 import SearchBar from './searchBar'
 export default function SearchModal({ isVisible, componentRef, close }) {
     return (
-        <>
-            {isVisible &&
-                <div ref={componentRef}>
-                    <Modal>
 
-                        <SearchBar />
+        <div ref={componentRef}>
+            <Modal isVisible={isVisible}>
 
-                    </Modal>
-                </div>
-            }
-        </>
+                <SearchBar />
+
+            </Modal>
+        </div>
+
     )
 }

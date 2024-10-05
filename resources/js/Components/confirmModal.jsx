@@ -1,5 +1,6 @@
 
 import Card from "./card";
+import FadeWrapper from "./fadeWrapper";
 import { router } from '@inertiajs/react'
 export default function ConfirmModal({ isVisible, componentRef, close, destroyRoute }) {
     function confirm() {
@@ -9,9 +10,9 @@ export default function ConfirmModal({ isVisible, componentRef, close, destroyRo
 
 
     return (
-        <>
-            {isVisible &&
-                <div ref={componentRef} className="fixed z-10 left-1/2 top-1/3 transform -translate-x-1/2 -translate-y-1/2">
+        <div ref={componentRef}>
+            <FadeWrapper isVisible={isVisible}>
+                <div className="fixed z-10 left-1/2 top-1/3 transform -translate-x-1/2 -translate-y-1/2" id="modal">
                     <Card name="Confirm">
                         <div className='bg-slate-100 rounded-b-lg p-4 h-full shadow-inherit'>
                             <h1 className="text-slate-700">Are you sure you want to delete this record?</h1>
@@ -22,8 +23,8 @@ export default function ConfirmModal({ isVisible, componentRef, close, destroyRo
                         </div>
                     </Card>
                 </div>
+            </FadeWrapper>
+        </div>
 
-            }
-        </>
     )
 }

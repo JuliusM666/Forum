@@ -23,8 +23,13 @@ export default function PageSort({ children, sort }) {
                 <span>Sort by <i className="fa fa-caret-down" /></span>
             </button>
             {isComponentVisible && (
-                <div className="absolute">
-                    <div className="border border-slate-400 shadow-2xl bg-white rounded-md mt-2">
+                <div className="absolute z-10">
+                    <div className="w-0 h-0 mx-auto
+                                    border-l-[5px] border-l-transparent
+                                    border-b-[5px] border-b-white
+                                    border-r-[5px] border-r-transparent">
+                    </div>
+                    <div className="shadow-2xl bg-white rounded-md">
                         <ul>
                             <Sort key="1" handleClick={changeSort} title={"Title"} value={"title"} currentSort={currentSort} />
                             <Sort key="2" handleClick={changeSort} title={"Creation date"} value={"creationDate"} currentSort={currentSort} />

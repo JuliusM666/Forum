@@ -27,7 +27,7 @@ class ThemeSubscription extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'broadcast', 'database'];
     }
 
     /**
@@ -51,7 +51,9 @@ class ThemeSubscription extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'title' => 'theme subscription',
+            'message' => 'User ' . $this->post->user->name . " has posted in theme: " . $this->post->theme->title,
         ];
     }
+
 }

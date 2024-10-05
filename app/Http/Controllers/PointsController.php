@@ -24,7 +24,7 @@ class PointsController extends Controller
         }
 
     }
-    public static function getVotesArray(Request $request)
+    public function getVotesArray(Request $request)
     {
         $arr = array();
         foreach ($request->user()->votes as $vote) {

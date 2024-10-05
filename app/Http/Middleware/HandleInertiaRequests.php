@@ -44,15 +44,15 @@ class HandleInertiaRequests extends Middleware
             ],
             'auth' => [
                 'user' => $request->user() == null ? null : $request->user()->loadCount('points'),
-                'votes' => $request->user() == null ? null : PointsController::getVotesArray($request),
+                'votes' => $request->user() == null ? null : (new PointsController)->getVotesArray($request),
                 'notifications' => $request->user() == null ? null : $request->user()->unreadNotifications,
 
             ],
             'verified' => $request->user() == null ? null : $request->user()->hasVerifiedEmail(),
             'sidebar' => [
-                'newPosts' => PostController::newPosts($request),
-                'popularPosts' => PostController::popularPosts($request),
-                'popularUsers' => UserController::popularUsers(),
+                'newPosts' => (new PostController)->newPosts($request),
+                'popularPosts' => (new PostController)->popularPosts($request),
+                'popularUsers' => (new UserController)->popularUsers(),
             ],
 
         ]);

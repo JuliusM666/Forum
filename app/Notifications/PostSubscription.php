@@ -55,7 +55,7 @@ class PostSubscription extends Notification implements ShouldQueue
     {
         return [
             'title' => 'post subscription',
-            'message' => 'User ' . $this->reply->user->name . " has replied in this " . $this->reply->post->title . " post"
+            'message' => 'User ' . $this->reply->user->name . " has replied in post: " . $this->reply->post->title,
         ];
     }
 

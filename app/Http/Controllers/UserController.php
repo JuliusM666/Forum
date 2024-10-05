@@ -164,7 +164,7 @@ class UserController extends Controller
     {
         //
     }
-    public static function popularUsers()
+    public function popularUsers()
     {
         return [
             'week' => User::select(['name', 'id', 'user_img'])->withCount([

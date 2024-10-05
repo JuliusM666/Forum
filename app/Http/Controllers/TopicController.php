@@ -18,7 +18,7 @@ class TopicController extends Controller
                 $query->withCount('posts');
             }
         ])->get();
-        $posts = PostController::latestPosts();
+        $posts = (new PostController)->latestPosts();
         foreach ($topics as $topic) {
             foreach ($topic["themes"] as $theme) {
                 $theme['post'] = $posts[$theme['id'] - 1];
@@ -46,7 +46,7 @@ class TopicController extends Controller
             }
         ]);
 
-        $posts = PostController::latestPosts();
+        $posts = (new PostController)->latestPosts();
         foreach ($topic["themes"] as $theme) {
             $theme['post'] = $posts[$theme['id'] - 1];
         }

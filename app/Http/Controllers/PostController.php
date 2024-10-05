@@ -88,15 +88,15 @@ class PostController extends Controller
             Cache::put($key, true, now()->addMinutes(10)); // 10 minutes
         }
     }
-    public static function newPosts(Request $request)
+    public function newPosts(Request $request)
     {
         return Post::with('user', 'theme')->withCount('replies')->latest()->limit(5)->get();
     }
-    public static function popularPosts(Request $request)
+    public function popularPosts(Request $request)
     {
         return Post::with('user', 'theme')->withCount('replies')->orderByDesc('replies_count')->limit(5)->get();
     }
-    public static function latestPosts()
+    public function latestPosts()
     {
         return Post::selectRaw('posts.*')->fromRaw('(SELECT * FROM posts ORDER BY created_at DESC) posts')
             ->groupBy('posts.theme_id')->with('user')
