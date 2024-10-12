@@ -87,7 +87,10 @@ export default function Comment({ id, routeData, isPost = false, isMain = false,
                                     {reply.hasOwnProperty('replies') ? reply.replies.length + " more replies" : "no replies"}
                                 </button>
                             }
-                            <button onClick={() => setActiveReply(activeReply != id ? id : null)} ><i className="fa-solid fa-reply" /></button>
+                            {auth.user &&
+                                <button onClick={() => setActiveReply(activeReply != id ? id : null)} ><i className="fa-solid fa-reply" /></button>
+                            }
+
 
 
                         </div>

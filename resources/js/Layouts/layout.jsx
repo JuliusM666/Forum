@@ -11,6 +11,7 @@ import ResetPasswordEmailModal from '../Components/resetPasswordEmailModal';
 import ConfirmModal from '@/Components/confirmModal';
 import UserMenu from '../Components/userMenu';
 import SideBar from '../Components/sidebar';
+import CookieConsent from '../Components/cookieConsent';
 import ResetPasswordModal from '../Components/resetPasswordModal';
 import Message from '../Components/message';
 import { ModalContext } from '../Components/Context/modalContext'
@@ -42,6 +43,7 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
 
 
         <div className='min-w-screen flex min-h-screen bg-gradient-to-r from-slate-100 to-blue-100'>
+            <CookieConsent />
             <RegistrationModal isVisible={showRegistration} componentRef={registrationRef} close={() => setShowRegistration(false)} />
             <LoginModal isVisible={showLogin} componentRef={loginRef} close={() => setShowLogin(false)} />
             <MenuModal handleRegistrationClick={() => setShowRegistration(true)} handleLoginClick={() => setShowLogin(true)} isVisible={showMenu} componentRef={menuRef} close={() => setShowMenu(false)} />

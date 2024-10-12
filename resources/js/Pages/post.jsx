@@ -6,6 +6,7 @@ import PageCard from '../Components/pageCard'
 import AddNewCommentButton from '../Components/addNewCommentButton'
 import Reply from '../Components/reply'
 import Comment from '../Components/comment'
+import ShareButton from '@/Components/shareButton'
 import moment from 'moment'
 import { useState } from 'react'
 import { PostContext } from '../Components/Context/postContext'
@@ -31,7 +32,10 @@ export default function Post({ breadcrumbs, post, topics, topic, theme, paginati
                             <h1>{moment(post.created_at).fromNow()}</h1>
                         </div>
                     </div>
-                    <Followers item={post} type={"post"} isFollowing={isFollowing} />
+                    <div className="flex gap-2 max-md:grid max-md:justify-items-center">
+                        <ShareButton url={route('post', [topic, theme, post])} />
+                        <Followers item={post} type={"post"} isFollowing={isFollowing} />
+                    </div>
                 </div>
 
             </div>
