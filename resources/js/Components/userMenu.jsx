@@ -2,7 +2,6 @@ import useComponentVisible from "./Hooks/useComponentVisible";
 import { usePage, Link, router } from "@inertiajs/react"
 import Notifications from "./notifications";
 import { useState, useEffect } from "react";
-import Echo from 'laravel-echo'
 export default function UserMenu() {
     const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
     const { auth } = usePage().props
@@ -11,14 +10,16 @@ export default function UserMenu() {
     if (auth.user) {
         window.Echo.private('App.Models.User.' + auth.user.id)
             .notification((notification) => {
+                router.reload({ only: ['auth'] })
                 notification['data'] = { message: notification.message, title: notification.title }
                 setNotifications([notification, ...notifications])
+
             });
     }
     useEffect(() => { setNotifications(auth.notifications) }, [isComponentVisible])
     return (
         <>
-            {auth.user && showNotifications && <Notifications close={() => { setShowNotifications(false); router.reload() }} notifications={notifications} />}
+            {auth.user && showNotifications && <Notifications close={() => { setShowNotifications(false); router.reload({ only: ['auth'] }) }} notifications={notifications} />}
             {auth.user &&
                 <div className="flex justify-end max-md:justify-center">
                     <div ref={ref} className="relative">

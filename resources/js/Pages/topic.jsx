@@ -1,10 +1,11 @@
 import Layout from '../Layouts/layout'
 import Topics from '../Components/topics'
 import AddNewPostButton from '../Components/addNewPostButton'
+import { Head } from '@inertiajs/react'
 export default function Topic({ breadcrumbs, topic, topics }) {
     return (
         <Layout breadcrumbs={breadcrumbs}>
-
+            <Head title={topic.title} />
 
             <div className='grid md:grid-cols-2 sm:grid-cols-1 items-center'>
                 <div>
@@ -14,12 +15,6 @@ export default function Topic({ breadcrumbs, topic, topics }) {
             </div>
 
             <Topics topic={topic} />
-
-
-
-
-
-
 
         </Layout>
     )

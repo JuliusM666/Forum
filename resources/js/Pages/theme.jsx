@@ -3,10 +3,11 @@ import PostElement from '@/Components/postElement'
 import AddNewPostButton from '../Components/addNewPostButton'
 import Followers from '../Components/followers'
 import PageCard from '../Components/pageCard'
+import { Head } from '@inertiajs/react'
 export default function Theme({ breadcrumbs, theme, topic, topics, pagination, isFollowing, sort }) {
     return (
         <Layout breadcrumbs={breadcrumbs}>
-
+            <Head title={theme.title} />
 
             <div className='grid grid-cols-1 items-center bg-slate-100 rounded-lg shadow-md mb-3'>
                 <div className='p-4'>

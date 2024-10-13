@@ -10,13 +10,14 @@ import ShareButton from '@/Components/shareButton'
 import moment from 'moment'
 import { useState } from 'react'
 import { PostContext } from '../Components/Context/postContext'
+import { Head } from '@inertiajs/react'
 export default function Post({ breadcrumbs, post, topics, topic, theme, pagination, isFollowing, reply = null }) {
     const [activeReply, setActiveReply] = useState(null)
     const [activeEdit, setActiveEdit] = useState(null)
     const routeData = [topic.id, theme.id, post.id]
     return (
         <Layout breadcrumbs={breadcrumbs}>
-
+            <Head title={post.title} />
             <div className='grid grid-cols-1 items-center bg-slate-100 rounded-lg shadow-md mb-3'>
                 <div className='p-4'>
                     <h1 className='text-2xl font-semibold max-sm:ml-2 truncate'>{post.title}</h1>

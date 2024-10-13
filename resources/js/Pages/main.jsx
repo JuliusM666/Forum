@@ -3,10 +3,11 @@ import Topics from '../Components/topics'
 import ActiveUsers from '../Components/activeUsers'
 import UserStatistics from '../Components/userStatistics'
 import AddNewPostButton from '../Components/addNewPostButton'
+import { Head } from '@inertiajs/react'
 export default function Main({ breadcrumbs, token, topics, isPasswordResetEmail, activeUsers, userStatistics }) {
     return (
         <Layout breadcrumbs={breadcrumbs} token={token} isPasswordResetEmail={isPasswordResetEmail}>
-
+            <Head title="home" />
 
 
             <div className='grid md:grid-cols-2 sm:grid-cols-1 items-center'>

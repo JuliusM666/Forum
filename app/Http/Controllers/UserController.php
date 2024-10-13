@@ -141,8 +141,9 @@ class UserController extends Controller
             return back()->with('message', 'Error');
         }
         $request->validate([
-            'user_img' => 'required_without:banner_img|nullable|sometimes|mimes:jpg,bmp,png,webp|max:1000',
-            'banner_img' => 'required_without:user_img|nullable|sometimes|mimes:jpg,bmp,png,webp|max:1000'
+            'user_img' => 'nullable|sometimes|mimes:jpg,bmp,png,webp|max:1000',
+            'banner_img' => 'nullable|sometimes|mimes:jpg,bmp,png,webp|max:1000',
+            'email_notifications' => 'required|boolean'
         ]);
         if ($request->file('user_img') != null) {
             $user_img = '/' . $request->file('user_img')->store('public/user_profile_pictures');
@@ -152,9 +153,9 @@ class UserController extends Controller
             $banner_img = '/' . $request->file('banner_img')->store('public/user_banners');
             $user->update(['banner_img' => $banner_img]);
         }
+        $user->update(['email_notifications' => $request->email_notifications]);
 
-
-        return back()->with('message', 'Files uploaded successfully');
+        return back()->with('message', 'Settings saved successfully');
     }
 
     /**

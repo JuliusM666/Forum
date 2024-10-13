@@ -1,10 +1,11 @@
 import Layout from '../Layouts/layout'
 import SideBar from '../Components/sidebar'
 import Card from '../Components/card'
+import { Head } from '@inertiajs/react'
 export default function Rules({ breadcrumbs }) {
     return (
         <Layout breadcrumbs={breadcrumbs}>
-
+            <Head title="rules" />
 
 
             <Card name={"Rules"}>

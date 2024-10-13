@@ -32,7 +32,11 @@ class PostSubscription extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'broadcast', 'database'];
+        if ($notifiable->email_notifications) {
+            return ['mail', 'broadcast', 'database'];
+        } else {
+            return ['broadcast', 'database'];
+        }
     }
 
     /**

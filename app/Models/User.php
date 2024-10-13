@@ -28,6 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'user_img',
         'banner_img',
         'last_seen',
+        'email_notifications',
         'facebook_id',
         'google_id',
         'linkedin_id',
@@ -78,10 +79,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     }
     public function sendPasswordResetNotification($token): void
     {
-        #http://127.0.0.1:8000/reset-password/f754f0b4b48b1783bd3728aa9660ee25ad0128f3dc729a8dbdc71d3f1eef65f4?email=nogojob849%40nastyx.com
         $url = route('password.reset', ['token' => $token]);
-
         $this->notify(new ResetPasswordNotification($url));
     }
-
 }

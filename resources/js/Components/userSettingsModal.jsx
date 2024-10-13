@@ -2,23 +2,25 @@ import Button from "../Components/button"
 import Modal from "../Components/modal"
 import Card from "../Components/card"
 import CloseButton from "../Components/closeButton"
-import { useForm, router, usePage } from "@inertiajs/react"
-import { useEffect } from "react"
 import ValidationError from "../Components/validationError"
+import ToggleButton from "./toggleButton"
+import { useForm, usePage } from "@inertiajs/react"
+import { useEffect } from "react"
 export default function UserSettingsModal({ isVisible, componentRef, close }) {
     const { flash, auth } = usePage().props
     const { data, setData, post, processing, progress, errors, clearErrors, reset } = useForm({
         user_img: "",
         banner_img: "",
+        email_notifications: false,
         _method: 'put',
     })
     function clearForm() {
         clearErrors()
         reset()
-        // document.getElementById("settings_form").reset();
     }
     useEffect(() => {
         clearForm()
+        if (auth.user != null) { setData("email_notifications", auth.user.email_notifications) }
     }, [isVisible]);
     function submit(e) {
         e.preventDefault()
@@ -60,6 +62,10 @@ export default function UserSettingsModal({ isVisible, componentRef, close }) {
                                     {progress.percentage}%
                                 </progress>
                             )}
+                            <div className="flex justify-between">
+                                <label className="text-slate-600 text-md font-semibold" htmlFor="banner_img">Email notifications <i className="fa-solid fa-envelope" /></label>
+                                <ToggleButton isChecked={data.email_notifications} handleChange={() => setData('email_notifications', !data.email_notifications)} />
+                            </div>
 
                             <Button disabled={processing} width={"w-full"}>Save</Button>
                             {flash.message && (

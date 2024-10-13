@@ -1,10 +1,13 @@
 import { useState, useRef } from "react"
 import Card from "./card"
 import CloseButton from "./closeButton"
-import { Link } from "@inertiajs/react"
+import { router } from "@inertiajs/react"
 import moment from "moment"
 export default function Notifications({ close, notifications }) {
     const [isShowID, setIsShowID] = useState(null)
+    function markAllasRead() {
+        router.post(route('notification.destroyAll'), "", { onSuccess: () => { close() } })
+    }
     return (
         <div className="fixed z-20 right-0 bottom-0 w-1/4 max-xl:w-1/3 max-lg:w-1/2 max-md:w-8/12 max-sm:w-11/12">
             <Card name="Notifications" ButtonComponent={<CloseButton handleOnClick={() => close()} />}>
@@ -12,7 +15,7 @@ export default function Notifications({ close, notifications }) {
 
 
                     <div className="flex justify-end p-2">
-                        <Link as="button" method="POST" href={route('notification.destroyAll')} preserveScroll className="text-slate-400 cursor-pointer font-semibold rounded-xl px-2 py-1  text-center hover:bg-slate-400 hover:text-slate-100">mark all as read</Link>
+                        <button onClick={() => markAllasRead()} className="text-slate-400 cursor-pointer font-semibold rounded-xl px-2 py-1  text-center hover:bg-slate-400 hover:text-slate-100">mark all as read</button>
                     </div>
 
                     <ul className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
