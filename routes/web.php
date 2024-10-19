@@ -31,33 +31,43 @@ use \App\Http\Controllers\Auth\SocialiteController;
 */
 
 
+Route::controller(TopicController::class)->group(function () {
+    Route::get('/', 'index')->name('home');
+    Route::get('/topic/{topic}', 'show')->name('topic');
+});
+Route::controller(PostController::class)->group(function () {
+    Route::get('/topic/{topic}/{theme}/{post}', 'show')->name('post');
+    Route::delete('/post/{post}', 'destroy')->name('post.destroy')->middleware('auth', 'verified');
+    Route::patch('/post/{post}', 'update')->name('post.update')->middleware('auth', 'verified');
+    Route::post('/post', 'store')->middleware('auth', 'verified');
+});
+Route::controller(ReplyController::class)->group(function () {
+    Route::get('/topic/{topic}/{theme}/{post}/{reply}', 'show')->name('reply');
+    Route::delete('/reply/{reply}', 'destroy')->name('reply.destroy')->middleware('auth', 'verified');
+    Route::patch('/reply/{reply}', 'update')->name('reply.update')->middleware('auth', 'verified');
+    Route::post('/reply', 'store')->middleware('auth', 'verified');
+});
+Route::controller(UserController::class)->group(function () {
+    Route::post('/login', 'login')->middleware('guest');
+    Route::resource('/user', UserController::class)->only(['store', 'show', 'update']);
+    Route::post('/logout', 'logout')->middleware('auth');
+});
+Route::controller(NotificationController::class)->group(function () { });
 
-
-Route::get('/', [TopicController::class, 'index'])->name('home');
-Route::get('/topic/{topic}', [TopicController::class, 'show'])->name("topic");
 Route::get('search/{query?}', [SearchController::class, 'index'])->name('search');
 Route::get('rules', [RulesController::class, 'index'])->name('rules');
 Route::get('activity', [ActivityController::class, 'index'])->name('activity');
 Route::get('membership', [MembershipController::class, 'index'])->name('membership');
 Route::get('/topic/{topic}/{theme}', [ThemeController::class, 'show'])->name('theme');
-Route::get('/topic/{topic}/{theme}/{post}', [PostController::class, 'show'])->name('post');
-Route::get('/topic/{topic}/{theme}/{post}/{reply}', [ReplyController::class, 'show'])->name('reply');
-Route::post('/post', [PostController::class, 'store'])->middleware('auth', 'verified');
-Route::post('/reply', [ReplyController::class, 'store'])->middleware('auth', 'verified');
-Route::post('/login', [UserController::class, 'login'])->middleware('guest');
-Route::resource('/user', UserController::class)->only(['store', 'show', 'update']);
-Route::post('/logout', [UserController::class, 'logout'])->middleware('auth');
 Route::post('/vote', [PointsController::class, 'store'])->middleware('auth', 'verified');
 Route::post('/follow/theme', [ThemeFollowerController::class, 'store'])->middleware('auth', 'verified');
 Route::post('/follow/post', [PostFollowerController::class, 'store'])->middleware('auth', 'verified');
 
-Route::post('/post/{post}', [PostController::class, 'destroy'])->name('post.destroy')->middleware('auth', 'verified', 'isAuthor');
-Route::put('/post/{post}', [PostController::class, 'update'])->name('post.update')->middleware('auth', 'verified', 'isAuthor');
-Route::post('/reply/{reply}', [ReplyController::class, 'destroy'])->name('reply.destroy')->middleware('auth', 'verified', 'isAuthor');
-Route::put('/reply/{reply}', [ReplyController::class, 'update'])->name('reply.update')->middleware('auth', 'verified', 'isAuthor');
-
 Route::post('/notification/{notification}', [NotificationController::class, 'destroy'])->name('notification.destroy');
 Route::post('/notification', [NotificationController::class, 'destroyAll'])->name('notification.destroyAll');
+
+
+
 # Password reset link request form 
 Route::get('/forgot-password', [ResetPasswordController::class, 'showEmailForm'])->middleware('guest')->name('password.request');
 Route::post('/forgot-password', [ResetPasswordController::class, 'handleEmailForm'])->middleware('guest')->name('password.email');

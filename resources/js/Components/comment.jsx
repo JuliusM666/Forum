@@ -21,12 +21,12 @@ export default function Comment({ id, routeData, isPost = false, isMain = false,
             router.get(route('reply', [...routeData, reply.id]), { preserveState: true })
         }
     }
-    const { data, setData, put, processing, errors, clearErrors, reset } = useForm({
+    const { data, setData, patch, processing, errors, clearErrors, reset } = useForm({
         message: reply.message,
     })
     function submit(e) {
         e.preventDefault()
-        put(updateRoute, {
+        patch(updateRoute, {
             preserveScroll: true,
             onSuccess: () => { clearErrors(), reset(), edit.setActiveEdit(null) }
 

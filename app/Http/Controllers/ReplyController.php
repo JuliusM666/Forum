@@ -65,6 +65,7 @@ class ReplyController extends Controller
     }
     public function update(Request $request, Reply $reply)
     {
+        $this->authorize('update', $reply);
         if ($reply->is_deleted) {
             return redirect()->route('home')->with('message', "Can't update deleted reply");
         }
@@ -78,6 +79,7 @@ class ReplyController extends Controller
     }
     public function destroy(Reply $reply)
     {
+        $this->authorize('delete', $reply);
         $reply->message = "[ the message was deleted by user ]";
         $reply->is_deleted = true;
         $reply->is_edited = false;

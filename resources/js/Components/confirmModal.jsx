@@ -4,7 +4,7 @@ import FadeWrapper from "./fadeWrapper";
 import { router } from '@inertiajs/react'
 export default function ConfirmModal({ isVisible, componentRef, close, destroyRoute }) {
     function confirm() {
-        router.post(destroyRoute, {}, { preserveScroll: true })
+        router.delete(destroyRoute, {}, { preserveScroll: true })
         close()
     }
 

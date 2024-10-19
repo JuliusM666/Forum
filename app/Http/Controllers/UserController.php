@@ -137,9 +137,8 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        if (Auth::user()->id != $user->id) {
-            return back()->with('message', 'Error');
-        }
+        $this->authorize('update', $user);
+
         $request->validate([
             'user_img' => 'nullable|sometimes|mimes:jpg,bmp,png,webp|max:1000',
             'banner_img' => 'nullable|sometimes|mimes:jpg,bmp,png,webp|max:1000',

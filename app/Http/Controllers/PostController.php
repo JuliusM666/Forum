@@ -13,6 +13,7 @@ use App\Notifications\ThemeSubscription;
 use Illuminate\Support\Facades\Cache;
 class PostController extends Controller
 {
+
     public function show(Topic $topic, Theme $theme, Post $post)
     {
         $this->increaseViews($post);
@@ -66,11 +67,13 @@ class PostController extends Controller
     }
     public function destroy(Post $post)
     {
+        $this->authorize('delete', $post);
         $post->delete();
         return redirect()->route('home')->with("message", "Post deleted successfully");
     }
     public function update(Request $request, Post $post)
     {
+        $this->authorize('update', $post);
         $request->validate([
             'message' => 'required|min:10|max:500',
         ]);

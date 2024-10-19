@@ -96,6 +96,7 @@ class DatabaseSeeder extends Seeder
             Points::factory()->create([
                 'user_id' => $user->id,
                 'voter_id' => $voter->id,
+                'created_at' => fake()->dateTimeBetween('-1 year', 'now'),
             ]);
         }
 
