@@ -52,7 +52,10 @@ Route::controller(UserController::class)->group(function () {
     Route::resource('/user', UserController::class)->only(['store', 'show', 'update']);
     Route::post('/logout', 'logout')->middleware('auth');
 });
-Route::controller(NotificationController::class)->group(function () { });
+Route::controller(NotificationController::class)->group(function () {
+    Route::delete('/notification/{notification}', 'destroy')->name('notification.destroy');
+    Route::delete('/notification', 'destroyAll')->name('notification.destroyAll');
+});
 
 Route::get('search/{query?}', [SearchController::class, 'index'])->name('search');
 Route::get('rules', [RulesController::class, 'index'])->name('rules');
@@ -63,21 +66,18 @@ Route::post('/vote', [PointsController::class, 'store'])->middleware('auth', 've
 Route::post('/follow/theme', [ThemeFollowerController::class, 'store'])->middleware('auth', 'verified');
 Route::post('/follow/post', [PostFollowerController::class, 'store'])->middleware('auth', 'verified');
 
-Route::post('/notification/{notification}', [NotificationController::class, 'destroy'])->name('notification.destroy');
-Route::post('/notification', [NotificationController::class, 'destroyAll'])->name('notification.destroyAll');
 
-
-
-# Password reset link request form 
-Route::get('/forgot-password', [ResetPasswordController::class, 'showEmailForm'])->middleware('guest')->name('password.request');
-Route::post('/forgot-password', [ResetPasswordController::class, 'handleEmailForm'])->middleware('guest')->name('password.email');
-Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showPasswordForm'])->middleware('guest')->name('password.reset');
-Route::post('/reset-password', [ResetPasswordController::class, 'handlePasswordForm'])->middleware('guest')->name('password.update');
+# Password reset link request form
+Route::controller(ResetPasswordController::class)->group(function () {
+    Route::get('/forgot-password', 'showEmailForm')->middleware('guest')->name('password.request');
+    Route::post('/forgot-password', 'handleEmailForm')->middleware('guest')->name('password.email');
+    Route::get('/reset-password/{token}', 'showPasswordForm')->middleware('guest')->name('password.reset');
+    Route::post('/reset-password', 'handlePasswordForm')->middleware('guest')->name('password.update');
+});
 
 # Verification handler
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
-
     return redirect()->route('home');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 # Resend Verification email

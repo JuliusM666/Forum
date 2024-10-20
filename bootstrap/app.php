@@ -1,4 +1,9 @@
 <?php
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Inertia\Inertia;
+use Illuminate\App\Exceptions;
+
 
 /*
 |--------------------------------------------------------------------------
