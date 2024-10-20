@@ -19,6 +19,15 @@ class Handler extends ExceptionHandler
     ];
 
     /**
+     * A list of error messages
+     *
+     * @var array<int, string>
+     */
+    protected $messages = [
+        404 => 'Not found',
+    ];
+
+    /**
      * Register the exception handling callbacks for the application.
      */
     public function register(): void
@@ -27,12 +36,29 @@ class Handler extends ExceptionHandler
             //
         });
     }
-    // public function render($request, Throwable $exception)
-    // {
-    //     if ($request->route()->hasParameter('post') && Post::withTrashed()->find($request->route()->parameter('post'))->trashed()) {
+    /**
+     * Render an exception into an HTTP response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Throwable
+     */
+    public function render($request, Throwable $e)
+    {
+        $response = parent::render($request, $e);
 
-    //         return redirect()->back()->with("message", "The Post is Deleted");
-    //     }
-    //     return parent::render($request, $exception);
-    // }
+        $status = $response->getStatusCode();
+
+        if (!array_key_exists($status, $this->messages)) {
+            return $response;
+        }
+
+        return inertia('errors/' . $status, [
+            'status' => $status,
+            'message' => $this->messages[$status],
+        ])
+            ->toResponse($request)
+            ->setStatusCode($status);
+    }
 }
