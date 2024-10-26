@@ -1,11 +1,13 @@
-import useComponentVisible from "./Hooks/useComponentVisible";
+import useComponentVisible from "./Hooks/useComponentVisible"
 import { usePage, Link, router } from "@inertiajs/react"
-import Notifications from "./notifications";
-import { useState, useEffect } from "react";
+import Notifications from "./notifications"
+import Chats from "./chats"
+import { useState, useEffect } from "react"
 export default function UserMenu() {
     const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
     const { auth } = usePage().props
     const [showNotifications, setShowNotifications] = useState(false)
+    const [showChats, setShowChats] = useState(false)
     const [notifications, setNotifications] = useState(auth.notifications)
     if (auth.user) {
         window.Echo.private('App.Models.User.' + auth.user.id)
@@ -17,9 +19,11 @@ export default function UserMenu() {
             });
     }
     useEffect(() => { setNotifications(auth.notifications) }, [isComponentVisible])
+    const chats = [{ user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", messages: [{ user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 1 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 2 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 1 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 2 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 2 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 2 }] },]
     return (
         <>
             {auth.user && showNotifications && <Notifications close={() => { setShowNotifications(false); router.reload({ only: ['auth'] }) }} notifications={notifications} />}
+            {auth.user && showChats && <Chats close={() => { setShowChats(false); router.reload({ only: ['auth'] }) }} chats={chats} />}
             {auth.user &&
                 <div className="flex justify-end max-md:justify-center">
                     <div ref={ref} className="relative">
@@ -37,16 +41,27 @@ export default function UserMenu() {
                                 <div className="shadow-2xl bg-white rounded-md  text-slate-400">
                                     <ul className="text-slate-600 grid font-md font-semibold">
                                         <Link preserveState preserveScroll href={route('user.show', auth.user)}>
-                                            <li className="block px-4 rounded-md py-2 hover:bg-slate-200 hover:text-slate-500">
+                                            <li className="block px-4 rounded-md py-2 hover:bg-slate-200 hover:text-slate-500 text-center">
                                                 Profile
                                             </li>
                                         </Link>
-                                        <button onClick={() => { setShowNotifications(true) }}>
+                                        <button onClick={() => { setShowNotifications(true), setShowChats(false) }}>
                                             <li className="relative block px-4 rounded-md py-2 hover:bg-slate-200 hover:text-slate-500">
                                                 Notifications
                                                 {notifications.length > 0 &&
                                                     <div className="animate-bounce absolute text-center align-middle top-1.5 shadow-md right-1 text-xs z-10 bg-slate-700 text-slate-100 px-1 rounded-full ">
                                                         {notifications.length}
+                                                    </div>
+
+                                                }
+                                            </li>
+                                        </button>
+                                        <button onClick={() => { setShowChats(true), setShowNotifications(false) }}>
+                                            <li className="relative block px-4 rounded-md py-2 hover:bg-slate-200 hover:text-slate-500">
+                                                Chats
+                                                {chats.length > 0 &&
+                                                    <div className="animate-bounce absolute text-center align-middle top-1.5 shadow-md right-1 text-xs z-10 bg-slate-700 text-slate-100 px-1 rounded-full ">
+                                                        {chats.length}
                                                     </div>
 
                                                 }
