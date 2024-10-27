@@ -1,22 +1,22 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
 import Card from "./card"
 import CloseButton from "./closeButton"
 import { Link } from "@inertiajs/react"
 import moment from "moment"
 import UserPicture from "./userPicture"
+import { ModalContext } from "./Context/modalContext"
+import EmojiBox from "./emojiBox"
 export default function Chats({ close, chats }) {
     const [activeChat, setActiveChat] = useState(null)
     return (
         <div className="fixed z-20 text-slate-700 right-0 bottom-0 w-1/4 max-xl:w-1/3 max-lg:w-1/2 max-md:w-8/12 max-sm:w-11/12">
             <Card name="Chats" ButtonComponent={<CloseButton handleOnClick={() => close()} />}>
                 <div className="bg-slate-100">
-                    <ul className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
-                        {activeChat == null && chats.map((chat, index) => {
-                            return (<Chat chat={chat} key={index} handleOnClick={() => setActiveChat(index)} />)
-                        })}
-                        {activeChat != null && <Messages handleBackClick={() => setActiveChat(null)} messages={chats[activeChat].messages} />}
-                        {chats.length == 0 && <h1 className="text-right p-2">no messages</h1>}
-                    </ul>
+                    {activeChat == null && chats.map((chat, index) => {
+                        return (<Chat chat={chat} key={index} handleOnClick={() => setActiveChat(index)} />)
+                    })}
+                    {activeChat != null && <Messages handleBackClick={() => setActiveChat(null)} messages={chats[activeChat].messages} />}
+                    {chats.length == 0 && <h1 className="text-right p-2">no messages</h1>}
                 </div>
             </Card>
         </div>
@@ -26,41 +26,61 @@ export default function Chats({ close, chats }) {
 
 function Chat({ chat, handleOnClick }) {
     return (
-        <button onClick={() => handleOnClick()} className="odd:bg-slate-100 text-slate-700 even:bg-slate-200 p-2 grid grid-cols-6 items-center hover:opacity-70">
-            <div className="flex justify-end mr-5">
-                <div className="w-9 h-9">
-                    <UserPicture user_id={1} user_img={"/public/user_profile_pictures/YB10jCxFYeYSDe7YX9NhL0vR6i4i25uFo01AITXj.png"} />
+        <ul className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
+            <button onClick={() => handleOnClick()} className="odd:bg-slate-100 text-slate-700 even:bg-slate-200 p-2 grid grid-cols-6 items-center hover:opacity-70">
+                <div className="flex justify-end mr-5">
+                    <div className="w-9 h-9">
+                        <UserPicture user_id={1} user_img={"/public/user_profile_pictures/YB10jCxFYeYSDe7YX9NhL0vR6i4i25uFo01AITXj.png"} />
+                    </div>
                 </div>
-            </div>
-            <div className="col-span-4 text-start">
-                <h1 className="font-semibold">{chat.user}</h1>
-                <h1>{chat.message}</h1>
-            </div>
-            <h1 className="text-xs font-semibold text-end">{moment(chat.created_at).fromNow()}</h1>
-        </button>
+                <div className="col-span-4 text-start">
+                    <h1 className="font-semibold">{chat.user}</h1>
+                    <h1>{chat.message}</h1>
+                </div>
+                <h1 className="text-xs font-semibold text-end">{moment(chat.created_at).fromNow()}</h1>
+            </button>
+        </ul>
     )
 }
 function Messages({ messages, handleBackClick }) {
+    const { setShowConfirm, destroyRoute, confirmMessage } = useContext(ModalContext)
+    const [activeMessage, setActiveMessage] = useState(null)
     return (
-        <div>
-            <div className="sticky top-0 bg-blue-100 z-20 p-1 grid grid-cols-3 justify-items-center items-center">
+        <div className="relative">
+            <div className="bg-blue-100 z-20 p-1 grid grid-cols-3 justify-items-center items-center">
                 <button onClick={() => handleBackClick()} className="justify-self-start hover:opacity-70 ml-1"><i className="fa-solid fa-caret-left text-lg text-slate-700" /></button>
                 <Link href={route("user.show", 1)} className="font-semibold hover:opacity-70">User</Link>
+                <button onClick={() => { setShowConfirm(true), destroyRoute.current = "destroy_route", confirmMessage.current = "This chat will only be deleted for you. Do you want to confirm?" }}
+                    className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
             </div>
-            {messages.map((message, index) => {
-                return (<Message message={message} key={index} />)
-            })}
-            <div className="sticky bottom-0">
-                <input />
-            </div>
+            <ul className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
+                {messages.map((message, index) => {
+                    return (<Message message={message} handleMessageClick={() => setActiveMessage(activeMessage != index ? index : null)} isActive={activeMessage == index} key={index} />)
+                })}
+            </ul>
+            <form className="relative flex gap-1 h-12 p-2">
+
+                <input className="w-full rounded-full bg-blue-100 border-none pr-8" placeholder="Type your message here..." />
+                <EmojiBox />
+                <button className="rounded-full bg-blue-300 hover:opacity-70 flex justify-center items-center p-2"><i className="fa-regular fa-paper-plane" /></button>
+            </form>
+
         </div>
     )
 }
-function Message({ message }) {
+function Message({ message, handleMessageClick, isActive }) {
+
     if (message.id == 1) {
         return (
-            <div className="flex justify-end p-2">
-                <div className="flex gap-0">
+            <div className="relative flex justify-end p-2">
+                {isActive &&
+                    <div className="gap-3 flex items-center mr-1">
+                        <button className="hover:opacity-70"><i className="fa-solid fa-circle-plus" /></button>
+                        <button className="hover:opacity-70"> <i className="fa-regular fa-pen-to-square" /></button>
+                        <button className="hover:opacity-70"> <i className="fa-solid fa-circle-xmark" /></button>
+                    </div>
+                }
+                <button onClick={() => handleMessageClick()} className="flex gap-0  hover:opacity-70">
                     <div className="bg-blue-300 rounded-md p-2">
                         {message.message}
                     </div>
@@ -70,11 +90,12 @@ function Message({ message }) {
                                         border-t-[8px] border-t-transparent
                                         border-r-[8px] border-r-transparent">
                     </div>
-                </div>
+                </button>
 
                 <div className="w-9 h-9">
                     <UserPicture user_id={1} user_img={"/public/user_profile_pictures/YB10jCxFYeYSDe7YX9NhL0vR6i4i25uFo01AITXj.png"} />
                 </div>
+
             </div>
         )
     } return (

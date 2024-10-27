@@ -16,7 +16,7 @@ import ResetPasswordModal from '../Components/resetPasswordModal';
 import Message from '../Components/message';
 import { ModalContext } from '../Components/Context/modalContext'
 import useModalVisible from '../Components/Hooks/useModalVisible';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 export default function Layout({ children, breadcrumbs, token = "", isPasswordResetEmail = false }) {
     const [registrationRef, showRegistration, setShowRegistration] = useModalVisible(false);
     const [loginRef, showLogin, setShowLogin] = useModalVisible(false);
@@ -26,7 +26,9 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
     const [resetPasswordEmailRef, showResetPasswordEmail, setShowResetPasswordEmail] = useModalVisible(isPasswordResetEmail);
     const [resetPasswordRef, showResetPassword, setShowResetPassword] = useModalVisible(token != '' ? true : false);
     const [confirmRef, showConfirm, setShowConfrim] = useModalVisible(false);
-    const [destroyRoute, setDestroyRoute] = useState(null);
+
+    const destroyRoute = useRef(null);
+    const confirmMessage = useRef("")
     const modals = [showRegistration, showLogin, showMenu, showSearch, showSettings, showResetPasswordEmail, showResetPassword, showConfirm]
     useEffect(() => {
         document.getElementById('layout').style.filter = ""
@@ -52,7 +54,7 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
             <VerificationModal />
             <ResetPasswordEmailModal isVisible={showResetPasswordEmail} componentRef={resetPasswordEmailRef} close={() => setShowResetPasswordEmail(false)} />
             <ResetPasswordModal isVisible={showResetPassword} componentRef={resetPasswordRef} close={() => setShowResetPassword(false)} token={token} />
-            <ConfirmModal isVisible={showConfirm} componentRef={confirmRef} close={() => setShowConfrim(false)} destroyRoute={destroyRoute} />
+            <ConfirmModal isVisible={showConfirm} componentRef={confirmRef} close={() => setShowConfrim(false)} destroyRoute={destroyRoute} message={confirmMessage} />
             <div id="layout">
                 <Header
                     handleRegistrationClick={() => setShowRegistration(true)}
@@ -64,10 +66,11 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
                 <div className='md:mx-16 sm:mx-0'>
                     <Breadcrumb breadcrumbs={breadcrumbs} />
                     <Message />
-                    <UserMenu />
 
 
-                    <ModalContext.Provider value={{ "setIsShowSettings": setShowSettings, "setShowConfirm": setShowConfrim, "setDestroyRoute": setDestroyRoute }}>
+
+                    <ModalContext.Provider value={{ "setIsShowSettings": setShowSettings, "setShowConfirm": setShowConfrim, "destroyRoute": destroyRoute, "confirmMessage": confirmMessage }}>
+                        <UserMenu />
                         <div className='grid grid-cols-4 max-lg:grid-cols-1' name="content_block">
                             <div name="main_block" className='col-span-3 mt-5'>
                                 {children}
