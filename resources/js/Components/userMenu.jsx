@@ -2,13 +2,14 @@ import useComponentVisible from "./Hooks/useComponentVisible"
 import { usePage, Link, router } from "@inertiajs/react"
 import Notifications from "./notifications"
 import Chats from "./chats"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
+import { ModalContext } from "./Context/modalContext"
 export default function UserMenu() {
     const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
     const { auth } = usePage().props
     const [showNotifications, setShowNotifications] = useState(false)
-    const [showChats, setShowChats] = useState(false)
     const [notifications, setNotifications] = useState(auth.notifications)
+    const { showChats, setShowChats } = useContext(ModalContext)
     if (auth.user) {
         window.Echo.private('App.Models.User.' + auth.user.id)
             .notification((notification) => {
@@ -18,6 +19,11 @@ export default function UserMenu() {
 
             });
     }
+    useEffect(() => {
+        if (showChats) {
+            setShowNotifications(false)
+        }
+    }, [showChats])
     useEffect(() => { setNotifications(auth.notifications) }, [isComponentVisible])
     const chats = [{ user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", messages: [{ user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 1 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 2 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 1 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 2 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 2 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 2 }] },]
     return (
@@ -56,7 +62,7 @@ export default function UserMenu() {
                                                 }
                                             </li>
                                         </button>
-                                        <button onClick={() => { setShowChats(true), setShowNotifications(false) }}>
+                                        <button onClick={() => { setShowChats(true) }}>
                                             <li className="relative block px-4 rounded-md py-2 hover:bg-slate-200 hover:text-slate-500">
                                                 Chats
                                                 {chats.length > 0 &&

@@ -1,8 +1,7 @@
-import useModalVisible from "./Hooks/useModalVisible"
-export default function EmojiBox() {
-    const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false)
+
+export default function EmojiBox({ componentRef, isComponentVisible, setIsComponentVisible }) {
     return (
-        <div ref={ref}>
+        <div ref={componentRef}>
             <button onClick={() => { setIsComponentVisible(!isComponentVisible) }} type="button" className="absolute right-14 top-3 hover:opacity-70"><i className="fa-regular fa-face-smile" /></button>
             {isComponentVisible &&
                 <div className="absolute bottom-9 right-8 grid grid-cols-1">

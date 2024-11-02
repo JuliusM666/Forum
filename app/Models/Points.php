@@ -12,10 +12,10 @@ class Points extends Model
     protected $fillable = ['user_id', 'voter_id'];
     public function voter(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, "voter_id");
     }
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, "user_id");
     }
 }

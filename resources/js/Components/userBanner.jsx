@@ -6,7 +6,7 @@ import { useContext } from "react"
 import { usePage } from "@inertiajs/react"
 export default function UserBanner({ user }) {
     const { auth } = usePage().props
-    const { setIsShowSettings } = useContext(ModalContext)
+    const { setIsShowSettings, setShowChats, setActiveChat } = useContext(ModalContext)
     return (
 
 
@@ -43,9 +43,15 @@ export default function UserBanner({ user }) {
                     <h1 className="text-slate-100 font-semibold ">Points</h1>
                     <h1 className="text-slate-200 whitespace-nowrap max-sm:text-xs"><Points points={user.points_count} user_id={user.id} /></h1>
                 </div>
-                <div className="text-slate-700 max-xl:hover:text-4xl hover:text-2xl pr-2 text-xl max-xl:right-1 max-xl:text-3xl col-span-2 max-lg: flex justify-end max-xl:absolute max-xl:top-2/4">
+                <div className="text-slate-700 pr-2 text-xl max-xl:right-1 max-xl:text-3xl col-span-2 max-lg: flex gap-4 justify-end max-xl:absolute max-xl:top-2/4">
+                    {auth.user != null &&
+                        <button className="max-xl:hover:text-4xl hover:text-2xl" onClick={() => { setShowChats(true), setActiveChat(user.id) }}>
+                            <i className="fa-solid fa-comment-dots" />
+                        </button>
+
+                    }
                     {auth.user != null && user.id == auth.user.id &&
-                        <button onClick={() => { setIsShowSettings(true), window.scrollTo(0, 0) }}>
+                        <button className="max-xl:hover:text-4xl hover:text-2xl" onClick={() => { setIsShowSettings(true), window.scrollTo(0, 0) }}>
                             <i className="fa-solid fa-gear " />
                         </button>
 

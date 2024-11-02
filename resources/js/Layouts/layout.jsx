@@ -27,6 +27,9 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
     const [resetPasswordRef, showResetPassword, setShowResetPassword] = useModalVisible(token != '' ? true : false);
     const [confirmRef, showConfirm, setShowConfrim] = useModalVisible(false);
 
+    const [showChats, setShowChats] = useState(false)
+    const [activeChat, setActiveChat] = useState(null)
+
     const destroyRoute = useRef(null);
     const confirmMessage = useRef("")
     const modals = [showRegistration, showLogin, showMenu, showSearch, showSettings, showResetPasswordEmail, showResetPassword, showConfirm]
@@ -69,7 +72,10 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
 
 
 
-                    <ModalContext.Provider value={{ "setIsShowSettings": setShowSettings, "setShowConfirm": setShowConfrim, "destroyRoute": destroyRoute, "confirmMessage": confirmMessage }}>
+                    <ModalContext.Provider value={{
+                        "showChats": showChats, "setShowChats": setShowChats, "setIsShowSettings": setShowSettings, "setActiveChat": setActiveChat,
+                        "activeChat": activeChat, "setShowConfirm": setShowConfrim, "destroyRoute": destroyRoute, "confirmMessage": confirmMessage
+                    }}>
                         <UserMenu />
                         <div className='grid grid-cols-4 max-lg:grid-cols-1' name="content_block">
                             <div name="main_block" className='col-span-3 mt-5'>

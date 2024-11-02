@@ -1,4 +1,5 @@
 import { useState, useContext } from "react"
+import useModalVisible from "./Hooks/useModalVisible"
 import Card from "./card"
 import CloseButton from "./closeButton"
 import { Link } from "@inertiajs/react"
@@ -7,7 +8,11 @@ import UserPicture from "./userPicture"
 import { ModalContext } from "./Context/modalContext"
 import EmojiBox from "./emojiBox"
 export default function Chats({ close, chats }) {
-    const [activeChat, setActiveChat] = useState(null)
+    const { activeChat, setActiveChat } = useContext(ModalContext)
+    if (activeChat != null && !chats.hasOwnProperty(activeChat)) {
+        chats[activeChat] = { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", messages: [] }
+    }
+
     return (
         <div className="fixed z-20 text-slate-700 right-0 bottom-0 w-1/4 max-xl:w-1/3 max-lg:w-1/2 max-md:w-8/12 max-sm:w-11/12">
             <Card name="Chats" ButtonComponent={<CloseButton handleOnClick={() => close()} />}>
@@ -45,6 +50,8 @@ function Chat({ chat, handleOnClick }) {
 function Messages({ messages, handleBackClick }) {
     const { setShowConfirm, destroyRoute, confirmMessage } = useContext(ModalContext)
     const [activeMessage, setActiveMessage] = useState(null)
+    const [input, setInput] = useState("")
+    const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false)
     return (
         <div className="relative">
             <div className="bg-blue-100 z-20 p-1 grid grid-cols-3 justify-items-center items-center">
@@ -55,29 +62,29 @@ function Messages({ messages, handleBackClick }) {
             </div>
             <ul className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
                 {messages.map((message, index) => {
-                    return (<Message message={message} handleMessageClick={() => setActiveMessage(activeMessage != index ? index : null)} isActive={activeMessage == index} key={index} />)
+                    return (<Message message={message} setShowEmoji={setIsComponentVisible} setInput={setInput} handleMessageClick={() => setActiveMessage(activeMessage != index ? index : null)} isActive={activeMessage == index} key={index} />)
                 })}
             </ul>
             <form className="relative flex gap-1 h-12 p-2">
 
-                <input className="w-full rounded-full bg-blue-100 border-none pr-8" placeholder="Type your message here..." />
-                <EmojiBox />
+                <input value={input} className="w-full rounded-full bg-blue-100 border-none pr-8" placeholder="Type your message here..." />
+                <EmojiBox componentRef={ref} isComponentVisible={isComponentVisible} setIsComponentVisible={setIsComponentVisible} />
                 <button className="rounded-full bg-blue-300 hover:opacity-70 flex justify-center items-center p-2"><i className="fa-regular fa-paper-plane" /></button>
             </form>
 
         </div>
     )
 }
-function Message({ message, handleMessageClick, isActive }) {
-
+function Message({ message, handleMessageClick, isActive, setInput, setShowEmoji }) {
+    const { setShowConfirm, destroyRoute, confirmMessage } = useContext(ModalContext)
     if (message.id == 1) {
         return (
             <div className="relative flex justify-end p-2">
                 {isActive &&
                     <div className="gap-3 flex items-center mr-1">
-                        <button className="hover:opacity-70"><i className="fa-solid fa-circle-plus" /></button>
-                        <button className="hover:opacity-70"> <i className="fa-regular fa-pen-to-square" /></button>
-                        <button className="hover:opacity-70"> <i className="fa-solid fa-circle-xmark" /></button>
+                        <button onClick={() => setShowEmoji(true)} className="hover:opacity-70"><i className="fa-solid fa-circle-plus" /></button>
+                        <button onClick={() => setInput(message.message)} className="hover:opacity-70"> <i className="fa-regular fa-pen-to-square" /></button>
+                        <button onClick={() => { setShowConfirm(true), destroyRoute.current = "destroy_route", confirmMessage.current = "This message will only be deleted for you. Do you want to confirm?" }} className="hover:opacity-70"> <i className="fa-solid fa-circle-xmark" /></button>
                     </div>
                 }
                 <button onClick={() => handleMessageClick()} className="flex gap-0  hover:opacity-70">
