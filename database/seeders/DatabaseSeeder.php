@@ -10,6 +10,8 @@ use \App\Models\Theme;
 use \App\Models\Reply;
 use \App\Models\Post;
 use \App\Models\Points;
+use \App\Models\Message;
+use \App\Models\MessageEmoji;
 use Storage;
 class DatabaseSeeder extends Seeder
 {
@@ -97,6 +99,25 @@ class DatabaseSeeder extends Seeder
                 'user_id' => $user->id,
                 'voter_id' => $voter->id,
                 'created_at' => fake()->dateTimeBetween('-1 year', 'now'),
+            ]);
+        }
+        for ($i = 0; $i < 500; $i++) {
+            Message::factory()->create([
+                'reciever_id' => $users->random()->id,
+                'sender_id' => $users->random()->id,
+            ]);
+        }
+        for ($i = 0; $i < 500; $i++) {
+            Message::factory()->create([
+                'reciever_id' => 1,
+                'sender_id' => $users->random()->id,
+            ]);
+        }
+        $messages = Message::all()->shuffle();
+        for ($i = 0; $i < 2000; $i++) {
+            MessageEmoji::factory()->create([
+                'user_id' => $users->random()->id,
+                'message_id' => $messages->random()->id,
             ]);
         }
 

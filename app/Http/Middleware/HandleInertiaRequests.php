@@ -46,6 +46,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user() == null ? null : $request->user()->loadCount('points'),
                 'votes' => $request->user() == null ? null : (new PointsController)->getVotesArray($request),
                 'notifications' => $request->user() == null ? [] : $request->user()->unreadNotifications,
+                'messages' => $request->user() == null ? [] : $request->user()->Messages(),
 
             ],
             'verified' => $request->user() == null ? null : $request->user()->hasVerifiedEmail(),

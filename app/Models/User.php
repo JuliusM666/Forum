@@ -77,14 +77,12 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     {
         return $this->hasMany(PostFollower::class);
     }
-    public function RecievedMessages(): HasMany
+    public function Messages()
     {
-        return $this->hasMany(Message::class, "reciever_id");
+        return Message::where("sender_id", $this->id)->orWhere("reciever_id", $this->id)->
+            groupBy("sender_id")->with('reciever')->get();
     }
-    public function SentMessages(): HasMany
-    {
-        return $this->hasMany(Message::class, "sender_id");
-    }
+
     public function sendPasswordResetNotification($token): void
     {
         $url = route('password.reset', ['token' => $token]);

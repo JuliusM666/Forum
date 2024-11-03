@@ -17,9 +17,7 @@ export default function Chats({ close, chats }) {
         <div className="fixed z-20 text-slate-700 right-0 bottom-0 w-1/4 max-xl:w-1/3 max-lg:w-1/2 max-md:w-8/12 max-sm:w-11/12">
             <Card name="Chats" ButtonComponent={<CloseButton handleOnClick={() => close()} />}>
                 <div className="bg-slate-100">
-                    {activeChat == null && chats.map((chat, index) => {
-                        return (<Chat chat={chat} key={index} handleOnClick={() => setActiveChat(index)} />)
-                    })}
+                    {activeChat == null && <Chat chats={chats} setActiveChat={setActiveChat} />}
                     {activeChat != null && <Messages handleBackClick={() => setActiveChat(null)} messages={chats[activeChat].messages} />}
                     {chats.length == 0 && <h1 className="text-right p-2">no messages</h1>}
                 </div>
@@ -29,21 +27,27 @@ export default function Chats({ close, chats }) {
     )
 }
 
-function Chat({ chat, handleOnClick }) {
+function Chat({ chats, setActiveChat }) {
     return (
         <ul className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
-            <button onClick={() => handleOnClick()} className="odd:bg-slate-100 text-slate-700 even:bg-slate-200 p-2 grid grid-cols-6 items-center hover:opacity-70">
-                <div className="flex justify-end mr-5">
-                    <div className="w-9 h-9">
-                        <UserPicture user_id={1} user_img={"/public/user_profile_pictures/YB10jCxFYeYSDe7YX9NhL0vR6i4i25uFo01AITXj.png"} />
-                    </div>
-                </div>
-                <div className="col-span-4 text-start">
-                    <h1 className="font-semibold">{chat.user}</h1>
-                    <h1>{chat.message}</h1>
-                </div>
-                <h1 className="text-xs font-semibold text-end">{moment(chat.created_at).fromNow()}</h1>
-            </button>
+            {chats.map((chat, index) => {
+                return (
+                    <li key={index}>
+                        <button onClick={() => setActiveChat(index)} className="odd:bg-slate-100 text-slate-700 even:bg-slate-200 p-2 grid grid-cols-6 items-center hover:opacity-70">
+                            <div className="flex justify-end mr-5">
+                                <div className="w-9 h-9">
+                                    <UserPicture user_id={chat.reciever.id} user_img={chat.reciever.user_img} />
+                                </div>
+                            </div>
+                            <div className="col-span-4 text-start">
+                                <h1 className="font-semibold">{chat.reciever.name}</h1>
+                                <h1>{chat.message}</h1>
+                            </div>
+                            <h1 className="text-xs font-semibold text-end">{moment(chat.created_at).fromNow()}</h1>
+                        </button>
+                    </li>
+                )
+            })}
         </ul>
     )
 }

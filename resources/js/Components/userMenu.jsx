@@ -25,7 +25,7 @@ export default function UserMenu() {
         }
     }, [showChats])
     useEffect(() => { setNotifications(auth.notifications) }, [isComponentVisible])
-    const chats = [{ user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", messages: [{ user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 1 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 2 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 1 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 2 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 2 }, { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", id: 2 }] },]
+    const chats = auth.messages
     return (
         <>
             {auth.user && showNotifications && <Notifications close={() => { setShowNotifications(false); router.reload({ only: ['auth'] }) }} notifications={notifications} />}
