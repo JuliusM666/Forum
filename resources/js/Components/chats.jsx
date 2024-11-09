@@ -9,7 +9,7 @@ import { ModalContext } from "./Context/modalContext"
 import EmojiBox from "./emojiBox"
 export default function Chats({ close, chats }) {
     const { activeChat, setActiveChat } = useContext(ModalContext)
-    if (activeChat != null && !chats.hasOwnProperty(activeChat)) {
+    if (activeChat != null && !chats.hasOwnProperty(activeChat)) {  // for new chat
         chats[activeChat] = { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", messages: [] }
     }
 
@@ -33,15 +33,15 @@ function Chat({ chats, setActiveChat }) {
             {chats.map((chat, index) => {
                 return (
                     <li key={index}>
-                        <button onClick={() => setActiveChat(index)} className="odd:bg-slate-100 text-slate-700 even:bg-slate-200 p-2 grid grid-cols-6 items-center hover:opacity-70">
+                        <button onClick={() => setActiveChat(index)} className="odd:bg-slate-100 text-slate-700 even:bg-slate-200 p-2 gap-1 grid grid-cols-6 items-center hover:opacity-70">
                             <div className="flex justify-end mr-5">
                                 <div className="w-9 h-9">
-                                    <UserPicture user_id={chat.reciever.id} user_img={chat.reciever.user_img} />
+                                    <UserPicture user_id={chat.sender.id} user_img={chat.sender.user_img} />
                                 </div>
                             </div>
                             <div className="col-span-4 text-start">
-                                <h1 className="font-semibold">{chat.reciever.name}</h1>
-                                <h1>{chat.message}</h1>
+                                <h1 className="font-semibold">{chat.sender.name}</h1>
+                                <p className="truncate">{chat.message}</p>
                             </div>
                             <h1 className="text-xs font-semibold text-end">{moment(chat.created_at).fromNow()}</h1>
                         </button>

@@ -4,6 +4,7 @@ namespace App\Models;
 
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -79,8 +80,25 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     }
     public function Messages()
     {
-        return Message::where("sender_id", $this->id)->orWhere("reciever_id", $this->id)->
-            groupBy("sender_id")->with('reciever')->get();
+        return Message::where("sender_id", $this->id)->orWhere("reciever_id", $this->id)->latest()->get()
+            ->groupBy(function (Message $message) {
+                if ($message->sender_id == $this->id) {
+                    return $message->sender_id . "*" . $message->reciever_id;
+                } else {
+                    return $message->reciever_id . "*" . $message->sender_id;
+                }
+            })->map(function ($message) {
+                $first_message = $message->first();
+                if ($first_message->sender_id == $this->id) {
+                    $first_message->load('reciever');
+                    $first_message['sender'] = $first_message['reciever'];
+                    unset($first_message['reciever']);
+                    return $first_message;
+                } else {
+                    return $first_message->load('sender');
+                }
+            })->sortByDesc('created_at')->values()->all();
+
     }
 
     public function sendPasswordResetNotification($token): void
