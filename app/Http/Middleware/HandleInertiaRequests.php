@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -46,7 +47,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user() == null ? null : $request->user()->loadCount('points'),
                 'votes' => $request->user() == null ? null : (new PointsController)->getVotesArray($request),
                 'notifications' => $request->user() == null ? [] : $request->user()->unreadNotifications,
-                'messages' => $request->user() == null ? [] : $request->user()->Messages(),
+                'messages' => $request->user() == null ? [] : (new MessageController)->indexChats(),
 
             ],
             'verified' => $request->user() == null ? null : $request->user()->hasVerifiedEmail(),

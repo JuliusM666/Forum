@@ -66,7 +66,6 @@ Route::post('/vote', [PointsController::class, 'store'])->middleware('auth', 've
 Route::post('/follow/theme', [ThemeFollowerController::class, 'store'])->middleware('auth', 'verified');
 Route::post('/follow/post', [PostFollowerController::class, 'store'])->middleware('auth', 'verified');
 
-
 # Password reset link request form
 Route::controller(ResetPasswordController::class)->group(function () {
     Route::get('/forgot-password', 'showEmailForm')->middleware('guest')->name('password.request');

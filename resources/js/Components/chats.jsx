@@ -1,25 +1,52 @@
-import { useState, useContext } from "react"
+import { useState, useContext, useEffect } from "react"
 import useModalVisible from "./Hooks/useModalVisible"
 import Card from "./card"
 import CloseButton from "./closeButton"
-import { Link } from "@inertiajs/react"
+import { Link, usePage } from "@inertiajs/react"
 import moment from "moment"
 import UserPicture from "./userPicture"
 import { ModalContext } from "./Context/modalContext"
 import EmojiBox from "./emojiBox"
-export default function Chats({ close, chats }) {
+export default function Chats({ close }) {
+    const { auth } = usePage().props
+    const [loading, setLoading] = useState(false)
+    let chats = auth.messages
     const { activeChat, setActiveChat } = useContext(ModalContext)
     if (activeChat != null && !chats.hasOwnProperty(activeChat)) {  // for new chat
         chats[activeChat] = { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", messages: [] }
     }
+    useEffect(() => {
+        const chatWindow = document.getElementById("chatWindow")
+        chatWindow.onscroll = function () {
+            if (chatWindow.scrollTop === (chatWindow.scrollHeight - chatWindow.offsetHeight)) {
+                if (chats.current_page != chats.last_page) {
+                    setLoading(true)
+                    axios.get('/api/chats?chat_page=' + (chats.current_page + 1))
+                        .then(function (response) {
+                            console.log(response)
+                            auth.messages.data = chats.data.concat(response.data.data)
+                            auth.messages.current_page = chats.current_page + 1
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        })
+                        .finally(function () {
+                            setLoading(false)
+                        });
+
+                }
+            }
+        }
+    }, [])
+
 
     return (
         <div className="fixed z-20 text-slate-700 right-0 bottom-0 w-1/4 max-xl:w-1/3 max-lg:w-1/2 max-md:w-8/12 max-sm:w-11/12">
             <Card name="Chats" ButtonComponent={<CloseButton handleOnClick={() => close()} />}>
                 <div className="bg-slate-100">
-                    {activeChat == null && <Chat chats={chats} setActiveChat={setActiveChat} />}
-                    {activeChat != null && <Messages handleBackClick={() => setActiveChat(null)} messages={chats[activeChat].messages} />}
-                    {chats.length == 0 && <h1 className="text-right p-2">no messages</h1>}
+                    {activeChat == null && <Chat chats={chats.data} setActiveChat={setActiveChat} />}
+                    {activeChat != null && <Messages handleBackClick={() => setActiveChat(null)} messages={chats.data[activeChat].messages} />}
+                    {chats.total == 0 && <h1 className="text-right p-2">no messages</h1>}
                 </div>
             </Card>
         </div>
@@ -29,7 +56,7 @@ export default function Chats({ close, chats }) {
 
 function Chat({ chats, setActiveChat }) {
     return (
-        <ul className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
+        <ul id="chatWindow" className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
             {chats.map((chat, index) => {
                 return (
                     <li key={index}>

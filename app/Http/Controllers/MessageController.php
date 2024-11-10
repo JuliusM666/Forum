@@ -10,9 +10,9 @@ class MessageController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function indexChats()
     {
-        //
+        return auth()->user()->Chats()->paginate(10, pageName: "chat_page");
     }
 
     /**

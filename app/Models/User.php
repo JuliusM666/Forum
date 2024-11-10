@@ -78,7 +78,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     {
         return $this->hasMany(PostFollower::class);
     }
-    public function Messages()
+    public function Chats()
     {
         return Message::where("sender_id", $this->id)->orWhere("reciever_id", $this->id)->latest()->get()
             ->groupBy(function (Message $message) {
@@ -97,7 +97,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
                 } else {
                     return $first_message->load('sender');
                 }
-            })->sortByDesc('created_at')->values()->all();
+            })->sortByDesc('created_at')->values();
 
     }
 

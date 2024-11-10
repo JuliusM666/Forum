@@ -25,11 +25,10 @@ export default function UserMenu() {
         }
     }, [showChats])
     useEffect(() => { setNotifications(auth.notifications) }, [isComponentVisible])
-    const chats = auth.messages
     return (
         <>
             {auth.user && showNotifications && <Notifications close={() => { setShowNotifications(false); router.reload({ only: ['auth'] }) }} notifications={notifications} />}
-            {auth.user && showChats && <Chats close={() => { setShowChats(false); router.reload({ only: ['auth'] }) }} chats={chats} />}
+            {auth.user && showChats && <Chats close={() => { setShowChats(false) }} />}
             {auth.user &&
                 <div className="flex justify-end max-md:justify-center">
                     <div ref={ref} className="relative">
@@ -65,9 +64,9 @@ export default function UserMenu() {
                                         <button onClick={() => { setShowChats(true) }}>
                                             <li className="relative block px-4 rounded-md py-2 hover:bg-slate-200 hover:text-slate-500">
                                                 Chats
-                                                {chats.length > 0 &&
+                                                {auth.messages.total > 0 &&
                                                     <div className="animate-bounce absolute text-center align-middle top-1.5 shadow-md right-1 text-xs z-10 bg-slate-700 text-slate-100 px-1 rounded-full ">
-                                                        {chats.length}
+                                                        {auth.messages.total}
                                                     </div>
 
                                                 }
