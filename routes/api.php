@@ -14,4 +14,5 @@ use App\Http\Controllers\MessageController;
 |
 */
 
-Route::get('/chats', [MessageController::class, 'indexChats'])->middleware('auth');
+Route::get('/chats', [MessageController::class, 'index'])->middleware('auth');
+Route::get('/chats/{id}', [MessageController::class, 'show'])->middleware('auth');

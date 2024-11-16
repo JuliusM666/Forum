@@ -7,10 +7,10 @@ import moment from "moment"
 import UserPicture from "./userPicture"
 import { ModalContext } from "./Context/modalContext"
 import EmojiBox from "./emojiBox"
+import Loading from "./loading"
 export default function Chats({ close }) {
     const { auth } = usePage().props
     const [loading, setLoading] = useState(false)
-    let chats = auth.messages
     const { activeChat, setActiveChat } = useContext(ModalContext)
     if (activeChat != null && !chats.hasOwnProperty(activeChat)) {  // for new chat
         chats[activeChat] = { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", messages: [] }
@@ -23,7 +23,6 @@ export default function Chats({ close }) {
                     setLoading(true)
                     axios.get('/api/chats?chat_page=' + (chats.current_page + 1))
                         .then(function (response) {
-                            console.log(response)
                             auth.messages.data = chats.data.concat(response.data.data)
                             auth.messages.current_page = chats.current_page + 1
                         })
@@ -44,7 +43,7 @@ export default function Chats({ close }) {
         <div className="fixed z-20 text-slate-700 right-0 bottom-0 w-1/4 max-xl:w-1/3 max-lg:w-1/2 max-md:w-8/12 max-sm:w-11/12">
             <Card name="Chats" ButtonComponent={<CloseButton handleOnClick={() => close()} />}>
                 <div className="bg-slate-100">
-                    {activeChat == null && <Chat chats={chats.data} setActiveChat={setActiveChat} />}
+                    {activeChat == null && <Chat chats={chats.data} setActiveChat={setActiveChat} loading={loading} />}
                     {activeChat != null && <Messages handleBackClick={() => setActiveChat(null)} messages={chats.data[activeChat].messages} />}
                     {chats.total == 0 && <h1 className="text-right p-2">no messages</h1>}
                 </div>
@@ -54,7 +53,7 @@ export default function Chats({ close }) {
     )
 }
 
-function Chat({ chats, setActiveChat }) {
+function Chat({ chats, setActiveChat, loading }) {
     return (
         <ul id="chatWindow" className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
             {chats.map((chat, index) => {
@@ -75,6 +74,7 @@ function Chat({ chats, setActiveChat }) {
                     </li>
                 )
             })}
+            {loading && <div className="flex justify-center"><Loading /></div>}
         </ul>
     )
 }

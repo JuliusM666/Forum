@@ -10,7 +10,7 @@ class MessageController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function indexChats()
+    public function index()
     {
         return auth()->user()->Chats()->paginate(10, pageName: "chat_page");
     }
@@ -36,7 +36,7 @@ class MessageController extends Controller
      */
     public function show(Message $message)
     {
-        //
+        echo $message->sender_id, $message->reciever_id;
     }
 
     /**
