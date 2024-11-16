@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use Illuminate\Http\Request;
-
+use Illuminate\Database\Eloquent\Builder;
 class MessageController extends Controller
 {
     /**
@@ -34,9 +34,13 @@ class MessageController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Message $message)
+    public function show($recipient_id)
     {
-        echo $message->sender_id, $message->reciever_id;
+        return Message::where("sender_id", auth()->user()->id)->where("reciever_id", $recipient_id)->
+            orWhere(function (Builder $query) use ($recipient_id) {
+                $query->where("sender_id", $recipient_id)
+                    ->where("reciever_id", auth()->user()->id);
+            })->with("sender")->latest()->cursorPaginate(10, cursorName: "message_page");
     }
 
     /**

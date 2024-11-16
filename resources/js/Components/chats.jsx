@@ -10,21 +10,40 @@ import EmojiBox from "./emojiBox"
 import Loading from "./loading"
 export default function Chats({ close }) {
     const { auth } = usePage().props
+    const { activeChat, setActiveChat } = useContext(ModalContext) // recipient id
+    // if (activeChat != null && !chats.hasOwnProperty(activeChat)) {  // for new chat
+    //     chats[activeChat] = { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", messages: [] }
+    // }
+
+
+
+    return (
+        <div className="fixed z-20 text-slate-700 right-0 bottom-0 w-1/4 max-xl:w-1/3 max-lg:w-1/2 max-md:w-8/12 max-sm:w-11/12">
+            <Card name="Chats" ButtonComponent={<CloseButton handleOnClick={() => close()} />}>
+                <div className="bg-slate-100">
+                    {activeChat == null && <Chat setActiveChat={setActiveChat} />}
+                    {activeChat != null && <Messages activeChat={activeChat} setActiveChat={setActiveChat} />}
+                    {auth.chats.total == 0 && <h1 className="text-right p-2">no messages</h1>}
+                </div>
+            </Card>
+        </div>
+
+    )
+}
+
+function Chat({ setActiveChat }) {
+    const { auth } = usePage().props
     const [loading, setLoading] = useState(false)
-    const { activeChat, setActiveChat } = useContext(ModalContext)
-    if (activeChat != null && !chats.hasOwnProperty(activeChat)) {  // for new chat
-        chats[activeChat] = { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", messages: [] }
-    }
     useEffect(() => {
         const chatWindow = document.getElementById("chatWindow")
         chatWindow.onscroll = function () {
             if (chatWindow.scrollTop === (chatWindow.scrollHeight - chatWindow.offsetHeight)) {
-                if (chats.current_page != chats.last_page) {
+                if (auth.chats.current_page != auth.chats.last_page) {
                     setLoading(true)
-                    axios.get('/api/chats?chat_page=' + (chats.current_page + 1))
+                    axios.get('/api/chats?chat_page=' + (auth.chats.current_page + 1))
                         .then(function (response) {
-                            auth.messages.data = chats.data.concat(response.data.data)
-                            auth.messages.current_page = chats.current_page + 1
+                            auth.chats.data = auth.chats.data.concat(response.data.data)
+                            auth.chats.current_page = auth.chats.current_page + 1
                         })
                         .catch(function (error) {
                             console.log(error);
@@ -37,29 +56,12 @@ export default function Chats({ close }) {
             }
         }
     }, [])
-
-
-    return (
-        <div className="fixed z-20 text-slate-700 right-0 bottom-0 w-1/4 max-xl:w-1/3 max-lg:w-1/2 max-md:w-8/12 max-sm:w-11/12">
-            <Card name="Chats" ButtonComponent={<CloseButton handleOnClick={() => close()} />}>
-                <div className="bg-slate-100">
-                    {activeChat == null && <Chat chats={chats.data} setActiveChat={setActiveChat} loading={loading} />}
-                    {activeChat != null && <Messages handleBackClick={() => setActiveChat(null)} messages={chats.data[activeChat].messages} />}
-                    {chats.total == 0 && <h1 className="text-right p-2">no messages</h1>}
-                </div>
-            </Card>
-        </div>
-
-    )
-}
-
-function Chat({ chats, setActiveChat, loading }) {
     return (
         <ul id="chatWindow" className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
-            {chats.map((chat, index) => {
+            {auth.chats.data.map((chat, index) => {
                 return (
                     <li key={index}>
-                        <button onClick={() => setActiveChat(index)} className="odd:bg-slate-100 text-slate-700 even:bg-slate-200 p-2 gap-1 grid grid-cols-6 items-center hover:opacity-70">
+                        <button onClick={() => setActiveChat(chat.sender.id)} className="odd:bg-slate-100 text-slate-700 even:bg-slate-200 p-2 gap-1 grid grid-cols-6 items-center hover:opacity-70">
                             <div className="flex justify-end mr-5">
                                 <div className="w-9 h-9">
                                     <UserPicture user_id={chat.sender.id} user_img={chat.sender.user_img} />
@@ -78,23 +80,51 @@ function Chat({ chats, setActiveChat, loading }) {
         </ul>
     )
 }
-function Messages({ messages, handleBackClick }) {
+function Messages({ activeChat, setActiveChat }) {
+    const { auth } = usePage().props
     const { setShowConfirm, destroyRoute, confirmMessage } = useContext(ModalContext)
     const [activeMessage, setActiveMessage] = useState(null)
     const [input, setInput] = useState("")
     const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false)
+    const [loading, setLoading] = useState(false)
+    function fetchMessages() {
+
+    }
+    useEffect(() => {
+        const chatWindow = document.getElementById("chatWindow")
+        chatWindow.onscroll = function () {
+            if (chatWindow.scrollTop === (chatWindow.scrollHeight - chatWindow.offsetHeight)) {
+                if (auth.chats.current_page != auth.chats.last_page) {
+                    setLoading(true)
+                    axios.get('/api/chats?chat_page=' + (auth.chats.current_page + 1))
+                        .then(function (response) {
+                            auth.chats.data = auth.chats.data.concat(response.data.data)
+                            auth.chats.current_page = auth.chats.current_page + 1
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        })
+                        .finally(function () {
+                            setLoading(false)
+                        });
+
+                }
+            }
+        }
+    }, [])
     return (
         <div className="relative">
             <div className="bg-blue-100 z-20 p-1 grid grid-cols-3 justify-items-center items-center">
-                <button onClick={() => handleBackClick()} className="justify-self-start hover:opacity-70 ml-1"><i className="fa-solid fa-caret-left text-lg text-slate-700" /></button>
+                <button onClick={() => setActiveChat(null)} className="justify-self-start hover:opacity-70 ml-1"><i className="fa-solid fa-caret-left text-lg text-slate-700" /></button>
                 <Link href={route("user.show", 1)} className="font-semibold hover:opacity-70">User</Link>
                 <button onClick={() => { setShowConfirm(true), destroyRoute.current = "destroy_route", confirmMessage.current = "This chat will only be deleted for you. Do you want to confirm?" }}
                     className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
             </div>
             <ul className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
-                {messages.map((message, index) => {
+                {auth.messages.map((message, index) => {
                     return (<Message message={message} setShowEmoji={setIsComponentVisible} setInput={setInput} handleMessageClick={() => setActiveMessage(activeMessage != index ? index : null)} isActive={activeMessage == index} key={index} />)
                 })}
+                {loading && <div className="flex justify-center"><Loading /></div>}
             </ul>
             <form className="relative flex gap-1 h-12 p-2">
 
