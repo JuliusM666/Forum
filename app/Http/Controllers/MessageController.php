@@ -40,7 +40,7 @@ class MessageController extends Controller
             orWhere(function (Builder $query) use ($recipient_id) {
                 $query->where("sender_id", $recipient_id)
                     ->where("reciever_id", auth()->user()->id);
-            })->with("sender")->latest()->cursorPaginate(10, cursorName: "message_page");
+            })->with("sender")->latest()->cursorPaginate(5, cursorName: "message_page");
     }
 
     /**

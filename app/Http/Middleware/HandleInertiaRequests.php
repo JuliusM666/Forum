@@ -48,13 +48,12 @@ class HandleInertiaRequests extends Middleware
                 'votes' => $request->user() == null ? null : (new PointsController)->getVotesArray($request),
                 'notifications' => $request->user() == null ? [] : $request->user()->unreadNotifications,
                 'chats' => $request->user() == null ? [] : (new MessageController)->index(),
-                'messages' => [],
 
             ],
             'verified' => $request->user() == null ? null : $request->user()->hasVerifiedEmail(),
             'sidebar' => [
-                'newPosts' => (new PostController)->newPosts($request),
-                'popularPosts' => (new PostController)->popularPosts($request),
+                'newPosts' => (new PostController)->newPosts(),
+                'popularPosts' => (new PostController)->popularPosts(),
                 'popularUsers' => (new UserController)->popularUsers(),
             ],
 

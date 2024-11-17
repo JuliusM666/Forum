@@ -91,11 +91,11 @@ class PostController extends Controller
             Cache::put($key, true, now()->addMinutes(10)); // 10 minutes
         }
     }
-    public function newPosts(Request $request)
+    public function newPosts()
     {
         return Post::with('user', 'theme')->withCount('replies')->latest()->limit(5)->get();
     }
-    public function popularPosts(Request $request)
+    public function popularPosts()
     {
         return Post::with('user', 'theme')->withCount('replies')->orderByDesc('replies_count')->limit(5)->get();
     }

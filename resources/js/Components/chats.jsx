@@ -81,37 +81,39 @@ function Chat({ setActiveChat }) {
     )
 }
 function Messages({ activeChat, setActiveChat }) {
-    const { auth } = usePage().props
     const { setShowConfirm, destroyRoute, confirmMessage } = useContext(ModalContext)
     const [activeMessage, setActiveMessage] = useState(null)
     const [input, setInput] = useState("")
     const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false)
     const [loading, setLoading] = useState(false)
-    function fetchMessages() {
-
+    const [messages, setMessages] = useState({})
+    function fetchMessages(path) {
+        setLoading(true)
+        axios.get(path)
+            .then(function (response) {
+                setMessages(response.data)
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+            .finally(function () {
+                setLoading(false)
+            });
     }
     useEffect(() => {
-        const chatWindow = document.getElementById("chatWindow")
-        chatWindow.onscroll = function () {
-            if (chatWindow.scrollTop === (chatWindow.scrollHeight - chatWindow.offsetHeight)) {
-                if (auth.chats.current_page != auth.chats.last_page) {
-                    setLoading(true)
-                    axios.get('/api/chats?chat_page=' + (auth.chats.current_page + 1))
-                        .then(function (response) {
-                            auth.chats.data = auth.chats.data.concat(response.data.data)
-                            auth.chats.current_page = auth.chats.current_page + 1
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        })
-                        .finally(function () {
-                            setLoading(false)
-                        });
-
-                }
+        console.log(messages)
+        fetchMessages('/api/chats/' + activeChat)
+        const messageWindow = document.getElementById("messageWindow")
+        messageWindow.onscroll = function () {
+            if (messageWindow.scrollTop === 0) {
+                alert("scrolled to the top")
             }
         }
     }, [])
+    useEffect(() => {
+        const messageWindow = document.getElementById("messageWindow")
+        messageWindow.scrollTop = messageWindow.scrollHeight
+    }, [messages])
     return (
         <div className="relative">
             <div className="bg-blue-100 z-20 p-1 grid grid-cols-3 justify-items-center items-center">
@@ -120,11 +122,11 @@ function Messages({ activeChat, setActiveChat }) {
                 <button onClick={() => { setShowConfirm(true), destroyRoute.current = "destroy_route", confirmMessage.current = "This chat will only be deleted for you. Do you want to confirm?" }}
                     className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
             </div>
-            <ul className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
-                {auth.messages.map((message, index) => {
+            <ul id="messageWindow" className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
+                {loading && <div className="flex justify-center"><Loading /></div>}
+                {messages.data && messages.data.map((message, index) => {
                     return (<Message message={message} setShowEmoji={setIsComponentVisible} setInput={setInput} handleMessageClick={() => setActiveMessage(activeMessage != index ? index : null)} isActive={activeMessage == index} key={index} />)
                 })}
-                {loading && <div className="flex justify-center"><Loading /></div>}
             </ul>
             <form className="relative flex gap-1 h-12 p-2">
 
