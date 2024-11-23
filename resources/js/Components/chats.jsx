@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react"
+import { useState, useContext, useEffect, useRef } from "react"
 import useModalVisible from "./Hooks/useModalVisible"
 import Card from "./card"
 import CloseButton from "./closeButton"
@@ -86,12 +86,16 @@ function Messages({ activeChat, setActiveChat }) {
     const [input, setInput] = useState("")
     const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false)
     const [loading, setLoading] = useState(false)
-    const [messages, setMessages] = useState({})
-    function fetchMessages(path) {
+    const [messages, setMessages] = useState([])
+    const nextPageUrl = useRef('/api/chats/' + activeChat)
+    const messageWindow = useRef(null)
+    const firstLoad = useRef(true)
+    async function fetchMessages() {
         setLoading(true)
-        axios.get(path)
+        axios.get(nextPageUrl.current)
             .then(function (response) {
-                setMessages(response.data)
+                setMessages(messages => ([...response.data.data, ...messages]))
+                nextPageUrl.current = response.data.next_page_url
             })
             .catch(function (error) {
                 console.log(error);
@@ -99,20 +103,23 @@ function Messages({ activeChat, setActiveChat }) {
             .finally(function () {
                 setLoading(false)
             });
+
     }
     useEffect(() => {
-        console.log(messages)
-        fetchMessages('/api/chats/' + activeChat)
-        const messageWindow = document.getElementById("messageWindow")
-        messageWindow.onscroll = function () {
-            if (messageWindow.scrollTop === 0) {
-                alert("scrolled to the top")
+        fetchMessages()
+        messageWindow.current.onscroll = function () {
+            if (messageWindow.current.scrollTop == 0 && nextPageUrl.current != null) {
+                fetchMessages()
             }
         }
     }, [])
     useEffect(() => {
-        const messageWindow = document.getElementById("messageWindow")
-        messageWindow.scrollTop = messageWindow.scrollHeight
+        if (firstLoad.current == true) {
+            if (messageWindow.current.scrollHeight != 0) {
+                messageWindow.current.scrollTop = messageWindow.current.scrollHeight
+                firstLoad.current = false
+            }
+        }
     }, [messages])
     return (
         <div className="relative">
@@ -122,9 +129,9 @@ function Messages({ activeChat, setActiveChat }) {
                 <button onClick={() => { setShowConfirm(true), destroyRoute.current = "destroy_route", confirmMessage.current = "This chat will only be deleted for you. Do you want to confirm?" }}
                     className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
             </div>
-            <ul id="messageWindow" className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
+            <ul ref={messageWindow} id="messageWindow" className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
                 {loading && <div className="flex justify-center"><Loading /></div>}
-                {messages.data && messages.data.map((message, index) => {
+                {messages.map((message, index) => {
                     return (<Message message={message} setShowEmoji={setIsComponentVisible} setInput={setInput} handleMessageClick={() => setActiveMessage(activeMessage != index ? index : null)} isActive={activeMessage == index} key={index} />)
                 })}
             </ul>
@@ -163,15 +170,15 @@ function Message({ message, handleMessageClick, isActive, setInput, setShowEmoji
                 </button>
 
                 <div className="w-9 h-9">
-                    <UserPicture user_id={1} user_img={"/public/user_profile_pictures/YB10jCxFYeYSDe7YX9NhL0vR6i4i25uFo01AITXj.png"} />
+                    <UserPicture user_id={message.sender.id} user_img={message.sender.user_img} />
                 </div>
 
             </div>
         )
     } return (
-        <div className="flex justify-start p-2">
-            <div className="w-9 h-9">
-                <UserPicture user_id={1} user_img={"/public/user_profile_pictures/YB10jCxFYeYSDe7YX9NhL0vR6i4i25uFo01AITXj.png"} />
+        <div className="flex justify-start p-2 gap-3">
+            <div className=" h-8 w-12">
+                <UserPicture user_id={message.sender.id} user_img={message.sender.user_img} />
             </div>
             <div className="flex gap-0">
                 <div className="w-0 h-0 mt-2
