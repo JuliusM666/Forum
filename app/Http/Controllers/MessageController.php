@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 class MessageController extends Controller
@@ -12,7 +13,24 @@ class MessageController extends Controller
      */
     public function index()
     {
-        return auth()->user()->Chats()->paginate(10, pageName: "chat_page");
+        return Message::where("sender_id", auth()->user()->id)->orWhere("reciever_id", auth()->user()->id)->latest()->get()
+            ->groupBy(function (Message $message) {
+                if ($message->sender_id == auth()->user()->id) {
+                    return $message->sender_id . "*" . $message->reciever_id;
+                } else {
+                    return $message->reciever_id . "*" . $message->sender_id;
+                }
+            })->map(function ($message) {
+                $first_message = $message->first();
+                if ($first_message->sender_id == auth()->user()->id) {
+                    $first_message->load('reciever');
+                    $first_message['sender'] = $first_message['reciever'];
+                    unset($first_message['reciever']);
+                    return $first_message;
+                } else {
+                    return $first_message->load('sender');
+                }
+            })->sortByDesc('created_at')->values()->paginate(10, pageName: "chat_page");
     }
 
     /**
@@ -36,11 +54,15 @@ class MessageController extends Controller
      */
     public function show($recipient_id)
     {
-        return Message::where("sender_id", auth()->user()->id)->where("reciever_id", $recipient_id)->
-            orWhere(function (Builder $query) use ($recipient_id) {
-                $query->where("sender_id", $recipient_id)
-                    ->where("reciever_id", auth()->user()->id);
-            })->with("sender")->latest()->cursorPaginate(5, cursorName: "message_page");
+        return [
+            "recipient" => User::find($recipient_id),
+            "messages" => Message::where("sender_id", auth()->user()->id)->where("reciever_id", $recipient_id)->
+                orWhere(function (Builder $query) use ($recipient_id) {
+                    $query->where("sender_id", $recipient_id)
+                        ->where("reciever_id", auth()->user()->id);
+                })->latest()->with("sender")->cursorPaginate(5, cursorName: "message_page")
+        ];
+
     }
 
     /**

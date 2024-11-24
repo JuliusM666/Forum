@@ -11,6 +11,7 @@ import Loading from "./loading"
 export default function Chats({ close }) {
     const { auth } = usePage().props
     const { activeChat, setActiveChat } = useContext(ModalContext) // recipient id
+
     // if (activeChat != null && !chats.hasOwnProperty(activeChat)) {  // for new chat
     //     chats[activeChat] = { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", messages: [] }
     // }
@@ -90,12 +91,14 @@ function Messages({ activeChat, setActiveChat }) {
     const nextPageUrl = useRef('/api/chats/' + activeChat)
     const messageWindow = useRef(null)
     const firstLoad = useRef(true)
+    const recipient_name = useRef("")
     async function fetchMessages() {
         setLoading(true)
         axios.get(nextPageUrl.current)
             .then(function (response) {
-                setMessages(messages => ([...response.data.data, ...messages]))
-                nextPageUrl.current = response.data.next_page_url
+                setMessages(messages => ([...response.data.messages.data, ...messages]))
+                nextPageUrl.current = response.data.messages.next_page_url
+                recipient_name.current = response.data.recipient.name
             })
             .catch(function (error) {
                 console.log(error);
@@ -125,7 +128,7 @@ function Messages({ activeChat, setActiveChat }) {
         <div className="relative">
             <div className="bg-blue-100 z-20 p-1 grid grid-cols-3 justify-items-center items-center">
                 <button onClick={() => setActiveChat(null)} className="justify-self-start hover:opacity-70 ml-1"><i className="fa-solid fa-caret-left text-lg text-slate-700" /></button>
-                <Link href={route("user.show", 1)} className="font-semibold hover:opacity-70">User</Link>
+                <Link href={route("user.show", activeChat)} className="font-semibold hover:opacity-70">{recipient_name.current}</Link>
                 <button onClick={() => { setShowConfirm(true), destroyRoute.current = "destroy_route", confirmMessage.current = "This chat will only be deleted for you. Do you want to confirm?" }}
                     className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
             </div>
@@ -147,40 +150,44 @@ function Messages({ activeChat, setActiveChat }) {
 }
 function Message({ message, handleMessageClick, isActive, setInput, setShowEmoji }) {
     const { setShowConfirm, destroyRoute, confirmMessage } = useContext(ModalContext)
-    if (message.id == 1) {
+    const { auth } = usePage().props
+    if (message.sender.id == auth.user.id) {
         return (
-            <div className="relative flex justify-end p-2">
+            <div>
                 {isActive &&
-                    <div className="gap-3 flex items-center mr-1">
+                    <div className="flex gap-3 justify-center items-center mr-1">
                         <button onClick={() => setShowEmoji(true)} className="hover:opacity-70"><i className="fa-solid fa-circle-plus" /></button>
                         <button onClick={() => setInput(message.message)} className="hover:opacity-70"> <i className="fa-regular fa-pen-to-square" /></button>
                         <button onClick={() => { setShowConfirm(true), destroyRoute.current = "destroy_route", confirmMessage.current = "This message will only be deleted for you. Do you want to confirm?" }} className="hover:opacity-70"> <i className="fa-solid fa-circle-xmark" /></button>
                     </div>
                 }
-                <button onClick={() => handleMessageClick()} className="flex gap-0  hover:opacity-70">
-                    <div className="bg-blue-300 rounded-md p-2">
-                        {message.message}
-                    </div>
-                    <div className="w-0 h-0 mt-2
+                <div className="flex justify-end p-2">
+
+                    <button onClick={() => handleMessageClick()} className="flex gap-0 hover:opacity-70 w-fit">
+                        <div className="bg-blue-300 rounded-md p-2">
+                            {message.message}
+                        </div>
+                        <div className="w-0 h-0 mt-2
                                         border-l-[10px] border-l-blue-300
                                         border-b-[8px] border-b-transparent
                                         border-t-[8px] border-t-transparent
                                         border-r-[8px] border-r-transparent">
+                        </div>
+                    </button>
+
+                    <div className="h-9 w-10">
+                        <UserPicture user_id={message.sender.id} user_img={message.sender.user_img} />
                     </div>
-                </button>
 
-                <div className="w-9 h-9">
-                    <UserPicture user_id={message.sender.id} user_img={message.sender.user_img} />
                 </div>
-
             </div>
         )
     } return (
-        <div className="flex justify-start p-2 gap-3">
-            <div className=" h-8 w-12">
+        <div className="flex justify-start p-2">
+            <div className="h-9 w-10">
                 <UserPicture user_id={message.sender.id} user_img={message.sender.user_img} />
             </div>
-            <div className="flex gap-0">
+            <div className="flex gap-0 w-fit">
                 <div className="w-0 h-0 mt-2
                                 border-l-[8px] border-l-transparent
                                 border-b-[8px] border-b-transparent
