@@ -13,6 +13,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ThemeFollowerController;
 use App\Http\Controllers\PostFollowerController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -55,6 +56,11 @@ Route::controller(UserController::class)->group(function () {
 Route::controller(NotificationController::class)->group(function () {
     Route::delete('/notification/{notification}', 'destroy')->name('notification.destroy');
     Route::delete('/notification', 'destroyAll')->name('notification.destroyAll');
+});
+Route::controller(MessageController::class)->group(function () {
+    Route::get('/chats', 'index')->middleware('auth');
+    Route::get('/chats/{id}', 'show')->middleware('auth');
+    Route::post('/chats/{id}/seen', 'seen')->middleware('auth');
 });
 
 Route::get('search/{query?}', [SearchController::class, 'index'])->name('search');

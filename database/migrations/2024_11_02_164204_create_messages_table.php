@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->foreignId('reciever_id')->references("id")->on("users");
             $table->foreignId('sender_id')->references("id")->on("users");
             $table->text("message");
+            $table->boolean("is_seen")->default(false);
             $table->timestamps();
         });
     }

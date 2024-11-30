@@ -39,12 +39,12 @@ function Chat({ setActiveChat }) {
         const chatWindow = document.getElementById("chatWindow")
         chatWindow.onscroll = function () {
             if (chatWindow.scrollTop === (chatWindow.scrollHeight - chatWindow.offsetHeight)) {
-                if (auth.chats.current_page != auth.chats.last_page) {
+                if (auth.chats.paginator.current_page != auth.chats.paginator.last_page) {
                     setLoading(true)
-                    axios.get('/api/chats?chat_page=' + (auth.chats.current_page + 1))
+                    axios.get('chats?chat_page=' + (auth.chats.paginator.current_page + 1))
                         .then(function (response) {
-                            auth.chats.data = auth.chats.data.concat(response.data.data)
-                            auth.chats.current_page = auth.chats.current_page + 1
+                            auth.chats.paginator.data = auth.chats.paginator.data.concat(response.data.data)
+                            auth.chats.paginator.current_page = auth.chats.paginator.current_page + 1
                         })
                         .catch(function (error) {
                             console.log(error);
@@ -58,11 +58,11 @@ function Chat({ setActiveChat }) {
         }
     }, [])
     return (
-        <ul id="chatWindow" className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
-            {auth.chats.data.map((chat, index) => {
+        <ul id="chatWindow" className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin " >
+            {auth.chats.paginator.data.map((chat, index) => {
                 return (
-                    <li key={index}>
-                        <button onClick={() => setActiveChat(chat.sender.id)} className="odd:bg-slate-100 text-slate-700 even:bg-slate-200 p-2 gap-1 grid grid-cols-6 items-center hover:opacity-70">
+                    <li key={index} className="odd:bg-slate-100 even:bg-slate-200">
+                        <button onClick={() => setActiveChat(chat.sender.id)} className=" text-slate-700 p-2 gap-1 grid grid-cols-6 items-center hover:opacity-70">
                             <div className="flex justify-end mr-5">
                                 <div className="w-9 h-9">
                                     <UserPicture user_id={chat.sender.id} user_img={chat.sender.user_img} />
@@ -70,7 +70,7 @@ function Chat({ setActiveChat }) {
                             </div>
                             <div className="col-span-4 text-start">
                                 <h1 className="font-semibold">{chat.sender.name}</h1>
-                                <p className="truncate">{chat.message}</p>
+                                <p className={`truncate text-sm ${chat.is_seen ? "" : " font-bold"}`}>{chat.message}</p>
                             </div>
                             <h1 className="text-xs font-semibold text-end">{moment(chat.created_at).fromNow()}</h1>
                         </button>
@@ -88,7 +88,7 @@ function Messages({ activeChat, setActiveChat }) {
     const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false)
     const [loading, setLoading] = useState(false)
     const [messages, setMessages] = useState([])
-    const nextPageUrl = useRef('/api/chats/' + activeChat)
+    const nextPageUrl = useRef('chats/' + activeChat)
     const messageWindow = useRef(null)
     const firstLoad = useRef(true)
     const recipient_name = useRef("")
@@ -110,6 +110,7 @@ function Messages({ activeChat, setActiveChat }) {
     }
     useEffect(() => {
         fetchMessages()
+        axios.post("chats/" + activeChat + "/seen")
         messageWindow.current.onscroll = function () {
             if (messageWindow.current.scrollTop == 0 && nextPageUrl.current != null) {
                 fetchMessages()
@@ -126,9 +127,12 @@ function Messages({ activeChat, setActiveChat }) {
     }, [messages])
     return (
         <div className="relative">
-            <div className="bg-blue-100 z-20 p-1 grid grid-cols-3 justify-items-center items-center">
+            <div className="bg-blue-100 z-20 p-1 grid grid-cols-3  items-center">
                 <button onClick={() => setActiveChat(null)} className="justify-self-start hover:opacity-70 ml-1"><i className="fa-solid fa-caret-left text-lg text-slate-700" /></button>
-                <Link href={route("user.show", activeChat)} className="font-semibold hover:opacity-70">{recipient_name.current}</Link>
+                <div className="truncate">
+                    <Link href={route("user.show", activeChat)} className="font-semibold hover:opacity-70">
+                        {recipient_name.current}</Link>
+                </div>
                 <button onClick={() => { setShowConfirm(true), destroyRoute.current = "destroy_route", confirmMessage.current = "This chat will only be deleted for you. Do you want to confirm?" }}
                     className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
             </div>
@@ -140,7 +144,7 @@ function Messages({ activeChat, setActiveChat }) {
             </ul>
             <form className="relative flex gap-1 h-12 p-2">
 
-                <input value={input} className="w-full rounded-full bg-blue-100 border-none pr-8" placeholder="Type your message here..." />
+                <input value={input} onChange={(e) => { setInput(e.target.value) }} className="w-full rounded-full bg-blue-100 border-none pr-8" placeholder="Type your message here..." />
                 <EmojiBox componentRef={ref} isComponentVisible={isComponentVisible} setIsComponentVisible={setIsComponentVisible} />
                 <button className="rounded-full bg-blue-300 hover:opacity-70 flex justify-center items-center p-2"><i className="fa-regular fa-paper-plane" /></button>
             </form>

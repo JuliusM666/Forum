@@ -8,12 +8,24 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 class MessageController extends Controller
 {
+
+
+    private function getConversation($recipient_id)
+    {
+        return Message::where(function (Builder $query) use ($recipient_id) {
+            $query->where("sender_id", auth()->user()->id)->where("reciever_id", $recipient_id)->
+                orWhere(function (Builder $query) use ($recipient_id) {
+                    $query->where("sender_id", $recipient_id)
+                        ->where("reciever_id", auth()->user()->id);
+                });
+        });
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Message::where("sender_id", auth()->user()->id)->orWhere("reciever_id", auth()->user()->id)->latest()->get()
+        $data = Message::where("sender_id", auth()->user()->id)->orWhere("reciever_id", auth()->user()->id)->latest()->get()
             ->groupBy(function (Message $message) {
                 if ($message->sender_id == auth()->user()->id) {
                     return $message->sender_id . "*" . $message->reciever_id;
@@ -31,14 +43,8 @@ class MessageController extends Controller
                     return $first_message->load('sender');
                 }
             })->sortByDesc('created_at')->values()->paginate(10, pageName: "chat_page");
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $count = Message::where("reciever_id", auth()->user()->id)->where("is_seen", false)->count();
+        return ['paginator' => $data, 'not_seen' => $count];
     }
 
     /**
@@ -56,23 +62,11 @@ class MessageController extends Controller
     {
         return [
             "recipient" => User::find($recipient_id),
-            "messages" => Message::where("sender_id", auth()->user()->id)->where("reciever_id", $recipient_id)->
-                orWhere(function (Builder $query) use ($recipient_id) {
-                    $query->where("sender_id", $recipient_id)
-                        ->where("reciever_id", auth()->user()->id);
-                })->latest()->with("sender")->cursorPaginate(5, cursorName: "message_page")
+            "messages" => $this->getConversation($recipient_id)->latest()->with("sender")
+                ->cursorPaginate(5, cursorName: "message_page"),
         ];
 
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Message $message)
-    {
-        //
-    }
-
     /**
      * Update the specified resource in storage.
      */
@@ -87,5 +81,11 @@ class MessageController extends Controller
     public function destroy(Message $message)
     {
         //
+    }
+
+    public function seen($recipient_id): void
+    {
+        $this->getConversation($recipient_id)->update(["is_seen" => true]);
+
     }
 }

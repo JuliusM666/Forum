@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MessageController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,5 +14,3 @@ use App\Http\Controllers\MessageController;
 |
 */
 
-Route::get('/chats', [MessageController::class, 'index'])->middleware('auth');
-Route::get('/chats/{id}', [MessageController::class, 'show'])->middleware('auth');
