@@ -43,7 +43,7 @@ function Chat({ setActiveChat }) {
                     setLoading(true)
                     axios.get('chats?chat_page=' + (auth.chats.paginator.current_page + 1))
                         .then(function (response) {
-                            auth.chats.paginator.data = auth.chats.paginator.data.concat(response.data.data)
+                            auth.chats.paginator.data = auth.chats.paginator.data.concat(response.data.paginator.data)
                             auth.chats.paginator.current_page = auth.chats.paginator.current_page + 1
                         })
                         .catch(function (error) {
@@ -129,7 +129,7 @@ function Messages({ activeChat, setActiveChat }) {
         <div className="relative">
             <div className="bg-blue-100 z-20 p-1 grid grid-cols-3  items-center">
                 <button onClick={() => setActiveChat(null)} className="justify-self-start hover:opacity-70 ml-1"><i className="fa-solid fa-caret-left text-lg text-slate-700" /></button>
-                <div className="truncate">
+                <div className="truncate text-center">
                     <Link href={route("user.show", activeChat)} className="font-semibold hover:opacity-70">
                         {recipient_name.current}</Link>
                 </div>
@@ -143,9 +143,8 @@ function Messages({ activeChat, setActiveChat }) {
                 })}
             </ul>
             <form className="relative flex gap-1 h-12 p-2">
-
-                <input value={input} onChange={(e) => { setInput(e.target.value) }} className="w-full rounded-full bg-blue-100 border-none pr-8" placeholder="Type your message here..." />
-                <EmojiBox componentRef={ref} isComponentVisible={isComponentVisible} setIsComponentVisible={setIsComponentVisible} />
+                <input id="chat_input" value={input} onChange={(e) => { setInput(e.target.value) }} className="w-full rounded-full bg-blue-100 border-none pr-8" placeholder="Type your message here..." />
+                <EmojiBox input={input} setInput={setInput} componentRef={ref} isComponentVisible={isComponentVisible} setIsComponentVisible={setIsComponentVisible} />
                 <button className="rounded-full bg-blue-300 hover:opacity-70 flex justify-center items-center p-2"><i className="fa-regular fa-paper-plane" /></button>
             </form>
 
