@@ -58,9 +58,11 @@ Route::controller(NotificationController::class)->group(function () {
     Route::delete('/notification', 'destroyAll')->name('notification.destroyAll');
 });
 Route::controller(MessageController::class)->group(function () {
-    Route::get('/chats', 'index')->middleware('auth');
-    Route::get('/chats/{id}', 'show')->middleware('auth');
-    Route::post('/chats/{id}/seen', 'seen')->middleware('auth');
+    Route::get('/chats', 'index')->name("chats.index")->middleware('auth');
+    Route::get('/chats/{id}', 'show')->name("chats.show")->middleware('auth');
+    Route::post('/chats', 'store')->name("chats.store")->middleware('auth');
+    Route::patch('/chats', 'update')->name("chats.update")->middleware('auth');
+    Route::delete('/chats', 'destroy')->name("chats.destroy")->middleware('auth');
 });
 
 Route::get('search/{query?}', [SearchController::class, 'index'])->name('search');

@@ -3,10 +3,10 @@
 namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
-use App\Policies\NotificationPolicy;
-use App\Policies\PostPolicy;
-use App\Policies\ReplyPolicy;
-use App\Policies\UserPolicy;
+// use App\Policies\NotificationPolicy;
+// use App\Policies\PostPolicy;
+// use App\Policies\ReplyPolicy;
+// use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\DatabaseNotification;
@@ -24,6 +24,7 @@ class AuthServiceProvider extends ServiceProvider
         Post::class => PostPolicy::class,
         Reply::class => ReplyPolicy::class,
         User::class => UserPolicy::class,
+        Message::class => MessagePolicy::class,
     ];
 
     /**

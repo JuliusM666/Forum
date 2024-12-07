@@ -2,7 +2,7 @@ import { useState, useContext, useEffect, useRef } from "react"
 import useModalVisible from "./Hooks/useModalVisible"
 import Card from "./card"
 import CloseButton from "./closeButton"
-import { Link, usePage } from "@inertiajs/react"
+import { Link, usePage, useForm } from "@inertiajs/react"
 import moment from "moment"
 import UserPicture from "./userPicture"
 import { ModalContext } from "./Context/modalContext"
@@ -84,21 +84,32 @@ function Chat({ setActiveChat }) {
 function Messages({ activeChat, setActiveChat }) {
     const { setShowConfirm, destroyRoute, confirmMessage } = useContext(ModalContext)
     const [activeMessage, setActiveMessage] = useState(null)
-    const [input, setInput] = useState("")
     const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false)
     const [loading, setLoading] = useState(false)
     const [messages, setMessages] = useState([])
-    const nextPageUrl = useRef('chats/' + activeChat)
+    const nextPageUrl = useRef(route('chats.show', activeChat))
     const messageWindow = useRef(null)
-    const firstLoad = useRef(true)
-    const recipient_name = useRef("")
+    const recipient = useRef({})
+    const firstFetch = useRef(true)
+    const { data, setData, post, reset, processing, errors } = useForm({
+        message: "",
+        reciever_id: ""
+    })
+    function submit(e) {
+        e.preventDefault()
+        post(route("chats.store", recipient.current.id), {
+            preserveScroll: true,
+            onSuccess: () => reset('message'),
+        })
+    }
     async function fetchMessages() {
         setLoading(true)
         axios.get(nextPageUrl.current)
             .then(function (response) {
-                setMessages(messages => ([...response.data.messages.data, ...messages]))
+                setMessages(messages => ([...messages, ...response.data.messages.data]))
                 nextPageUrl.current = response.data.messages.next_page_url
-                recipient_name.current = response.data.recipient.name
+                recipient.current = response.data.recipient
+                setData("reciever_id", recipient.current.id)
             })
             .catch(function (error) {
                 console.log(error);
@@ -110,7 +121,6 @@ function Messages({ activeChat, setActiveChat }) {
     }
     useEffect(() => {
         fetchMessages()
-        axios.post("chats/" + activeChat + "/seen")
         messageWindow.current.onscroll = function () {
             if (messageWindow.current.scrollTop == 0 && nextPageUrl.current != null) {
                 fetchMessages()
@@ -118,10 +128,13 @@ function Messages({ activeChat, setActiveChat }) {
         }
     }, [])
     useEffect(() => {
-        if (firstLoad.current == true) {
-            if (messageWindow.current.scrollHeight != 0) {
-                messageWindow.current.scrollTop = messageWindow.current.scrollHeight
-                firstLoad.current = false
+        if (messages.length > 0 && firstFetch.current) {
+            messageWindow.current.scrollTop = messageWindow.current.scrollHeight
+            if (messageWindow.current.scrollTop == 0 && nextPageUrl.current != null) {
+                fetchMessages()
+            }
+            else {
+                firstFetch.current = false
             }
         }
     }, [messages])
@@ -131,23 +144,23 @@ function Messages({ activeChat, setActiveChat }) {
                 <button onClick={() => setActiveChat(null)} className="justify-self-start hover:opacity-70 ml-1"><i className="fa-solid fa-caret-left text-lg text-slate-700" /></button>
                 <div className="truncate text-center">
                     <Link href={route("user.show", activeChat)} className="font-semibold hover:opacity-70">
-                        {recipient_name.current}</Link>
+                        {recipient.current.name}</Link>
                 </div>
                 <button onClick={() => { setShowConfirm(true), destroyRoute.current = "destroy_route", confirmMessage.current = "This chat will only be deleted for you. Do you want to confirm?" }}
                     className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
             </div>
             <ul ref={messageWindow} id="messageWindow" className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
                 {loading && <div className="flex justify-center"><Loading /></div>}
-                {messages.map((message, index) => {
-                    return (<Message message={message} setShowEmoji={setIsComponentVisible} setInput={setInput} handleMessageClick={() => setActiveMessage(activeMessage != index ? index : null)} isActive={activeMessage == index} key={index} />)
+                {messages.toReversed().map((message, index) => {
+                    return (<Message message={message} setShowEmoji={setIsComponentVisible} setInput={(val) => setData("message", val)} handleMessageClick={() => setActiveMessage(activeMessage != index ? index : null)} isActive={activeMessage == index} key={index} />)
                 })}
             </ul>
-            <form className="relative flex gap-1 h-12 p-2">
-                <input id="chat_input" value={input} onChange={(e) => { setInput(e.target.value) }} className="w-full rounded-full bg-blue-100 border-none pr-8" placeholder="Type your message here..." />
-                <EmojiBox input={input} setInput={setInput} componentRef={ref} isComponentVisible={isComponentVisible} setIsComponentVisible={setIsComponentVisible} />
-                <button className="rounded-full bg-blue-300 hover:opacity-70 flex justify-center items-center p-2"><i className="fa-regular fa-paper-plane" /></button>
+            <form onSubmit={submit} className="relative flex gap-1 h-12 p-2">
+                <input id="chat_input" value={data.message} onChange={(e) => { setData("message", e.target.value) }} className="w-full rounded-full bg-blue-100 border-none pr-8" placeholder="Type your message here..." />
+                <EmojiBox input={data.message} setInput={(val) => setData("message", val)} componentRef={ref} isComponentVisible={isComponentVisible} setIsComponentVisible={setIsComponentVisible} />
+                <button disabled={processing} className="rounded-full bg-blue-300 hover:opacity-70 flex justify-center items-center p-2"><i className="fa-regular fa-paper-plane" /></button>
             </form>
-
+            {errors.message && <div className="text-red-500 text-start px-5 text-sm">{errors.message}</div>}
         </div>
     )
 }
@@ -166,7 +179,7 @@ function Message({ message, handleMessageClick, isActive, setInput, setShowEmoji
                 }
                 <div className="flex justify-end p-2">
 
-                    <button onClick={() => handleMessageClick()} className="flex gap-0 hover:opacity-70 w-fit">
+                    <button onClick={() => handleMessageClick()} className="flex gap-0 hover:opacity-70 justify-end w-4/5">
                         <div className="bg-blue-300 rounded-md p-2">
                             {message.message}
                         </div>
@@ -178,7 +191,7 @@ function Message({ message, handleMessageClick, isActive, setInput, setShowEmoji
                         </div>
                     </button>
 
-                    <div className="h-9 w-10">
+                    <div className="h-9 w-9">
                         <UserPicture user_id={message.sender.id} user_img={message.sender.user_img} />
                     </div>
 
@@ -187,10 +200,10 @@ function Message({ message, handleMessageClick, isActive, setInput, setShowEmoji
         )
     } return (
         <div className="flex justify-start p-2">
-            <div className="h-9 w-10">
+            <div className="h-9 w-9">
                 <UserPicture user_id={message.sender.id} user_img={message.sender.user_img} />
             </div>
-            <div className="flex gap-0 w-fit">
+            <div className="flex gap-0 justify-start w-4/5">
                 <div className="w-0 h-0 mt-2
                                 border-l-[8px] border-l-transparent
                                 border-b-[8px] border-b-transparent

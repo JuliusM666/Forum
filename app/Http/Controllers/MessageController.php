@@ -52,7 +52,16 @@ class MessageController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'reciever_id' => 'required|integer',
+            'message' => 'required|min:1|max:200',
+        ]);
+
+        Message::create([
+            'message' => $request->message,
+            'sender_id' => auth()->user()->id,
+            'reciever_id' => $request->reciever_id,
+        ]);
     }
 
     /**
@@ -60,6 +69,7 @@ class MessageController extends Controller
      */
     public function show($recipient_id)
     {
+        $this->getConversation($recipient_id)->update(["is_seen" => true]);
         return [
             "recipient" => User::find($recipient_id),
             "messages" => $this->getConversation($recipient_id)->latest()->with("sender")
@@ -72,7 +82,7 @@ class MessageController extends Controller
      */
     public function update(Request $request, Message $message)
     {
-        //
+        $this->authorize('update', $message);
     }
 
     /**
@@ -80,12 +90,6 @@ class MessageController extends Controller
      */
     public function destroy(Message $message)
     {
-        //
-    }
-
-    public function seen($recipient_id): void
-    {
-        $this->getConversation($recipient_id)->update(["is_seen" => true]);
-
+        $this->authorize('delete', $message);
     }
 }
