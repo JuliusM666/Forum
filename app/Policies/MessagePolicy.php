@@ -16,7 +16,7 @@ class MessagePolicy
      */
     public function update(User $user, Message $message): bool
     {
-        return $user->id == $message->sender_id;
+        return $user->id === $message->sender_id;
     }
 
     /**
@@ -24,7 +24,7 @@ class MessagePolicy
      */
     public function delete(User $user, Message $message): bool
     {
-        return $user->id == $message->sender_id;
+        return $user->id === $message->sender_id;
     }
 
 

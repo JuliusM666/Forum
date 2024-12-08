@@ -16,6 +16,9 @@ return new class extends Migration {
             $table->foreignId('sender_id')->references("id")->on("users");
             $table->text("message");
             $table->boolean("is_seen")->default(false);
+            $table->softDeletes();
+            $table->boolean("deleted_for_sender")->default(false);
+            $table->boolean("deleted_for_reciever")->default(false);
             $table->timestamps();
         });
     }

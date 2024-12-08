@@ -146,7 +146,7 @@ function Messages({ activeChat, setActiveChat }) {
                     <Link href={route("user.show", activeChat)} className="font-semibold hover:opacity-70">
                         {recipient.current.name}</Link>
                 </div>
-                <button onClick={() => { setShowConfirm(true), destroyRoute.current = "destroy_route", confirmMessage.current = "This chat will only be deleted for you. Do you want to confirm?" }}
+                <button onClick={() => { destroyRoute.current = route("chats.delete_conversation", recipient.current.id), setShowConfirm(true), confirmMessage.current = "This chat will be deleted for only you. Do you want to confirm?" }}
                     className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
             </div>
             <ul ref={messageWindow} id="messageWindow" className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
@@ -171,10 +171,14 @@ function Message({ message, handleMessageClick, isActive, setInput, setShowEmoji
         return (
             <div>
                 {isActive &&
-                    <div className="flex gap-3 justify-center items-center mr-1">
+                    <div className="flex gap-3 justify-end w-4/5">
                         <button onClick={() => setShowEmoji(true)} className="hover:opacity-70"><i className="fa-solid fa-circle-plus" /></button>
-                        <button onClick={() => setInput(message.message)} className="hover:opacity-70"> <i className="fa-regular fa-pen-to-square" /></button>
-                        <button onClick={() => { setShowConfirm(true), destroyRoute.current = "destroy_route", confirmMessage.current = "This message will only be deleted for you. Do you want to confirm?" }} className="hover:opacity-70"> <i className="fa-solid fa-circle-xmark" /></button>
+                        {message.deleted_at == null &&
+                            <>
+                                <button onClick={() => setInput(message.message)} className="hover:opacity-70"> <i className="fa-regular fa-pen-to-square" /></button>
+                                <button onClick={() => { confirmMessage.current = "This message will be deleted. Do you want to confirm?", setShowConfirm(true), destroyRoute.current = route("chats.destroy", message.id) }} className="hover:opacity-70"> <i className="fa-solid fa-circle-xmark" /></button>
+                            </>
+                        }
                     </div>
                 }
                 <div className="flex justify-end p-2">
