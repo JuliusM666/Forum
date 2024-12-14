@@ -64,9 +64,9 @@ export default function UserMenu() {
                                         <button onClick={() => { setShowChats(true) }}>
                                             <li className="relative block px-4 rounded-md py-2 hover:bg-slate-200 hover:text-slate-500">
                                                 Chats
-                                                {auth.chats.not_seen > 0 &&
+                                                {auth.chats_not_seen > 0 &&
                                                     <div className="animate-bounce absolute text-center align-middle top-1.5 shadow-md right-1 text-xs z-10 bg-slate-700 text-slate-100 px-1 rounded-full ">
-                                                        {auth.chats.not_seen}
+                                                        {auth.chats_not_seen}
                                                     </div>
 
                                                 }

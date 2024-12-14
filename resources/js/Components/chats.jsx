@@ -9,7 +9,6 @@ import { ModalContext } from "./Context/modalContext"
 import EmojiBox from "./emojiBox"
 import Loading from "./loading"
 export default function Chats({ close }) {
-    const { auth } = usePage().props
     const { activeChat, setActiveChat } = useContext(ModalContext) // recipient id
 
     // if (activeChat != null && !chats.hasOwnProperty(activeChat)) {  // for new chat
@@ -24,7 +23,6 @@ export default function Chats({ close }) {
                 <div className="bg-slate-100">
                     {activeChat == null && <Chat setActiveChat={setActiveChat} />}
                     {activeChat != null && <Messages activeChat={activeChat} setActiveChat={setActiveChat} />}
-                    {auth.chats.total == 0 && <h1 className="text-right p-2">no messages</h1>}
                 </div>
             </Card>
         </div>
@@ -34,32 +32,37 @@ export default function Chats({ close }) {
 
 function Chat({ setActiveChat }) {
     const { auth } = usePage().props
+    const [chats, setChats] = useState([])
     const [loading, setLoading] = useState(false)
+    const chatWindow = useRef()
+    const nextPageUrl = useRef(route("chats.index"))
+    function fetchChats() {
+        setLoading(true)
+        axios.get(nextPageUrl.current)
+            .then(function (response) {
+                setChats(chats => ([...chats, ...response.data.data]))
+                nextPageUrl.current = response.data.next_page_url
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+            .finally(function () {
+                setLoading(false)
+            });
+    }
     useEffect(() => {
-        const chatWindow = document.getElementById("chatWindow")
-        chatWindow.onscroll = function () {
-            if (chatWindow.scrollTop === (chatWindow.scrollHeight - chatWindow.offsetHeight)) {
-                if (auth.chats.paginator.current_page != auth.chats.paginator.last_page) {
-                    setLoading(true)
-                    axios.get('chats?chat_page=' + (auth.chats.paginator.current_page + 1))
-                        .then(function (response) {
-                            auth.chats.paginator.data = auth.chats.paginator.data.concat(response.data.paginator.data)
-                            auth.chats.paginator.current_page = auth.chats.paginator.current_page + 1
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        })
-                        .finally(function () {
-                            setLoading(false)
-                        });
-
+        fetchChats()
+        chatWindow.current.onscroll = function () {
+            if (chatWindow.current.scrollTop === (chatWindow.current.scrollHeight - chatWindow.current.offsetHeight)) {
+                if (nextPageUrl.current != null) {
+                    fetchChats()
                 }
             }
         }
     }, [])
     return (
-        <ul id="chatWindow" className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin " >
-            {auth.chats.paginator.data.map((chat, index) => {
+        <ul ref={chatWindow} className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin " >
+            {chats.map((chat, index) => {
                 return (
                     <li key={index} className="odd:bg-slate-100 even:bg-slate-200">
                         <button onClick={() => setActiveChat(chat.sender.id)} className=" text-slate-700 p-2 gap-1 grid grid-cols-6 items-center hover:opacity-70">
@@ -70,7 +73,10 @@ function Chat({ setActiveChat }) {
                             </div>
                             <div className="col-span-4 text-start">
                                 <h1 className="font-semibold">{chat.sender.name}</h1>
-                                <p className={`truncate text-sm ${chat.is_seen ? "" : " font-bold"}`}>{chat.message}</p>
+                                {chat.is_seen == false && chat.sender_id != auth.user.id
+                                    ? <p className="truncate text-sm font-bold">{chat.message}</p>
+                                    : <p className="truncate text-sm">{chat.message}</p>
+                                }
                             </div>
                             <h1 className="text-xs font-semibold text-end">{moment(chat.created_at).fromNow()}</h1>
                         </button>
@@ -102,7 +108,7 @@ function Messages({ activeChat, setActiveChat }) {
             onSuccess: () => reset('message'),
         })
     }
-    async function fetchMessages() {
+    function fetchMessages() {
         setLoading(true)
         axios.get(nextPageUrl.current)
             .then(function (response) {

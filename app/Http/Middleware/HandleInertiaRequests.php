@@ -38,7 +38,6 @@ class HandleInertiaRequests extends Middleware
         //         'user' => $request->user(),
         //     ],
         // ];
-
         return array_merge(parent::share($request), [
             'flash' => [
                 'message' => fn() => $request->session()->get('message')
@@ -47,7 +46,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user() == null ? null : $request->user()->loadCount('points'),
                 'votes' => $request->user() == null ? null : (new PointsController)->getVotesArray($request),
                 'notifications' => $request->user() == null ? [] : $request->user()->unreadNotifications,
-                'chats' => $request->user() == null ? [] : (new MessageController)->index(),
+                'chats_not_seen' => $request->user() == null ? null : (new MessageController)->getNotSeenCount(),
 
             ],
             'verified' => $request->user() == null ? null : $request->user()->hasVerifiedEmail(),
