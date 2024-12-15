@@ -30,7 +30,7 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
     const [showChats, setShowChats] = useState(false)
     const [activeChat, setActiveChat] = useState(null)
 
-    const destroyRoute = useRef(null);
+    const confirmAction = useRef(null);
     const confirmMessage = useRef("")
     const modals = [showRegistration, showLogin, showMenu, showSearch, showSettings, showResetPasswordEmail, showResetPassword, showConfirm]
     useEffect(() => {
@@ -57,7 +57,7 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
             <VerificationModal />
             <ResetPasswordEmailModal isVisible={showResetPasswordEmail} componentRef={resetPasswordEmailRef} close={() => setShowResetPasswordEmail(false)} />
             <ResetPasswordModal isVisible={showResetPassword} componentRef={resetPasswordRef} close={() => setShowResetPassword(false)} token={token} />
-            <ConfirmModal isVisible={showConfirm} componentRef={confirmRef} close={() => setShowConfrim(false)} destroyRoute={destroyRoute} message={confirmMessage} />
+            <ConfirmModal isVisible={showConfirm} componentRef={confirmRef} close={() => setShowConfrim(false)} confirmAction={confirmAction} message={confirmMessage} />
             <div id="layout">
                 <Header
                     handleRegistrationClick={() => setShowRegistration(true)}
@@ -74,7 +74,7 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
 
                     <ModalContext.Provider value={{
                         "showChats": showChats, "setShowChats": setShowChats, "setIsShowSettings": setShowSettings, "setActiveChat": setActiveChat,
-                        "activeChat": activeChat, "setShowConfirm": setShowConfrim, "destroyRoute": destroyRoute, "confirmMessage": confirmMessage
+                        "activeChat": activeChat, "setShowConfirm": setShowConfrim, "confirmAction": confirmAction, "confirmMessage": confirmMessage
                     }}>
                         <UserMenu />
                         <div className='grid grid-cols-4 max-lg:grid-cols-1' name="content_block">

@@ -1,10 +1,9 @@
 
 import Card from "./card";
 import FadeWrapper from "./fadeWrapper";
-import { router } from '@inertiajs/react'
-export default function ConfirmModal({ isVisible, componentRef, close, destroyRoute, message }) {
+export default function ConfirmModal({ isVisible, componentRef, close, confirmAction, message }) {
     function confirm() {
-        router.delete(destroyRoute.current, {}, { preserveScroll: true })
+        confirmAction.current()
         close()
     }
 

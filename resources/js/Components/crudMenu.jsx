@@ -1,9 +1,10 @@
 import useComponentVisible from "./Hooks/useComponentVisible"
 import { ModalContext } from "./Context/modalContext"
+import { router } from "@inertiajs/react"
 import { useContext } from "react"
 export default function CrudMenu({ item, handleEdit, isPost }) {
     const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false)
-    const { setShowConfirm, destroyRoute, confirmMessage } = useContext(ModalContext)
+    const { setShowConfirm, confirmAction, confirmMessage } = useContext(ModalContext)
 
     return (
         <div ref={ref} className=" text-slate-700 relative">
@@ -19,7 +20,7 @@ export default function CrudMenu({ item, handleEdit, isPost }) {
                         </li>
                         <li>
                             <button onClick={() => {
-                                setShowConfirm(true); destroyRoute.current = isPost ? route('post.destroy', item.id) : route('reply.destroy', item.id),
+                                setShowConfirm(true), confirmAction.current = () => router.delete(isPost ? route('post.destroy', item.id) : route('reply.destroy', item.id), {}, { preserveScroll: true }),
                                     confirmMessage.current = "Are you sure you want to delete this " + (isPost ? "post" : "reply") + "?"
                             }} className="hover:opacity-70"><i className="fa-solid fa-trash" /></button>
 

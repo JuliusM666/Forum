@@ -2,7 +2,7 @@ import { useState, useContext, useEffect, useRef } from "react"
 import useModalVisible from "./Hooks/useModalVisible"
 import Card from "./card"
 import CloseButton from "./closeButton"
-import { Link, usePage, useForm } from "@inertiajs/react"
+import { Link, usePage, useForm, router } from "@inertiajs/react"
 import moment from "moment"
 import UserPicture from "./userPicture"
 import { ModalContext } from "./Context/modalContext"
@@ -88,7 +88,7 @@ function Chat({ setActiveChat }) {
     )
 }
 function Messages({ activeChat, setActiveChat }) {
-    const { setShowConfirm, destroyRoute, confirmMessage } = useContext(ModalContext)
+    const { setShowConfirm, confirmAction, confirmMessage } = useContext(ModalContext)
     const [activeMessage, setActiveMessage] = useState(null)
     const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false)
     const [loading, setLoading] = useState(false)
@@ -99,13 +99,13 @@ function Messages({ activeChat, setActiveChat }) {
     const firstFetch = useRef(true)
     const { data, setData, post, reset, processing, errors } = useForm({
         message: "",
-        reciever_id: ""
+        reciever_id: activeChat
     })
     function submit(e) {
         e.preventDefault()
-        post(route("chats.store", recipient.current.id), {
+        post(route("chats.store"), {
             preserveScroll: true,
-            onSuccess: () => reset('message'),
+            onSuccess: () => { reset('message'), document.getElementById("chat_input").innerHTML = "" }
         })
     }
     function fetchMessages() {
@@ -115,7 +115,6 @@ function Messages({ activeChat, setActiveChat }) {
                 setMessages(messages => ([...messages, ...response.data.messages.data]))
                 nextPageUrl.current = response.data.messages.next_page_url
                 recipient.current = response.data.recipient
-                setData("reciever_id", recipient.current.id)
             })
             .catch(function (error) {
                 console.log(error);
@@ -152,7 +151,10 @@ function Messages({ activeChat, setActiveChat }) {
                     <Link href={route("user.show", activeChat)} className="font-semibold hover:opacity-70">
                         {recipient.current.name}</Link>
                 </div>
-                <button onClick={() => { destroyRoute.current = route("chats.delete_conversation", recipient.current.id), setShowConfirm(true), confirmMessage.current = "This chat will be deleted for only you. Do you want to confirm?" }}
+                <button onClick={() => {
+                    confirmAction.current = () => { router.delete(route("chats.delete_conversation", recipient.current.id), {}, { preserveScroll: true }), setActiveChat(null) }
+                        , setShowConfirm(true), confirmMessage.current = "This chat will be deleted for only you. Do you want to confirm?"
+                }}
                     className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
             </div>
             <ul ref={messageWindow} id="messageWindow" className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
@@ -161,17 +163,19 @@ function Messages({ activeChat, setActiveChat }) {
                     return (<Message message={message} setShowEmoji={setIsComponentVisible} setInput={(val) => setData("message", val)} handleMessageClick={() => setActiveMessage(activeMessage != index ? index : null)} isActive={activeMessage == index} key={index} />)
                 })}
             </ul>
-            <form onSubmit={submit} className="relative flex gap-1 h-12 p-2">
-                <input id="chat_input" value={data.message} onChange={(e) => { setData("message", e.target.value) }} className="w-full rounded-full bg-blue-100 border-none pr-8" placeholder="Type your message here..." />
+            <form onSubmit={submit} className="relative flex gap-1 p-2">
+                <div className="overflow-y-scroll max-h-52 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin w-full whitespace-pre-wrap break-all text-sm py-1 pl-2 pr-14 rounded-md bg-blue-100" id="chat_input" value={data.message}
+                    onInput={(e) => { setData("message", e.currentTarget.textContent) }} onKeyDown={(e) => e.key == "Enter" ? submit(e) : ""}
+                    contentEditable data-text={"Type your message here..."} ></div>
                 <EmojiBox input={data.message} setInput={(val) => setData("message", val)} componentRef={ref} isComponentVisible={isComponentVisible} setIsComponentVisible={setIsComponentVisible} />
-                <button disabled={processing} className="rounded-full bg-blue-300 hover:opacity-70 flex justify-center items-center p-2"><i className="fa-regular fa-paper-plane" /></button>
+                <button disabled={processing} className="rounded-full h-fit bg-blue-300 hover:opacity-70 flex justify-center items-center p-2"><i className="fa-regular fa-paper-plane" /></button>
             </form>
             {errors.message && <div className="text-red-500 text-start px-5 text-sm">{errors.message}</div>}
         </div>
     )
 }
 function Message({ message, handleMessageClick, isActive, setInput, setShowEmoji }) {
-    const { setShowConfirm, destroyRoute, confirmMessage } = useContext(ModalContext)
+    const { setShowConfirm, confirmAction, confirmMessage } = useContext(ModalContext)
     const { auth } = usePage().props
     if (message.sender.id == auth.user.id) {
         return (
@@ -182,7 +186,10 @@ function Message({ message, handleMessageClick, isActive, setInput, setShowEmoji
                         {message.deleted_at == null &&
                             <>
                                 <button onClick={() => setInput(message.message)} className="hover:opacity-70"> <i className="fa-regular fa-pen-to-square" /></button>
-                                <button onClick={() => { confirmMessage.current = "This message will be deleted. Do you want to confirm?", setShowConfirm(true), destroyRoute.current = route("chats.destroy", message.id) }} className="hover:opacity-70"> <i className="fa-solid fa-circle-xmark" /></button>
+                                <button onClick={() => {
+                                    confirmMessage.current = "This message will be deleted. Do you want to confirm?", setShowConfirm(true),
+                                        confirmAction.current = () => router.delete(route("chats.destroy", message.id))
+                                }} className="hover:opacity-70"> <i className="fa-solid fa-circle-xmark" /></button>
                             </>
                         }
                     </div>
@@ -190,7 +197,7 @@ function Message({ message, handleMessageClick, isActive, setInput, setShowEmoji
                 <div className="flex justify-end p-2">
 
                     <button onClick={() => handleMessageClick()} className="flex gap-0 hover:opacity-70 justify-end w-4/5">
-                        <div className="bg-blue-300 rounded-md p-2">
+                        <div className="bg-blue-300 rounded-md p-2 whitespace-pre-line break-all">
                             {message.message}
                         </div>
                         <div className="w-0 h-0 mt-2
@@ -220,7 +227,7 @@ function Message({ message, handleMessageClick, isActive, setInput, setShowEmoji
                                 border-t-[8px] border-t-transparent
                                 border-r-[10px] border-r-blue-100">
                 </div>
-                <div className="bg-blue-100 rounded-md p-2">
+                <div className="bg-blue-100 rounded-md p-2 whitespace-pre-line break-all">
                     {message.message}
                 </div>
 

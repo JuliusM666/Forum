@@ -1,17 +1,13 @@
 import { useEffect, useRef } from "react"
 export default function EmojiBox({ componentRef, isComponentVisible, setIsComponentVisible, setInput, input }) {
-    const prevCursorPos = useRef(null)
-    useEffect(() => {
-        let chat = document.getElementById("chat_input")
-        chat.focus()
-    }, [isComponentVisible])
-    useEffect(() => {
-        if (prevCursorPos.current != null) {
-            let chat = document.getElementById("chat_input")
-            chat.setSelectionRange(prevCursorPos.current, prevCursorPos.current + 1)
-            prevCursorPos.current = null
-        }
-    }, [input])
+    // const prevCursorPos = useRef(null)
+    // useEffect(() => {
+    //     if (prevCursorPos.current != null) {
+    //         let chat = document.getElementById("chat_input")
+    //         chat.setSelectionRange(prevCursorPos.current, prevCursorPos.current + 1)
+    //         prevCursorPos.current = null
+    //     }
+    // }, [input])
     function addEmoji(emoji) {
         let chat = document.getElementById("chat_input")
         setInput(input.slice(0, chat.selectionEnd) + emoji + input.slice(chat.selectionEnd))
