@@ -47,7 +47,7 @@ class HandleInertiaRequests extends Middleware
                 'votes' => $request->user() == null ? null : (new PointsController)->getVotesArray($request),
                 'notifications' => $request->user() == null ? [] : $request->user()->unreadNotifications,
                 'chats_not_seen' => $request->user() == null ? null : (new MessageController)->getNotSeenCount(),
-
+                'chats' => $request->user() == null ? null : [],
             ],
             'verified' => $request->user() == null ? null : $request->user()->hasVerifiedEmail(),
             'sidebar' => [

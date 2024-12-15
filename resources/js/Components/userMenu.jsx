@@ -9,7 +9,7 @@ export default function UserMenu() {
     const { auth } = usePage().props
     const [showNotifications, setShowNotifications] = useState(false)
     const [notifications, setNotifications] = useState(auth.notifications)
-    const { showChats, setShowChats } = useContext(ModalContext)
+    const { showChats, setShowChats, setActiveChat } = useContext(ModalContext)
     if (auth.user) {
         window.Echo.private('App.Models.User.' + auth.user.id)
             .notification((notification) => {
@@ -72,7 +72,7 @@ export default function UserMenu() {
                                                 }
                                             </li>
                                         </button>
-                                        <Link as="button" method="post" href='/logout'>
+                                        <Link onClick={() => setActiveChat(null)} as="button" method="post" href='/logout'>
                                             <li className="text-right block px-4 rounded-md py-2 hover:bg-slate-200 hover:text-slate-500">
                                                 <i className="fa-solid fa-right-from-bracket" /> </li>
                                         </Link>

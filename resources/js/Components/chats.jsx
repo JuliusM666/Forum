@@ -10,13 +10,6 @@ import EmojiBox from "./emojiBox"
 import Loading from "./loading"
 export default function Chats({ close }) {
     const { activeChat, setActiveChat } = useContext(ModalContext) // recipient id
-
-    // if (activeChat != null && !chats.hasOwnProperty(activeChat)) {  // for new chat
-    //     chats[activeChat] = { user: "user1", message: "Hi", created_at: "2024-10-19 15:36:35", messages: [] }
-    // }
-
-
-
     return (
         <div className="fixed z-20 text-slate-700 right-0 bottom-0 w-1/4 max-xl:w-1/3 max-lg:w-1/2 max-md:w-8/12 max-sm:w-11/12">
             <Card name="Chats" ButtonComponent={<CloseButton handleOnClick={() => close()} />}>
@@ -32,7 +25,6 @@ export default function Chats({ close }) {
 
 function Chat({ setActiveChat }) {
     const { auth } = usePage().props
-    const [chats, setChats] = useState([])
     const [loading, setLoading] = useState(false)
     const chatWindow = useRef()
     const nextPageUrl = useRef(route("chats.index"))
@@ -40,7 +32,7 @@ function Chat({ setActiveChat }) {
         setLoading(true)
         axios.get(nextPageUrl.current)
             .then(function (response) {
-                setChats(chats => ([...chats, ...response.data.data]))
+                auth.chats = [...auth.chats, ...response.data.data]
                 nextPageUrl.current = response.data.next_page_url
             })
             .catch(function (error) {
@@ -62,7 +54,7 @@ function Chat({ setActiveChat }) {
     }, [])
     return (
         <ul ref={chatWindow} className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin " >
-            {chats.map((chat, index) => {
+            {auth.chats.map((chat, index) => {
                 return (
                     <li key={index} className="odd:bg-slate-100 even:bg-slate-200">
                         <button onClick={() => setActiveChat(chat.sender.id)} className=" text-slate-700 p-2 gap-1 grid grid-cols-6 items-center hover:opacity-70">
@@ -157,14 +149,14 @@ function Messages({ activeChat, setActiveChat }) {
                 }}
                     className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
             </div>
-            <ul ref={messageWindow} id="messageWindow" className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
+            <ul ref={messageWindow} id="messageWindow" className="overflow-y-scroll min-h-20 max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
                 {loading && <div className="flex justify-center"><Loading /></div>}
                 {messages.toReversed().map((message, index) => {
                     return (<Message message={message} setShowEmoji={setIsComponentVisible} setInput={(val) => setData("message", val)} handleMessageClick={() => setActiveMessage(activeMessage != index ? index : null)} isActive={activeMessage == index} key={index} />)
                 })}
             </ul>
             <form onSubmit={submit} className="relative flex gap-1 p-2">
-                <div className="overflow-y-scroll max-h-52 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin w-full whitespace-pre-wrap break-all text-sm py-1 pl-2 pr-14 rounded-md bg-blue-100" id="chat_input" value={data.message}
+                <div className="overflow-y-scroll max-h-52 scrollbar-thumb-slate-700 scrollbar-track-blue-100 scrollbar-thin w-full whitespace-pre-wrap break-all text-sm py-1 pl-2 pr-14 rounded-md bg-blue-100" id="chat_input"
                     onInput={(e) => { setData("message", e.currentTarget.textContent) }} onKeyDown={(e) => e.key == "Enter" ? submit(e) : ""}
                     contentEditable data-text={"Type your message here..."} ></div>
                 <EmojiBox input={data.message} setInput={(val) => setData("message", val)} componentRef={ref} isComponentVisible={isComponentVisible} setIsComponentVisible={setIsComponentVisible} />
