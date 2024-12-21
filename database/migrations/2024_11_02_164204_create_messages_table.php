@@ -19,7 +19,9 @@ return new class extends Migration {
             $table->softDeletes();
             $table->boolean("deleted_for_sender")->default(false);
             $table->boolean("deleted_for_reciever")->default(false);
+            $table->boolean("is_edited")->default(false);
             $table->timestamps();
+            $table->index("created_at");
         });
     }
 

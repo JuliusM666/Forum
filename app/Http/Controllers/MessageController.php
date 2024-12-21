@@ -105,6 +105,7 @@ class MessageController extends Controller
             'message' => 'required|min:1|max:200',
         ]);
         $message->message = $request->message;
+        $message->is_edited = true;
         $message->save();
     }
 

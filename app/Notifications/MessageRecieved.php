@@ -6,21 +6,18 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Models\Reply;
+use App\Models\Message;
 
-
-
-class PostSubscription extends Notification implements ShouldQueue
+class MessageRecieved extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    private $reply;
-    public function __construct(Reply $reply)
+    public function __construct()
     {
-        $this->reply = $reply;
+        //
     }
 
     /**
@@ -31,9 +28,9 @@ class PostSubscription extends Notification implements ShouldQueue
     public function via(object $notifiable): array
     {
         if ($notifiable->email_notifications) {
-            return ['mail', 'broadcast', 'database'];
+            return ['mail', 'broadcast'];
         } else {
-            return ['broadcast', 'database'];
+            return ['broadcast'];
         }
     }
 
@@ -43,9 +40,9 @@ class PostSubscription extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->greeting('Hello, ' . $notifiable->name . '  you are subscribed to ' . $this->reply->post->title . ' post.')
-            ->subject('Subscription notification')
-            ->line('User ' . $this->reply->user->name . " has replied in this post");
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -56,10 +53,7 @@ class PostSubscription extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'title' => 'post subscription',
-            'message' => 'User ' . $this->reply->user->name . " has replied in post: " . $this->reply->post->title,
+            //
         ];
     }
-
-
 }

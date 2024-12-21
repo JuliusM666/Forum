@@ -1,7 +1,7 @@
 import useComponentVisible from "./Hooks/useComponentVisible"
 import { usePage, Link, router } from "@inertiajs/react"
 import Notifications from "./notifications"
-import Chats from "./chats"
+import Chats from "./Chat/chats"
 import { useState, useEffect, useContext } from "react"
 import { ModalContext } from "./Context/modalContext"
 export default function UserMenu() {

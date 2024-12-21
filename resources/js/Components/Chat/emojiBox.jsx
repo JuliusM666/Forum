@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect } from "react"
 export default function EmojiBox({ componentRef, isComponentVisible, setIsComponentVisible, setInput, input }) {
     useEffect(() => {
         if (isComponentVisible) {
@@ -33,7 +33,7 @@ export default function EmojiBox({ componentRef, isComponentVisible, setIsCompon
             <button onClick={() => { setIsComponentVisible(!isComponentVisible) }} type="button" className="absolute right-14 top-3 hover:opacity-70"><i className="fa-regular fa-face-smile" /></button>
             {isComponentVisible &&
                 <div className="absolute -top-24 right-8 grid grid-cols-1">
-                    <div className=" bg-blue-100 rounded-lg p-2 grid grid-cols-5 overflow-y-scroll max-h-24 scrollbar-thumb-blue-200 scrollbar-track-slate-100 scrollbar-thin">
+                    <ul className=" bg-blue-100 rounded-lg p-2 grid grid-cols-5 overflow-y-scroll max-h-24 scrollbar-thumb-blue-200 scrollbar-track-slate-100 scrollbar-thin">
                         <Emoji addEmoji={addEmoji}>😀</Emoji>
                         <Emoji addEmoji={addEmoji}>😁</Emoji>
                         <Emoji addEmoji={addEmoji}>😂</Emoji>
@@ -55,7 +55,7 @@ export default function EmojiBox({ componentRef, isComponentVisible, setIsCompon
                         <Emoji addEmoji={addEmoji}>🤗</Emoji>
                         <Emoji addEmoji={addEmoji}>🤩</Emoji>
 
-                    </div>
+                    </ul>
                     <div className="w-0 h-0 justify-self-end mr-6
                   border-l-[10px] border-l-transparent
                   border-b-[8px] border-b-transparent
