@@ -8,16 +8,19 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Models\Message;
 
-class MessageRecieved extends Notification implements ShouldQueue
+class MessageNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    private $message;
+    private $isStore;
+    public function __construct(Message $message, bool $isStore)
     {
-        //
+        $this->message = $message;
+        $this->isStore = $isStore;
     }
 
     /**
@@ -27,7 +30,7 @@ class MessageRecieved extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        if ($notifiable->email_notifications) {
+        if ($notifiable->email_notifications && auth()->user()->id != $this->message->sender_id && $this->isStore) {
             return ['mail', 'broadcast'];
         } else {
             return ['broadcast'];
@@ -40,9 +43,14 @@ class MessageRecieved extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
+            ->greeting('Hello, ' . $notifiable->name . '  you have recieved new message.')
+            ->subject('New message recieved')
+            ->line('User ' . $this->message->sender->username . " has sent new message to you.");
+    }
+
+    public function broadcastType(): string
+    {
+        return 'message';
     }
 
     /**
@@ -52,8 +60,6 @@ class MessageRecieved extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        return [
-            //
-        ];
+        return $this->message->toArray();
     }
 }

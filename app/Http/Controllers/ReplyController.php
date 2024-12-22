@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use App\Notifications\PostSubscription;
+use Illuminate\Support\Facades\Notification;
+
 class ReplyController extends Controller
 {
     public function store(Request $request)
@@ -31,8 +33,6 @@ class ReplyController extends Controller
                 $follower->user->notify(new PostSubscription($reply));
             }
         }
-
-
     }
     public function show(Topic $topic, Theme $theme, Post $post, Reply $reply)
     {

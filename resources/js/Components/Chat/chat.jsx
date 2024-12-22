@@ -4,7 +4,7 @@ import Loading from "../loading"
 import UserPicture from "../userPicture"
 import moment from "moment"
 
-export default function Chat({ setActiveChat }) {
+export default function Chat({ setActiveChat, chats, setChats }) {
     const { auth } = usePage().props
     const [loading, setLoading] = useState(false)
     const chatWindow = useRef()
@@ -13,7 +13,7 @@ export default function Chat({ setActiveChat }) {
         setLoading(true)
         axios.get(nextPageUrl.current)
             .then(function (response) {
-                auth.chats = [...auth.chats, ...response.data.data]
+                setChats(chats => [...chats, ...response.data.data])
                 nextPageUrl.current = response.data.next_page_url
             })
             .catch(function (error) {
@@ -35,7 +35,7 @@ export default function Chat({ setActiveChat }) {
     }, [])
     return (
         <ul ref={chatWindow} className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin " >
-            {auth.chats.map((chat, index) => {
+            {chats.map((chat, index) => {
                 return (
                     <li key={index} className="odd:bg-slate-100 even:bg-slate-200">
                         <button onClick={() => setActiveChat(chat.sender.id)} className=" text-slate-700 p-2 gap-1 grid grid-cols-6 items-center hover:opacity-70">

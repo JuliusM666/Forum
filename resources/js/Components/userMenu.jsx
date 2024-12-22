@@ -6,29 +6,33 @@ import { useState, useEffect, useContext } from "react"
 import { ModalContext } from "./Context/modalContext"
 export default function UserMenu() {
     const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
-    const { auth } = usePage().props
+    const { notifications, auth, chatsNotSeen } = usePage().props
+    const [chats, setChats] = useState([])
     const [showNotifications, setShowNotifications] = useState(false)
-    const [notifications, setNotifications] = useState(auth.notifications)
     const { showChats, setShowChats, setActiveChat } = useContext(ModalContext)
-    if (auth.user) {
-        window.Echo.private('App.Models.User.' + auth.user.id)
-            .notification((notification) => {
-                router.reload({ only: ['auth'] })
-                notification['data'] = { message: notification.message, title: notification.title }
-                setNotifications([notification, ...notifications])
 
-            });
-    }
+    useEffect(() => {
+        if (auth.user) {
+            window.Echo.private('App.Models.User.' + auth.user.id)
+                .notification((notification) => {
+                    if (notification.type == "message") {
+
+                    }
+                    else {
+                        router.reload({ only: ['notifications'] })
+                    }
+                });
+        }
+    }, [])
     useEffect(() => {
         if (showChats) {
             setShowNotifications(false)
         }
     }, [showChats])
-    useEffect(() => { setNotifications(auth.notifications) }, [isComponentVisible])
     return (
         <>
-            {auth.user && showNotifications && <Notifications close={() => { setShowNotifications(false); router.reload({ only: ['auth'] }) }} notifications={notifications} />}
-            {auth.user && showChats && <Chats close={() => { setShowChats(false) }} />}
+            {auth.user && showNotifications && <Notifications close={() => setShowNotifications(false)} />}
+            {auth.user && showChats && <Chats chats={chats} setChats={setChats} close={() => { setShowChats(false) }} />}
             {auth.user &&
                 <div className="flex justify-end max-md:justify-center">
                     <div ref={ref} className="relative">
@@ -61,12 +65,12 @@ export default function UserMenu() {
                                                 }
                                             </li>
                                         </button>
-                                        <button onClick={() => { setShowChats(true) }}>
+                                        <button onClick={() => { setShowChats(true), setShowNotifications(false) }}>
                                             <li className="relative block px-4 rounded-md py-2 hover:bg-slate-200 hover:text-slate-500">
                                                 Chats
-                                                {auth.chats_not_seen > 0 &&
+                                                {chatsNotSeen > 0 &&
                                                     <div className="animate-bounce absolute text-center align-middle top-1.5 shadow-md right-1 text-xs z-10 bg-slate-700 text-slate-100 px-1 rounded-full ">
-                                                        {auth.chats_not_seen}
+                                                        {chatsNotSeen}
                                                     </div>
 
                                                 }

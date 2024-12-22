@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use App\Models\User;
+use App\Notifications\MessageNotification;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 class MessageController extends Controller
@@ -68,11 +69,13 @@ class MessageController extends Controller
             'message' => 'required|min:1|max:200',
         ]);
 
-        Message::create([
+        $message = Message::create([
             'message' => $request->message,
             'sender_id' => auth()->user()->id,
             'reciever_id' => $request->reciever_id,
         ]);
+        $message->reciever->notify(new MessageNotification($message, true));
+        $message->sender->notify(new MessageNotification($message, true));
     }
 
     /**
@@ -107,6 +110,8 @@ class MessageController extends Controller
         $message->message = $request->message;
         $message->is_edited = true;
         $message->save();
+        $message->reciever->notify(new MessageNotification($message, false));
+        $message->sender->notify(new MessageNotification($message, false));
     }
 
     /**
@@ -116,6 +121,9 @@ class MessageController extends Controller
     {
         $this->authorize('delete', $message);
         $message->delete();
+        $message->message = "deleted by user";
+        $message->reciever->notify(new MessageNotification($message, false));
+        $message->sender->notify(new MessageNotification($message, false));
     }
 
 }
