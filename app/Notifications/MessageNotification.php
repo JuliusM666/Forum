@@ -6,7 +6,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use App\Models\Message;
+use App\Models\User;
 
 class MessageNotification extends Notification implements ShouldQueue
 {
@@ -17,7 +19,8 @@ class MessageNotification extends Notification implements ShouldQueue
      */
     private $message;
     private $isStore;
-    public function __construct(Message $message, bool $isStore)
+    private $sender;
+    public function __construct(array $message, bool $isStore = false)
     {
         $this->message = $message;
         $this->isStore = $isStore;
@@ -30,7 +33,7 @@ class MessageNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        if ($notifiable->email_notifications && auth()->user()->id != $this->message->sender_id && $this->isStore) {
+        if ($notifiable->email_notifications && auth()->user()->id != $this->message['sender_id'] && $this->isStore) {
             return ['mail', 'broadcast'];
         } else {
             return ['broadcast'];
@@ -45,7 +48,7 @@ class MessageNotification extends Notification implements ShouldQueue
         return (new MailMessage)
             ->greeting('Hello, ' . $notifiable->name . '  you have recieved new message.')
             ->subject('New message recieved')
-            ->line('User ' . $this->message->sender->username . " has sent new message to you.");
+            ->line('User ' . $this->message['sender']['username'] . " has sent new message to you.");
     }
 
     public function broadcastType(): string
@@ -58,8 +61,11 @@ class MessageNotification extends Notification implements ShouldQueue
      *
      * @return array<string, mixed>
      */
+
     public function toArray(object $notifiable): array
     {
-        return $this->message->toArray();
+
+        return $this->message;
     }
+
 }

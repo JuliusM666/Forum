@@ -48,7 +48,6 @@ class HandleInertiaRequests extends Middleware
             ],
             'notifications' => $request->user() == null ? [] : $request->user()->unreadNotifications,
             'chatsNotSeen' => $request->user() == null ? null : (new MessageController)->getNotSeenCount(),
-            'chats' => $request->user() == null ? null : [],
             'verified' => $request->user() == null ? null : $request->user()->hasVerifiedEmail(),
             'sidebar' => [
                 'newPosts' => (new PostController)->newPosts(),

@@ -1,6 +1,6 @@
 import { useContext } from "react"
 import { ModalContext } from "../Context/modalContext"
-import { usePage } from "@inertiajs/react"
+import { usePage, router } from "@inertiajs/react"
 import UserPicture from "../userPicture"
 
 export default function Message({ message, setActiveMessage, isActive, setInput, setShowEmoji, setIsEdit, isEdit }) {

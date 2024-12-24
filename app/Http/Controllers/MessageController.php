@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use App\Models\User;
+use App\Notifications\DeleteMessagesNotification;
 use App\Notifications\MessageNotification;
+use App\Notifications\SeenMessageNotification;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
+
 class MessageController extends Controller
 {
 
@@ -28,13 +31,23 @@ class MessageController extends Controller
     {
         $this->getConversation($recipient_id)->where("sender_id", auth()->user()->id)->update(["deleted_for_sender" => true]);
         $this->getConversation($recipient_id)->where("reciever_id", auth()->user()->id)->update(["deleted_for_reciever" => true]);
+        auth()->user()->notify(new DeleteMessagesNotification($recipient_id));
+    }
+
+    public function markAsSeen(Message $message)
+    {
+        Message::withTrashed()->where("sender_id", $message->sender_id)->where("reciever_id", auth()->user()->id)
+            ->where("created_at", "<=", $message->created_at)
+            ->update(["is_seen" => true]);
+        auth()->user()->notify(new SeenMessageNotification($message->id));
+        User::find($message->sender_id)->notify(new SeenMessageNotification($message->id));
     }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $messages = Message::withTrashed()->selectRaw("min(reciever_id,sender_id) as col1, max(reciever_id,sender_id) as col2, *")
+        $messages = Message::withTrashed()->selectRaw("min(reciever_id,sender_id) as col1, max(reciever_id,sender_id) as col2 , *")
             ->fromRaw("(SELECT * FROM messages ORDER BY created_at DESC) messages")
             ->where(function (Builder $query) {
                 $query->where("sender_id", auth()->user()->id)->
@@ -42,14 +55,16 @@ class MessageController extends Controller
                     orWhere(function (Builder $query) {
                         $query->where("reciever_id", auth()->user()->id)->where("deleted_for_reciever", false);
                     });
-            })->groupByRaw("min(col1,col2), max(col1,col2)")->latest()->cursorPaginate(10, cursorName: "chat_page");
+            })->groupByRaw("col1,col2")->with("sender", "reciever")->latest()->paginate(10, pageName: "chat_page");
         $messages->getCollection()->transform(function (Message $message) {
-            if ($message->sender_id != auth()->user()->id) {
-                $message->sender = $message->sender()->first();
-            } else {
-                $message->sender = $message->reciever()->first();
+            $newMessage = $message->toArray();
+            if ($message->trashed()) {
+                $newMessage['message'] = "deleted by user";
             }
-            return $message;
+            if ($message->sender_id == auth()->user()->id) {
+                $newMessage['sender'] = $message['reciever'];
+            }
+            return $newMessage;
         });
         return $messages;
     }
@@ -74,8 +89,11 @@ class MessageController extends Controller
             'sender_id' => auth()->user()->id,
             'reciever_id' => $request->reciever_id,
         ]);
-        $message->reciever->notify(new MessageNotification($message, true));
-        $message->sender->notify(new MessageNotification($message, true));
+        $message->load("sender");
+        $messageForReciever = $message->toArray();
+        $messageForReciever['sender'] = $message->reciever()->first();
+        $message->reciever->notify(new MessageNotification($message->toArray(), true));
+        $message->sender->notify(new MessageNotification($messageForReciever, true));
     }
 
     /**
@@ -83,7 +101,6 @@ class MessageController extends Controller
      */
     public function show($recipient_id)
     {
-        $this->getConversation($recipient_id)->update(["is_seen" => true]);
         $messages = $this->getConversation($recipient_id)->latest()->with("sender")
             ->cursorPaginate(5, cursorName: "message_page");
         $messages->getCollection()->transform(function ($message) {
@@ -110,8 +127,8 @@ class MessageController extends Controller
         $message->message = $request->message;
         $message->is_edited = true;
         $message->save();
-        $message->reciever->notify(new MessageNotification($message, false));
-        $message->sender->notify(new MessageNotification($message, false));
+        $message->reciever->notify(new MessageNotification($message->toArray()));
+        $message->sender->notify(new MessageNotification($message->toArray()));
     }
 
     /**
@@ -122,8 +139,8 @@ class MessageController extends Controller
         $this->authorize('delete', $message);
         $message->delete();
         $message->message = "deleted by user";
-        $message->reciever->notify(new MessageNotification($message, false));
-        $message->sender->notify(new MessageNotification($message, false));
+        $message->reciever->notify(new MessageNotification($message->toArray()));
+        $message->sender->notify(new MessageNotification($message->toArray()));
     }
 
 }

@@ -4,11 +4,10 @@ import Loading from "../loading"
 import UserPicture from "../userPicture"
 import moment from "moment"
 
-export default function Chat({ setActiveChat, chats, setChats }) {
+export default function Chat({ setActiveChat, chats, setChats, nextPageUrl }) {
     const { auth } = usePage().props
     const [loading, setLoading] = useState(false)
     const chatWindow = useRef()
-    const nextPageUrl = useRef(route("chats.index"))
     function fetchChats() {
         setLoading(true)
         axios.get(nextPageUrl.current)

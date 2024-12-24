@@ -1,13 +1,14 @@
 import { useContext, useState, useRef, useEffect } from "react"
 import { ModalContext } from "../Context/modalContext"
 import useModalVisible from "../Hooks/useModalVisible"
-import { Link, router, useForm } from "@inertiajs/react"
+import { Link, router, useForm, usePage } from "@inertiajs/react"
 import Loading from "../loading"
 import Message from "./message"
 import EmojiBox from "./emojiBox"
 
-export default function Messages({ activeChat, setActiveChat }) {
+export default function Messages({ activeChat, setActiveChat, removeChat, setSeen }) {
     const { setShowConfirm, confirmAction, confirmMessage } = useContext(ModalContext)
+    const { auth } = usePage().props
     const [activeMessage, setActiveMessage] = useState(null)
     const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false)
     const [loading, setLoading] = useState(false)
@@ -22,6 +23,21 @@ export default function Messages({ activeChat, setActiveChat }) {
         message: "",
         reciever_id: activeChat
     })
+    function markMessagesAsSeen() {
+        for (let i = 0; i < messages.length; i++) {
+            if (messages[i].sender_id != auth.user.id) {
+                if (messages[i].is_seen == false) {
+                    const newMessages = [...messages]
+                    newMessages[i].is_seen = true
+                    setMessages(newMessages)
+                    router.post(route("chats.seen", messages[i].id), {}, {
+                        preserveScroll: true, onSuccess: () => { setSeen(messages[i].id) }
+                    })
+                }
+                break
+            }
+        }
+    }
     function submit(e) {
         e.preventDefault()
         if (isEdit) {
@@ -60,11 +76,15 @@ export default function Messages({ activeChat, setActiveChat }) {
             if (messageWindow.current.scrollTop == 0 && nextPageUrl.current != null) {
                 fetchMessages()
             }
+            if (messageWindow.current.scrollTop === (messageWindow.current.scrollHeight - messageWindow.current.offsetHeight)) {
+                markMessagesAsSeen()
+            }
         }
     }, [])
     useEffect(() => {
         if (messages.length > 0 && firstFetch.current) {
             messageWindow.current.scrollTop = messageWindow.current.scrollHeight
+            markMessagesAsSeen()
             if (messageWindow.current.scrollTop == 0 && nextPageUrl.current != null) {
                 fetchMessages()
             }
@@ -82,7 +102,7 @@ export default function Messages({ activeChat, setActiveChat }) {
                         {recipient.current.name}</Link>
                 </div>
                 <button onClick={() => {
-                    confirmAction.current = () => { router.delete(route("chats.delete_conversation", recipient.current.id), {}, { preserveScroll: true }), setActiveChat(null) }
+                    confirmAction.current = () => { router.delete(route("chats.delete_conversation", recipient.current.id), { preserveScroll: true, onSuccess: () => { removeChat(activeChat); setActiveChat(null); } }) }
                         , setShowConfirm(true), confirmMessage.current = "This chat will be deleted only for you. Do you want to confirm?"
                 }}
                     className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
