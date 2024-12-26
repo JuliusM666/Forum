@@ -46,7 +46,7 @@ export default function Message({ message, isSeen, setActiveMessage, isActive, s
                     </div>
 
                 </div>
-                <div className="text-end text-xs px-1 mr-16">
+                <div className="flex gap-1 justify-end  text-xs  mr-16">
                     {isSeen && <h1>read</h1>}
                     {message.is_edited == true && <h1>edited</h1>}
                 </div>

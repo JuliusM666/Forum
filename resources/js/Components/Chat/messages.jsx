@@ -6,7 +6,7 @@ import Loading from "../loading"
 import Message from "./message"
 import EmojiBox from "./emojiBox"
 
-export default function Messages({ activeChat, setActiveChat, messages, messagesRef, setMessages, update, deleteConversation }) {
+export default function Messages({ activeChat, setActiveChat, messages, setMessages, update, deleteConversation }) {
     const { setShowConfirm, confirmAction, confirmMessage } = useContext(ModalContext)
     const { auth } = usePage().props
     const [seenIndicatorId, setSeenIndicatorId] = useState(null)
@@ -19,20 +19,26 @@ export default function Messages({ activeChat, setActiveChat, messages, messages
     const recipient = useRef({})
     const chatInput = useRef()
     const firstFetch = useRef(true)
-
+    const messagesRef = useRef(messages)
+    useEffect(() => { messagesRef.current = messages }, [messages])
     const isNewMessage = useRef(false)
     const [messageData, setMessageData] = useState("")
-    const [processing, setProcessing] = useState(false)
+    const processing = useRef(false)
+    const seenProcessing = useRef(false)
     const [errors, setErrors] = useState([])
     const reset = () => { setErrors([]), setMessageData(""), chatInput.current.innerHTML = "" }
 
     function markMessagesAsSeen() {
-        for (const message of messagesRef.current) {
-            if (message.sender_id != auth.user.id) {
-                if (message.is_seen == false) {
-                    axios.post(route("chats.seen", message.id)).then((response) => update(response.data)).catch((error) => console.log(error))
+        if (seenProcessing.current == false) {
+            for (const message of messagesRef.current) {
+
+                if (message.reciever_id == auth.user.id) {
+                    if (message.is_seen == false) {
+                        seenProcessing.current = true
+                        axios.post(route("chats.seen", message.id)).then((response) => update(response.data)).catch((error) => console.log(error)).finally(() => seenProcessing.current = false)
+                    }
+                    break
                 }
-                break
             }
         }
     }
@@ -41,7 +47,7 @@ export default function Messages({ activeChat, setActiveChat, messages, messages
         const data = { reciever_id: activeChat, message: messageData }
         const url = isEdit ? route("chats.update", [activeMessage]) : route("chats.store")
         const method = isEdit ? "patch" : "post"
-        setProcessing(true)
+        processing.current = true
         axios({ method: method, url: url, data: data })
             .then((response) => {
                 if (method == "post") {
@@ -50,10 +56,11 @@ export default function Messages({ activeChat, setActiveChat, messages, messages
                 }
                 else if (method == "patch") {
                     update(response.data)
+                    setIsEdit(false)
                 }
                 reset()
             })
-            .catch((error) => setErrors(error.response.data)).finally(() => setProcessing(false))
+            .catch((error) => setErrors(error.response.data)).finally(() => processing.current = false)
 
     }
 
@@ -79,7 +86,7 @@ export default function Messages({ activeChat, setActiveChat, messages, messages
             if (messageWindow.current.scrollTop == 0 && nextPageUrl.current != null) {
                 fetchMessages()
             }
-            if (messageWindow.current.scrollTop === (messageWindow.current.scrollHeight - messageWindow.current.offsetHeight)) {
+            if (messageWindow.current.scrollTop >= (messageWindow.current.scrollHeight - messageWindow.current.offsetHeight) - messageWindow.current.lastChild.offsetHeight) {
                 markMessagesAsSeen()
             }
         }
@@ -95,17 +102,15 @@ export default function Messages({ activeChat, setActiveChat, messages, messages
         if (messages.length > 0 && firstFetch.current) {
             messageWindow.current.scrollTop = messageWindow.current.scrollHeight
             markMessagesAsSeen()
-            if (messageWindow.current.scrollTop == 0 && nextPageUrl.current != null) {
-                fetchMessages()
-            }
-            else {
-                firstFetch.current = false
-            }
+            firstFetch.current = false
         }
         else if (isNewMessage.current) {
             isNewMessage.current = false
             messageWindow.current.scrollTop = messageWindow.current.scrollHeight
 
+        }
+        if (messageWindow.current.scrollHeight <= messageWindow.current.clientHeight) {
+            markMessagesAsSeen()
         }
     }, [messages])
     return (
@@ -130,10 +135,10 @@ export default function Messages({ activeChat, setActiveChat, messages, messages
             </ul>
             <form onSubmit={submit} className="relative flex gap-1 p-2">
                 <div ref={chatInput} className="overflow-y-scroll max-h-52 scrollbar-thumb-slate-700 scrollbar-track-blue-100 scrollbar-thin w-full whitespace-pre-wrap break-all text-sm py-1 pl-2 pr-14 rounded-md bg-blue-100" id="chat_input"
-                    onInput={(e) => { setMessageData(e.currentTarget.textContent) }} onKeyDown={(e) => e.key == "Enter" && processing == false ? submit(e) : ""}
+                    onInput={(e) => { setMessageData(e.currentTarget.textContent) }} onKeyDown={(e) => e.key == "Enter" && processing.current == false ? submit(e) : ""}
                     contentEditable data-text={"Type your message here..."} />
                 <EmojiBox input={messageData} setInput={(val) => setMessageData(val)} componentRef={ref} isComponentVisible={isComponentVisible} setIsComponentVisible={setIsComponentVisible} />
-                <button disabled={processing} className="rounded-full h-fit bg-blue-300 hover:opacity-70 flex p-2 text-center align-middle">
+                <button disabled={processing.current} className="rounded-full h-fit bg-blue-300 hover:opacity-70 flex p-2 text-center align-middle">
                     {isEdit && <i className="fa-regular fa-pen-to-square" />}
                     {!isEdit && <i className="fa-regular fa-paper-plane" />}
                 </button>

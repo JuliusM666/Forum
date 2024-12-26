@@ -22,28 +22,33 @@ export default function Chats({ close, showChats }) {
         if (chatsRef.current.length == 0 && nextPageUrl.current != null) {
             return
         }
-        let messageExists = false
+        let messageId = null
         for (let i = 0; i < chatsRef.current.length; i++) {
             if ((chatsRef.current[i].reciever_id == message.reciever_id && chatsRef.current[i].sender_id == message.sender_id) || (chatsRef.current[i].sender_id == message.reciever_id && chatsRef.current[i].reciever_id == message.sender_id)) {
-                messageExists = true
                 if (chatsRef.current[i].created_at <= message.created_at) {
-                    message.sender = chatsRef.current[i].sender
-                    const newChats = [...chatsRef.current]
-                    if (message.is_edited == false && message.deleted_at == null) {
-                        newChats.splice(i, 1)
-                        newChats.unshift(message)
-                    }
-                    else {
-                        newChats[i] = message
-                    }
-                    setChats(newChats)
+                    message = { ...message, sender: chatsRef.current[i].sender }
+                    messageId = i
                 }
                 break
             }
         }
-        if (messageExists == false && message.is_edited == false && message.deleted_at == null) {
+        if (messageId == null && message.is_edited == false && message.deleted_at == null && message.is_seen == false) {
+
             setChats([message, ...chatsRef.current])
         }
+        else if (messageId != null) {
+            const newChats = [...chatsRef.current]
+            if (message.is_edited == false && message.deleted_at == null && message.is_seen == false) {
+                newChats.splice(messageId, 1)
+                newChats.unshift(message)
+            }
+            else {
+                newChats[messageId] = message
+            }
+            setChats(newChats)
+        }
+
+
 
     }
     function updateMessages(message) {
@@ -51,14 +56,12 @@ export default function Chats({ close, showChats }) {
             let messageId = null
             for (let i = 0; i < messagesRef.current.length; i++) {
                 if (messagesRef.current[i].id == message.id) {
-                    message.sender = messagesRef.current[i].sender
+                    message = { ...message, sender: messagesRef.current[i].sender }
                     messageId = i
                     break
                 }
-
             }
-
-            if (messageId == null && message.is_edited == false && message.deleted_at == null) {
+            if (messageId == null && message.is_edited == false && message.deleted_at == null && message.is_seen == false) {
                 setMessages([message, ...messagesRef.current])
             }
             else if (messageId != null) {
@@ -69,6 +72,7 @@ export default function Chats({ close, showChats }) {
         }
     }
     function update(message) {
+        console.log(message)
         if (message.correct_id != null) {
             message.id = message.correct_id
         }
@@ -83,7 +87,6 @@ export default function Chats({ close, showChats }) {
             window.Echo.private('App.Models.User.' + auth.user.id)
                 .notification((notification) => {
                     router.reload({ only: ['chatsNotSeen'] })
-                    console.log(notification)
                     if (notification.type == "message") {
                         update(notification)
                     }
@@ -103,7 +106,7 @@ export default function Chats({ close, showChats }) {
                     <Card name="Chats" ButtonComponent={<CloseButton handleOnClick={() => close()} />}>
                         <div className="bg-slate-100">
                             {activeChat == null && <Chat nextPageUrl={nextPageUrl} chats={chats} setChats={setChats} setActiveChat={setActiveChat} />}
-                            {activeChat != null && <Messages deleteConversation={deleteConversation} messagesRef={messagesRef} update={update} messages={messages} setMessages={setMessages} activeChat={activeChat} setActiveChat={setActiveChat} />}
+                            {activeChat != null && <Messages deleteConversation={deleteConversation} update={update} messages={messages} setMessages={setMessages} activeChat={activeChat} setActiveChat={setActiveChat} />}
                         </div>
                     </Card>
                 </div>

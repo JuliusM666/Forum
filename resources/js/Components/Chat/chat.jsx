@@ -23,7 +23,9 @@ export default function Chat({ setActiveChat, chats, setChats, nextPageUrl }) {
             });
     }
     useEffect(() => {
-        fetchChats()
+        if (nextPageUrl.current != null) {
+            fetchChats()
+        }
         chatWindow.current.onscroll = function () {
             if (chatWindow.current.scrollTop === (chatWindow.current.scrollHeight - chatWindow.current.offsetHeight)) {
                 if (nextPageUrl.current != null) {
