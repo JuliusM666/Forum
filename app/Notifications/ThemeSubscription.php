@@ -48,6 +48,10 @@ class ThemeSubscription extends Notification implements ShouldQueue
             ->action('Show Post', route('post', [$this->post->theme->topic, $this->post->theme, $this->post]));
     }
 
+    public function broadcastType(): string
+    {
+        return 'notification';
+    }
     /**
      * Get the array representation of the notification.
      *
@@ -56,8 +60,13 @@ class ThemeSubscription extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'title' => 'theme subscription',
-            'message' => 'User ' . $this->post->user->name . " has posted in theme: " . $this->post->theme->title,
+            'data' => [
+                'data' => [
+                    'title' => 'theme subscription',
+                    'message' => 'User ' . $this->post->user->name . " has posted in theme: " . $this->post->theme->title
+                ]
+
+            ]
         ];
     }
 

@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class DeleteMessagesNotification extends Notification implements ShouldQueue
+class DeleteConversationNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -32,7 +32,7 @@ class DeleteMessagesNotification extends Notification implements ShouldQueue
 
     public function broadcastType(): string
     {
-        return 'deleteMessages';
+        return 'deleteConversation';
     }
 
     /**

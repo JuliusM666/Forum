@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use App\Models\User;
-use App\Notifications\DeleteMessagesNotification;
+use App\Notifications\DeleteConversationNotification;
 use App\Notifications\MessageNotification;
-use App\Notifications\SeenMessageNotification;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -30,17 +29,20 @@ class MessageController extends Controller
     public function deleteConversation($recipient_id)
     {
         $this->getConversation($recipient_id)->where("sender_id", auth()->user()->id)->update(["deleted_for_sender" => true]);
-        $this->getConversation($recipient_id)->where("reciever_id", auth()->user()->id)->update(["deleted_for_reciever" => true]);
-        auth()->user()->notify(new DeleteMessagesNotification($recipient_id));
+        $this->getConversation($recipient_id)->where("reciever_id", auth()->user()->id)->update(["deleted_for_reciever" => true, "is_seen" => true]);
+        auth()->user()->notify(new DeleteConversationNotification($recipient_id));
     }
 
-    public function markAsSeen(Message $message)
+    public function markAsSeen($message) # because of soft delete
     {
+        $message = Message::withTrashed()->find($message);
         Message::withTrashed()->where("sender_id", $message->sender_id)->where("reciever_id", auth()->user()->id)
             ->where("created_at", "<=", $message->created_at)
             ->update(["is_seen" => true]);
-        auth()->user()->notify(new SeenMessageNotification($message->id));
-        User::find($message->sender_id)->notify(new SeenMessageNotification($message->id));
+        $message->refresh();
+        User::find($message->reciever_id)->notify(new MessageNotification($message->toArray()));
+        User::find($message->sender_id)->notify(new MessageNotification($message->toArray()));
+        return $message;
     }
     /**
      * Display a listing of the resource.
@@ -89,11 +91,13 @@ class MessageController extends Controller
             'sender_id' => auth()->user()->id,
             'reciever_id' => $request->reciever_id,
         ]);
+        $message->refresh();
         $message->load("sender");
-        $messageForReciever = $message->toArray();
-        $messageForReciever['sender'] = $message->reciever()->first();
+        $messageForSender = $message->toArray();
+        $messageForSender['sender'] = $message->reciever()->first();
         $message->reciever->notify(new MessageNotification($message->toArray(), true));
-        $message->sender->notify(new MessageNotification($messageForReciever, true));
+        $message->sender->notify(new MessageNotification($messageForSender, true));
+        return $messageForSender;
     }
 
     /**
@@ -129,6 +133,7 @@ class MessageController extends Controller
         $message->save();
         $message->reciever->notify(new MessageNotification($message->toArray()));
         $message->sender->notify(new MessageNotification($message->toArray()));
+        return $message;
     }
 
     /**
@@ -141,6 +146,7 @@ class MessageController extends Controller
         $message->message = "deleted by user";
         $message->reciever->notify(new MessageNotification($message->toArray()));
         $message->sender->notify(new MessageNotification($message->toArray()));
+        return $message;
     }
 
 }

@@ -19,9 +19,9 @@ class MessageNotification extends Notification implements ShouldQueue
      */
     private $message;
     private $isStore;
-    private $sender;
     public function __construct(array $message, bool $isStore = false)
     {
+        $message['correct_id'] = $message['id'];
         $this->message = $message;
         $this->isStore = $isStore;
     }

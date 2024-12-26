@@ -55,6 +55,7 @@ export default function Chat({ setActiveChat, chats, setChats, nextPageUrl }) {
                     </li>
                 )
             })}
+            {chats.length == 0 && <h1 className="text-end p-2">No chats yet</h1>}
             {loading && <div className="flex justify-center"><Loading /></div>}
         </ul>
     )

@@ -1,12 +1,17 @@
 import { useContext } from "react"
 import { ModalContext } from "../Context/modalContext"
-import { usePage, router } from "@inertiajs/react"
+import { usePage } from "@inertiajs/react"
 import UserPicture from "../userPicture"
 
-export default function Message({ message, setActiveMessage, isActive, setInput, setShowEmoji, setIsEdit, isEdit }) {
+export default function Message({ message, isSeen, setActiveMessage, isActive, setInput, setShowEmoji, setIsEdit, isEdit, update }) {
     const { setShowConfirm, confirmAction, confirmMessage } = useContext(ModalContext)
     const { auth } = usePage().props
-    if (message.sender.id == auth.user.id) {
+    function deleteMessage() {
+        axios.delete(route("chats.destroy", message.id))
+            .then((response) => { update(response.data) })
+            .catch((error) => console.log(error))
+    }
+    if (message.sender_id == auth.user.id) {
         return (
             <div className="my-2">
                 {isActive &&
@@ -17,7 +22,7 @@ export default function Message({ message, setActiveMessage, isActive, setInput,
                                 <button onClick={() => { isEdit ? setIsEdit(false) : (setInput(message.message), setIsEdit(true)) }} className="hover:opacity-70"> <i className="fa-regular fa-pen-to-square" /></button>
                                 <button onClick={() => {
                                     confirmMessage.current = "This message will be deleted. Do you want to confirm?", setShowConfirm(true),
-                                        confirmAction.current = () => router.delete(route("chats.destroy", message.id))
+                                        confirmAction.current = () => deleteMessage()
                                 }} className="hover:opacity-70"> <i className="fa-solid fa-circle-xmark" /></button>
                             </>
                         }
@@ -37,11 +42,12 @@ export default function Message({ message, setActiveMessage, isActive, setInput,
                     </button>
 
                     <div className="h-9 w-9">
-                        <UserPicture user_id={message.sender.id} user_img={message.sender.user_img} />
+                        <UserPicture user_id={auth.user.id} user_img={auth.user.user_img} />
                     </div>
 
                 </div>
                 <div className="text-end text-xs px-1 mr-16">
+                    {isSeen && <h1>read</h1>}
                     {message.is_edited == true && <h1>edited</h1>}
                 </div>
             </div >

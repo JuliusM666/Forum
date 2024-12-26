@@ -48,6 +48,11 @@ class PostSubscription extends Notification implements ShouldQueue
             ->line('User ' . $this->reply->user->name . " has replied in this post");
     }
 
+    public function broadcastType(): string
+    {
+        return 'notification';
+    }
+
     /**
      * Get the array representation of the notification.
      *
@@ -56,8 +61,12 @@ class PostSubscription extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'title' => 'post subscription',
-            'message' => 'User ' . $this->reply->user->name . " has replied in post: " . $this->reply->post->title,
+            'data' => [
+                'data' => [
+                    'title' => 'post subscription',
+                    'message' => 'User ' . $this->reply->user->name . " has replied in post: " . $this->reply->post->title
+                ]
+            ]
         ];
     }
 
