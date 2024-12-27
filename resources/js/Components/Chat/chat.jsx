@@ -35,7 +35,7 @@ export default function Chat({ setActiveChat, chats, setChats, nextPageUrl }) {
         }
     }, [])
     return (
-        <ul ref={chatWindow} className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin " >
+        <ul ref={chatWindow} className="overflow-y-scroll min-h-20 max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin " >
             {chats.map((chat, index) => {
                 return (
                     <li key={index} className="odd:bg-slate-100 even:bg-slate-200">
@@ -57,7 +57,10 @@ export default function Chat({ setActiveChat, chats, setChats, nextPageUrl }) {
                     </li>
                 )
             })}
-            {chats.length == 0 && <h1 className="text-end p-2">No chats yet</h1>}
+            {chats.length == 0 && <li className="grid grid-cols-1 text-center p-6 gap-4">
+                <i className="fa-regular fa-comments text-9xl text-blue-300" />
+                <h1 className="font-semibold text-slate-700">No chats, yet.</h1>
+            </li>}
             {loading && <div className="flex justify-center"><Loading /></div>}
         </ul>
     )

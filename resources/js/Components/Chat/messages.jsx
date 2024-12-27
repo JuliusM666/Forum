@@ -132,6 +132,12 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
                 {messages.toReversed().map((message, index) => {
                     return (<Message isSeen={seenIndicatorId == message.id} update={update} message={message} setIsEdit={setIsEdit} isEdit={isEdit} setShowEmoji={setIsComponentVisible} setInput={(val) => { setMessageData(val); chatInput.current.textContent = val }} setActiveMessage={setActiveMessage} isActive={activeMessage == message.id} key={index} />)
                 })}
+                {messages.length == 0 &&
+                    <li className="grid grid-cols-1 text-center p-6 gap-4">
+                        <i className="fa-regular fa-comments text-9xl text-blue-300" />
+                        <h1 className="font-semibold text-slate-700">No messages, yet.</h1>
+                    </li>
+                }
             </ul>
             <form onSubmit={submit} className="relative flex gap-1 p-2">
                 <div ref={chatInput} className="overflow-y-scroll max-h-52 scrollbar-thumb-slate-700 scrollbar-track-blue-100 scrollbar-thin w-full whitespace-pre-wrap break-all text-sm py-1 pl-2 pr-14 rounded-md bg-blue-100" id="chat_input"

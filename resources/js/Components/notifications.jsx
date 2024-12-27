@@ -25,7 +25,7 @@ export default function Notifications({ close, showNotifications, setNotificatio
     return (
         <>
             {
-                showNotifications && <div className="fixed z-20 right-0 bottom-0 w-1/4 max-xl:w-1/3 max-lg:w-1/2 max-md:w-8/12 max-sm:w-11/12">
+                showNotifications && <div className="fixed z-20 right-0 bottom-0 w-1/4 max-xl:w-1/3 max-lg:w-1/2 max-md:w-8/12 max-sm:w-full">
                     <Card name="Notifications" ButtonComponent={<CloseButton handleOnClick={() => { close() }} />}>
                         <div className="bg-slate-100 p-2">
 
@@ -34,11 +34,14 @@ export default function Notifications({ close, showNotifications, setNotificatio
                                 <button onClick={() => markAllAsRead()} className="text-slate-400 cursor-pointer font-semibold rounded-xl px-2 py-1  text-center hover:bg-slate-400 hover:text-slate-100">mark all as read</button>
                             </div>
 
-                            <ul className="overflow-y-scroll max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
+                            <ul className="overflow-y-scroll min-h-20 max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
                                 {notifications.map((notification, index) => {
                                     return (<Notification notification={notification} index={index} key={index} isShowID={isShowID} setIsShowID={setIsShowID} />)
                                 })}
-                                {notifications.length == 0 && <h1 className="text-right p-2">no notifications</h1>}
+                                {notifications.length == 0 && <li className="grid grid-cols-1 text-center p-6 gap-4">
+                                    <i className="fa-regular fa-bell text-9xl text-blue-300" />
+                                    <h1 className="font-semibold text-slate-700">No notifications, yet.</h1>
+                                </li>}
                             </ul>
                         </div>
                     </Card>
