@@ -23,20 +23,22 @@ export default function Chats({ close, showChats }) {
             return
         }
         let messageId = null
+        let isLater = false
         for (let i = 0; i < chatsRef.current.length; i++) {
             if ((chatsRef.current[i].reciever_id == message.reciever_id && chatsRef.current[i].sender_id == message.sender_id) || (chatsRef.current[i].sender_id == message.reciever_id && chatsRef.current[i].reciever_id == message.sender_id)) {
+                messageId = i
                 if (chatsRef.current[i].created_at <= message.created_at) {
+                    isLater = true
                     message = { ...message, sender: chatsRef.current[i].sender }
-                    messageId = i
+
                 }
                 break
             }
         }
         if (messageId == null && message.is_edited == false && message.deleted_at == null && message.is_seen == false) {
-
             setChats([message, ...chatsRef.current])
         }
-        else if (messageId != null) {
+        else if (messageId != null && isLater == true) {
             const newChats = [...chatsRef.current]
             if (message.is_edited == false && message.deleted_at == null && message.is_seen == false) {
                 newChats.splice(messageId, 1)
@@ -72,26 +74,25 @@ export default function Chats({ close, showChats }) {
         }
     }
     function update(message) {
-        console.log(message)
-        if (message.correct_id != null) {
-            message.id = message.correct_id
-        }
         updateChats(message)
         updateMessages(message)
+        router.reload({ only: ['chatsNotSeen'] })  // for instant feedback*/ 
     }
-    function deleteConversation(recipient_id) {
-        setChats((chats) => chats.filter(chat => chat.sender.id !== recipient_id))
+    function deleteConversation(message) {
+        setChats((chats) => chats.filter(chat => chat.id !== message.id))
     }
     useEffect(() => {
         if (auth.user) {
             window.Echo.private('App.Models.User.' + auth.user.id)
                 .notification((notification) => {
-                    router.reload({ only: ['chatsNotSeen'] })
+                    if (notification.correct_id != null) {
+                        notification.id = notification.correct_id
+                    }
                     if (notification.type == "message") {
                         update(notification)
                     }
                     else if (notification.type == "deleteConversation") {
-                        deleteConversation(notification.recipient_id)
+                        deleteConversation(notification)
                     }
                 })
             return () => {
@@ -99,6 +100,7 @@ export default function Chats({ close, showChats }) {
             }
         }
     }, [])
+    useEffect(() => { setMessages([]) }, [activeChat])
     return (
         <>
             {showChats &&
@@ -106,7 +108,7 @@ export default function Chats({ close, showChats }) {
                     <Card name="Chats" ButtonComponent={<CloseButton handleOnClick={() => close()} />}>
                         <div className="bg-slate-100">
                             {activeChat == null && <Chat nextPageUrl={nextPageUrl} chats={chats} setChats={setChats} setActiveChat={setActiveChat} />}
-                            {activeChat != null && <Messages deleteConversation={deleteConversation} update={update} messages={messages} setMessages={setMessages} activeChat={activeChat} setActiveChat={setActiveChat} />}
+                            {activeChat != null && <Messages key={activeChat} deleteConversation={deleteConversation} update={update} messages={messages} setMessages={setMessages} activeChat={activeChat} setActiveChat={setActiveChat} />}
                         </div>
                     </Card>
                 </div>

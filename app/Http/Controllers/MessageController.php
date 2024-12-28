@@ -26,16 +26,20 @@ class MessageController extends Controller
     }
 
 
-    public function deleteConversation($recipient_id)
+    public function deleteConversation($message)
     {
-        $this->getConversation($recipient_id)->where("sender_id", auth()->user()->id)->update(["deleted_for_sender" => true]);
-        $this->getConversation($recipient_id)->where("reciever_id", auth()->user()->id)->update(["deleted_for_reciever" => true, "is_seen" => true]);
-        auth()->user()->notify(new DeleteConversationNotification($recipient_id));
+        $message = Message::withTrashed()->find($message); # becuase of soft deletes
+        $recipient_id = $message->reciever_id == auth()->user()->id ? $message->sender_id : $message->reciever_id;
+        Message::withTrashed()->where("sender_id", auth()->user()->id)->where("reciever_id", $recipient_id)
+            ->where("created_at", "<=", $message->created_at)->update(["deleted_for_sender" => true]);
+        Message::withTrashed()->where("sender_id", $recipient_id)->where("reciever_id", auth()->user()->id)
+            ->where("created_at", "<=", $message->created_at)->update(["deleted_for_reciever" => true, "is_seen" => true]);
+        auth()->user()->notify(new DeleteConversationNotification($message->toArray()));
     }
 
-    public function markAsSeen($message) # because of soft delete
+    public function markAsSeen($message)
     {
-        $message = Message::withTrashed()->find($message);
+        $message = Message::withTrashed()->find($message); # because of soft delete
         Message::withTrashed()->where("sender_id", $message->sender_id)->where("reciever_id", auth()->user()->id)
             ->where("created_at", "<=", $message->created_at)
             ->update(["is_seen" => true]);

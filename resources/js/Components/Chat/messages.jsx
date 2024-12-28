@@ -1,10 +1,13 @@
-import { useContext, useState, useRef, useEffect } from "react"
+import { useContext, useState, useRef, useEffect, useCallback } from "react"
 import { ModalContext } from "../Context/modalContext"
 import useModalVisible from "../Hooks/useModalVisible"
 import { Link, usePage } from "@inertiajs/react"
 import Loading from "../loading"
 import Message from "./message"
 import EmojiBox from "./emojiBox"
+import MessageTyping from "./messageTyping"
+import formatDate from "@/utils/formatDate"
+import moment from "moment"
 
 export default function Messages({ activeChat, setActiveChat, messages, setMessages, update, deleteConversation }) {
     const { setShowConfirm, confirmAction, confirmMessage } = useContext(ModalContext)
@@ -25,9 +28,46 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
     const [messageData, setMessageData] = useState("")
     const processing = useRef(false)
     const seenProcessing = useRef(false)
+    const deleteConversationProcessing = useRef(false)
     const [errors, setErrors] = useState([])
+    const [typingMesssage, setTypingMessage] = useState({})
+    const typingChannel = 'chat.' + Math.max(auth.user.id, activeChat) + '.' + Math.min(auth.user.id, activeChat)
+    let prevDate = null
+    const messagesForRender = messages.toReversed().map((message, index) => {
+        let isMarked = false
+        if (prevDate == null || moment(prevDate).format("YYYY-M-D") != moment(message.created_at).format("YYYY-M-D")) {
+            prevDate = message.created_at
+            isMarked = true
+        }
+        return (
+            <div key={index}>
+                {isMarked && <li className="text-center text-xs">{formatDate(message.created_at)}</li>}
+                <Message isSeen={seenIndicatorId == message.id} update={update} message={message} setIsEdit={setIsEdit} isEdit={isEdit} setShowEmoji={setIsComponentVisible} setInput={(val) => { setMessageData(val); chatInput.current.textContent = val }} setActiveMessage={setActiveMessage} isActive={activeMessage == message.id} />
+                {index == messages.length - 1 && prevDate != null && formatDate(prevDate) != moment(message.created_at).format("HH:mm") && <li className="text-center text-xs">{moment(message.created_at).format("HH:mm")}</li>}
+            </div>
+        )
+    })
     const reset = () => { setErrors([]), setMessageData(""), chatInput.current.innerHTML = "" }
-
+    function typing() {
+        if (auth.user) {
+            window.Echo.private(typingChannel)
+                .whisper('typing', {
+                    typerId: auth.user.id,
+                    typerImage: auth.user.user_img
+                })
+        }
+    }
+    function handleDeleteConversation() {
+        confirmAction.current = () => {
+            deleteConversationProcessing.current = true
+            axios.delete(route("chats.delete_conversation", messages[0].id))
+                .then(response => { deleteConversation(messages[0]), setActiveChat(null) })
+                .catch(error => console.log(error))
+                .finally(deleteConversationProcessing.current = false)
+        }
+        confirmMessage.current = "This chat will be deleted only for you. Do you want to confirm?"
+        setShowConfirm(true)
+    }
     function markMessagesAsSeen() {
         if (seenProcessing.current == false) {
             for (const message of messagesRef.current) {
@@ -82,17 +122,29 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
     }
     useEffect(() => {
         fetchMessages()
+        if (auth.user) {
+            window.Echo.private(typingChannel)
+                .listenForWhisper('typing', (e) => {
+                    if (e.typerId != auth.user.id) {
+                        setTypingMessage((typingMesssage) => ({ sender_id: e.typerId, sender: { id: e.typerId, user_img: e.typerImage }, message: "Typing..." }))
+                    }
+                })
+        }
         messageWindow.current.onscroll = function () {
-            if (messageWindow.current.scrollTop == 0 && nextPageUrl.current != null) {
+            if (messageWindow.current.scrollTop == 0 && nextPageUrl.current != null && messagesRef.current.length > 0) {
                 fetchMessages()
             }
             if (messageWindow.current.scrollTop >= (messageWindow.current.scrollHeight - messageWindow.current.offsetHeight) - messageWindow.current.lastChild.offsetHeight) {
                 markMessagesAsSeen()
             }
         }
-        return (() => setMessages([]))
+        return (() => {
+            setMessages(() => [])
+            window.Echo.leave(typingChannel)
+        })
     }, [])
     useEffect(() => {
+        firstFetch.current = messages.length == 0 ? true : firstFetch.current
         for (const mess of messages) {
             if (mess.sender_id == auth.user.id && mess.is_seen) {
                 setSeenIndicatorId(mess.id)
@@ -109,7 +161,7 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
             messageWindow.current.scrollTop = messageWindow.current.scrollHeight
 
         }
-        if (messageWindow.current.scrollHeight <= messageWindow.current.clientHeight) {
+        if (messageWindow.current.scrollHeight <= messageWindow.current.clientHeight) { // work around for empty messages
             markMessagesAsSeen()
         }
     }, [messages])
@@ -121,18 +173,16 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
                     <Link href={route("user.show", activeChat)} className="font-semibold hover:opacity-70">
                         {recipient.current.name}</Link>
                 </div>
-                <button onClick={() => {
-                    confirmAction.current = () => { axios.delete(route("chats.delete_conversation", recipient.current.id)).then(response => { deleteConversation(activeChat); setActiveChat(null) }).catch(error => console.log(error)) }
-                        , setShowConfirm(true), confirmMessage.current = "This chat will be deleted only for you. Do you want to confirm?"
-                }}
+                <button disabled={messages.length == 0 || deleteConversationProcessing.current} onClick={() => handleDeleteConversation()}
                     className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
             </div>
             <ul ref={messageWindow} id="messageWindow" className="overflow-y-scroll min-h-20 max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
                 {loading && <div className="flex justify-center"><Loading /></div>}
-                {messages.toReversed().map((message, index) => {
-                    return (<Message isSeen={seenIndicatorId == message.id} update={update} message={message} setIsEdit={setIsEdit} isEdit={isEdit} setShowEmoji={setIsComponentVisible} setInput={(val) => { setMessageData(val); chatInput.current.textContent = val }} setActiveMessage={setActiveMessage} isActive={activeMessage == message.id} key={index} />)
-                })}
-                {messages.length == 0 &&
+                {messagesForRender}
+                {Object.keys(typingMesssage).length > 0 &&
+                    <MessageTyping typingMesssage={typingMesssage} setTypingMessage={setTypingMessage} />
+                }
+                {messages.length == 0 && !loading &&
                     <li className="grid grid-cols-1 text-center p-6 gap-4">
                         <i className="fa-regular fa-comments text-9xl text-blue-300" />
                         <h1 className="font-semibold text-slate-700">No messages, yet.</h1>
@@ -141,7 +191,7 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
             </ul>
             <form onSubmit={submit} className="relative flex gap-1 p-2">
                 <div ref={chatInput} className="overflow-y-scroll max-h-52 scrollbar-thumb-slate-700 scrollbar-track-blue-100 scrollbar-thin w-full whitespace-pre-wrap break-all text-sm py-1 pl-2 pr-14 rounded-md bg-blue-100" id="chat_input"
-                    onInput={(e) => { setMessageData(e.currentTarget.textContent) }} onKeyDown={(e) => e.key == "Enter" && processing.current == false ? submit(e) : ""}
+                    onInput={(e) => { setMessageData(e.currentTarget.textContent); typing() }} onKeyDown={(e) => e.key == "Enter" && processing.current == false ? submit(e) : ""}
                     contentEditable data-text={"Type your message here..."} />
                 <EmojiBox input={messageData} setInput={(val) => setMessageData(val)} componentRef={ref} isComponentVisible={isComponentVisible} setIsComponentVisible={setIsComponentVisible} />
                 <button disabled={processing.current} className="rounded-full h-fit bg-blue-300 hover:opacity-70 flex p-2 text-center align-middle">
@@ -153,3 +203,5 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
         </div >
     )
 }
+
+

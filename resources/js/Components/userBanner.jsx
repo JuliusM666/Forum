@@ -45,7 +45,7 @@ export default function UserBanner({ user }) {
                 </div>
                 <div className="text-slate-700 pr-2 text-xl max-xl:right-1 max-xl:text-3xl col-span-2 max-lg: flex gap-4 justify-end max-xl:absolute max-xl:top-2/4">
                     {auth.user != null &&
-                        <button className="max-xl:hover:text-4xl hover:text-2xl" onClick={() => { setShowChats(true), setActiveChat(user.id) }}>
+                        <button className="max-xl:hover:text-4xl hover:text-2xl" onClick={() => { setActiveChat(user.id), setShowChats(true) }}>
                             <i className="fa-solid fa-comment-dots" />
                         </button>
 

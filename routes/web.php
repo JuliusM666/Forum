@@ -64,7 +64,7 @@ Route::controller(MessageController::class)->group(function () {
     Route::post('/chats/seen/{message}', 'markAsSeen')->name("chats.seen")->middleware('auth');
     Route::patch('/chats/{message}', 'update')->name("chats.update")->middleware('auth');
     Route::delete('/chats/{message}', 'destroy')->name("chats.destroy")->middleware('auth');
-    Route::delete('/chats/{recipient_id}/all', 'deleteConversation')->name("chats.delete_conversation")->middleware('auth');
+    Route::delete('/chats/{message}/all', 'deleteConversation')->name("chats.delete_conversation")->middleware('auth');
 });
 
 Route::get('search/{query?}', [SearchController::class, 'index'])->name('search');

@@ -1,15 +1,19 @@
-import { useContext } from "react"
+import { useContext, useRef } from "react"
 import { ModalContext } from "../Context/modalContext"
 import { usePage } from "@inertiajs/react"
 import UserPicture from "../userPicture"
 
-export default function Message({ message, isSeen, setActiveMessage, isActive, setInput, setShowEmoji, setIsEdit, isEdit, update }) {
+export default function Message({ message, typing = false, isSeen, setActiveMessage, isActive, setInput, setShowEmoji, setIsEdit, isEdit, update }) {
     const { setShowConfirm, confirmAction, confirmMessage } = useContext(ModalContext)
+    const processing = useRef(false)
     const { auth } = usePage().props
     function deleteMessage() {
-        axios.delete(route("chats.destroy", message.id))
-            .then((response) => { update(response.data) })
-            .catch((error) => console.log(error))
+        if (processing.current == false) {
+            processing.current = true
+            axios.delete(route("chats.destroy", message.id))
+                .then((response) => { update(response.data), processing.current = false })
+                .catch((error) => console.log(error))
+        }
     }
     if (message.sender_id == auth.user.id) {
         return (
@@ -65,9 +69,9 @@ export default function Message({ message, isSeen, setActiveMessage, isActive, s
                                 border-t-[8px] border-t-transparent
                                 border-r-[10px] border-r-blue-100">
                     </div>
-                    <div className="bg-blue-100 rounded-md p-2 whitespace-pre-line break-all">
+                    <p className={`bg-blue-100 rounded-md p-2 whitespace-pre-line break-all ${typing == true ? 'text-slate-400' : ''}`}>
                         {message.message}
-                    </div>
+                    </p>
 
                 </div>
 

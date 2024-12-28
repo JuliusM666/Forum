@@ -14,10 +14,11 @@ class DeleteConversationNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    private $recipient_id;
-    public function __construct(int $recipient_id)
+    private $message;
+    public function __construct(array $message)
     {
-        $this->recipient_id = $recipient_id;
+        $message['correct_id'] = $message['id'];
+        $this->message = $message;
     }
 
     /**
@@ -42,8 +43,6 @@ class DeleteConversationNotification extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        return [
-            "recipient_id" => $this->recipient_id
-        ];
+        return $this->message;
     }
 }

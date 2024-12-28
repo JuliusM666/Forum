@@ -1,8 +1,8 @@
 import useComponentVisible from "./Hooks/useComponentVisible"
-import { usePage, Link, router } from "@inertiajs/react"
+import { usePage, Link } from "@inertiajs/react"
 import Notifications from "./notifications"
 import Chats from "./Chat/chats"
-import { useState, useEffect, useContext, useRef } from "react"
+import { useState, useContext } from "react"
 import { ModalContext } from "./Context/modalContext"
 export default function UserMenu() {
     const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
