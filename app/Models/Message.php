@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Message extends Model
@@ -19,9 +18,5 @@ class Message extends Model
     public function reciever(): BelongsTo
     {
         return $this->belongsTo(User::class, "reciever_id");
-    }
-    public function emojis(): HasMany
-    {
-        return $this->hasMany(MessageEmoji::class);
     }
 }
