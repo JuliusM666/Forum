@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
+use \App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,3 +22,6 @@ Broadcast::channel('chat.{firstId}.{secondId}', function ($user, $firstId, $seco
     return (int) $user->id === (int) $firstId || (int) $user->id === (int) $secondId;
 });
 
+Broadcast::channel('users.online', function (User $user) {
+    return ["id" => $user->id, "type" => $user->type == null ? "user" : $user->type, "name" => $user->name];
+}, ['guards' => ['web', 'guest-guard']]);

@@ -27,7 +27,6 @@ class TopicController extends Controller
         $baseParams = [
             'breadcrumbs' => [0 => ["name" => "Home", "route" => route('home')]],
             'topics' => $topics,
-            'activeUsers' => User::all()->whereBetween('last_seen', [now()->subMinutes(3), now()])->select('id', 'name'),
             'userStatistics' => [
                 'userCount' => User::all()->count(),
                 'latestUser' => User::latest()->first(),

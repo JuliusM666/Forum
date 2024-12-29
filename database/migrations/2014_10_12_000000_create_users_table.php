@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->string('email')->unique();
             $table->string('user_img');
             $table->string('banner_img');
-            $table->dateTime('last_seen')->nullable();
+            $table->dateTime('last_seen')->default(now());
             $table->boolean('email_notifications')->default(true);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

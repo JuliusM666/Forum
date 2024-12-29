@@ -1,4 +1,4 @@
-import UserPicture from "./userPicture"
+import UserPictureWithStatus from "./userPictureWithStatus"
 import Points from "../Components/points"
 import moment from "moment"
 import { ModalContext } from "./Context/modalContext"
@@ -17,7 +17,7 @@ export default function UserBanner({ user }) {
 
             <div className="absolute flex top-2/4 max-xl:top-1/4 gap-5">
                 <div className=" w-28 h-28  p-2  max-lg:top-1/4">
-                    <UserPicture user_id={user.id} user_img={user.user_img} />
+                    <UserPictureWithStatus user_id={user.id} user_img={user.user_img} />
                 </div>
                 <div className="bg-slate-700 h-fit p-2 px-5">
                     <h1 className="text-xl text-slate-200 font-thin">{user.name}</h1>

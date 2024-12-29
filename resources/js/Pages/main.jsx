@@ -4,7 +4,7 @@ import ActiveUsers from '../Components/activeUsers'
 import UserStatistics from '../Components/userStatistics'
 import AddNewPostButton from '../Components/addNewPostButton'
 import { Head } from '@inertiajs/react'
-export default function Main({ breadcrumbs, token, topics, isPasswordResetEmail, activeUsers, userStatistics }) {
+export default function Main({ breadcrumbs, token, topics, isPasswordResetEmail, userStatistics }) {
     return (
         <Layout breadcrumbs={breadcrumbs} token={token} isPasswordResetEmail={isPasswordResetEmail}>
             <Head title="home" />
@@ -27,7 +27,7 @@ export default function Main({ breadcrumbs, token, topics, isPasswordResetEmail,
 
 
 
-            <ActiveUsers activeUsers={activeUsers} />
+            <ActiveUsers />
             <UserStatistics userStatistics={userStatistics} />
 
 

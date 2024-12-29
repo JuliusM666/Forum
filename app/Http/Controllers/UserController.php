@@ -70,7 +70,7 @@ class UserController extends Controller
         ]);
         if (Auth::attempt(['name' => $request->username, 'password' => $request->password], $request->remember)) {
             $request->session()->regenerate();
-
+            auth()->user()->update(["last_seen" => now()]);
             return redirect()->route('home');
         }
         return back()->withErrors([
@@ -189,8 +189,11 @@ class UserController extends Controller
 
         ];
     }
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('home');
     }
 }

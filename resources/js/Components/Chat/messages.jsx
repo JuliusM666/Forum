@@ -7,6 +7,7 @@ import Message from "./message"
 import EmojiBox from "./emojiBox"
 import MessageTyping from "./messageTyping"
 import formatDate from "@/utils/formatDate"
+import { UsersOnlineContext } from "../Context/usersOnlineContext"
 import moment from "moment"
 
 export default function Messages({ activeChat, setActiveChat, messages, setMessages, update, deleteConversation }) {
@@ -31,6 +32,7 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
     const deleteConversationProcessing = useRef(false)
     const [errors, setErrors] = useState([])
     const [typingMesssage, setTypingMessage] = useState({})
+    const { usersOnline } = useContext(UsersOnlineContext)
     const typingChannel = 'chat.' + Math.max(auth.user.id, activeChat) + '.' + Math.min(auth.user.id, activeChat)
     let prevDate = null
     const messagesForRender = messages.toReversed().map((message, index) => {
@@ -166,16 +168,25 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
         }
     }, [messages])
     return (
-        <div className="relative">
-            <div className="bg-blue-100 z-20 p-1 grid grid-cols-3  items-center">
+        <div>
+            <div className="bg-blue-100 z-20 p-1 grid grid-cols-4  items-center">
                 <button onClick={() => setActiveChat(null)} className="justify-self-start hover:opacity-70 ml-1"><i className="fa-solid fa-caret-left text-lg text-slate-700" /></button>
-                <div className="truncate text-center">
-                    <Link href={route("user.show", activeChat)} className="font-semibold hover:opacity-70">
-                        {recipient.current.name}</Link>
+                <div className="flex justify-center col-span-2">
+                    <div className="truncate">
+                        <Link href={route("user.show", activeChat)}>
+                            <div className="relative">
+                                <h1 className="font-semibold hover:opacity-70 truncate px-1.5"> {recipient.current.name}</h1>
+                                <div className={`absolute w-2 h-2 right-0 bottom-0.5 shadow-sm ${usersOnline.find((user) => user.type == "user" && user.id == activeChat) ? "shadow-green-600" : "shadow-red-600"} border-white border rounded-full ${usersOnline.find((user) => user.type == "user" && user.id == activeChat) ? "bg-green-400" : "bg-red-400"}`} />
+                            </div>
+
+
+                        </Link>
+                    </div>
+
                 </div>
                 <button disabled={messages.length == 0 || deleteConversationProcessing.current} onClick={() => handleDeleteConversation()}
                     className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
-            </div>
+            </div >
             <ul ref={messageWindow} id="messageWindow" className="overflow-y-scroll min-h-20 max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
                 {loading && <div className="flex justify-center"><Loading /></div>}
                 {messagesForRender}

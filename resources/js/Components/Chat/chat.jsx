@@ -1,7 +1,7 @@
 import { usePage } from "@inertiajs/react"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useContext } from "react"
 import Loading from "../loading"
-import UserPicture from "../userPicture"
+import UserPictureWithStatus from "../userPictureWithStatus"
 import formatDate from "@/utils/formatDate"
 
 export default function Chat({ setActiveChat, chats, setChats, nextPageUrl }) {
@@ -42,7 +42,7 @@ export default function Chat({ setActiveChat, chats, setChats, nextPageUrl }) {
                         <button onClick={() => setActiveChat(chat.sender.id)} className=" text-slate-700 p-2 gap-1 grid grid-cols-6 items-center hover:opacity-70">
                             <div className="flex justify-end mr-5">
                                 <div className="w-9 h-9">
-                                    <UserPicture user_id={chat.sender.id} user_img={chat.sender.user_img} />
+                                    <UserPictureWithStatus user_id={chat.sender.id} user_img={chat.sender.user_img} />
                                 </div>
                             </div>
                             <div className="col-span-4 text-start">

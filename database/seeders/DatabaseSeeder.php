@@ -113,13 +113,7 @@ class DatabaseSeeder extends Seeder
                 'sender_id' => $users->random()->id,
             ]);
         }
-        $messages = Message::all()->shuffle();
-        for ($i = 0; $i < 2000; $i++) {
-            MessageEmoji::factory()->create([
-                'user_id' => $users->random()->id,
-                'message_id' => $messages->random()->id,
-            ]);
-        }
+
 
     }
 }

@@ -16,6 +16,8 @@ import ResetPasswordModal from '../Components/resetPasswordModal';
 import Message from '../Components/message';
 import { ModalContext } from '../Components/Context/modalContext'
 import useModalVisible from '../Components/Hooks/useModalVisible';
+import { UsersOnlineContext } from '@/Components/Context/usersOnlineContext';
+import { usePage } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
 export default function Layout({ children, breadcrumbs, token = "", isPasswordResetEmail = false }) {
     const [registrationRef, showRegistration, setShowRegistration] = useModalVisible(false);
@@ -41,9 +43,35 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
                 break
             }
         }
-    }, modals)
-
-
+    }, [modals])
+    const { auth } = usePage().props
+    const [usersOnline, setUsersOnline] = useState([])
+    const usersOnlineRef = useRef([])
+    useEffect(() => { usersOnlineRef.current = usersOnline }, [usersOnline])
+    useEffect(() => {
+        console.log("mount")
+        window.Echo.join("users.online")
+            .here((users) => {
+                console.log(users)
+                setUsersOnline(usersOnline => users)
+            })
+            .joining((user) => {
+                console.log("joining", user)
+                setUsersOnline(usersOnline => [...usersOnline, user])
+            })
+            .leaving((user) => {
+                console.log("leaving", user)
+                setUsersOnline(usersOnlineRef.current.filter((u =>
+                    u.id !== user.id)))
+            })
+            .error((error) => {
+                console.error(error);
+            })
+        return () => {
+            console.log("unmount")
+            window.Echo.leave("users.online")
+        }
+    }, [auth.user])
     return (
 
 
@@ -71,20 +99,20 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
                     <Message />
 
 
-
-                    <ModalContext.Provider value={{
-                        "showChats": showChats, "setShowChats": setShowChats, "setIsShowSettings": setShowSettings, "setActiveChat": setActiveChat,
-                        "activeChat": activeChat, "setShowConfirm": setShowConfrim, "confirmAction": confirmAction, "confirmMessage": confirmMessage
-                    }}>
-                        <UserMenu />
-                        <div className='grid grid-cols-4 max-lg:grid-cols-1' name="content_block">
-                            <div name="main_block" className='col-span-3 mt-5'>
-                                {children}
+                    <UsersOnlineContext.Provider value={{ "usersOnline": usersOnline }} >
+                        <ModalContext.Provider value={{
+                            "showChats": showChats, "setShowChats": setShowChats, "setIsShowSettings": setShowSettings, "setActiveChat": setActiveChat,
+                            "activeChat": activeChat, "setShowConfirm": setShowConfrim, "confirmAction": confirmAction, "confirmMessage": confirmMessage
+                        }}>
+                            <UserMenu />
+                            <div className='grid grid-cols-4 max-lg:grid-cols-1' name="content_block">
+                                <div name="main_block" className='col-span-3 mt-5'>
+                                    {children}
+                                </div>
+                                <SideBar handleLoginClick={() => setShowLogin(true)} handleRegisterClick={() => setShowRegistration(true)} />
                             </div>
-                            <SideBar handleLoginClick={() => setShowLogin(true)} handleRegisterClick={() => setShowRegistration(true)} />
-                        </div>
-                    </ModalContext.Provider>
-
+                        </ModalContext.Provider>
+                    </UsersOnlineContext.Provider>
 
 
                     <Footer />
