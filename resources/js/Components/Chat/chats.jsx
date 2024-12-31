@@ -106,7 +106,7 @@ export default function Chats({ close, showChats }) {
             {showChats &&
                 <div className="fixed z-20 text-slate-700 right-0 bottom-0 w-1/4 max-xl:w-1/3 max-lg:w-1/2 max-md:w-8/12 max-sm:w-full">
                     <Card name="Chats" ButtonComponent={<CloseButton handleOnClick={() => close()} />}>
-                        <div className="bg-slate-100">
+                        <div className="bg-slate-100 h-1/2">
                             {activeChat == null && <Chat nextPageUrl={nextPageUrl} chats={chats} setChats={setChats} setActiveChat={setActiveChat} />}
                             {activeChat != null && <Messages key={activeChat} deleteConversation={deleteConversation} update={update} messages={messages} setMessages={setMessages} activeChat={activeChat} setActiveChat={setActiveChat} />}
                         </div>

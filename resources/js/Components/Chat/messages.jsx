@@ -169,7 +169,7 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
     }, [messages])
     return (
         <div>
-            <div className="bg-blue-100 z-20 p-1 grid grid-cols-4  items-center">
+            <div className="bg-blue-100 z-20 p-1 grid grid-cols-4 h-[5vh]  items-center">
                 <button onClick={() => setActiveChat(null)} className="justify-self-start hover:opacity-70 ml-1"><i className="fa-solid fa-caret-left text-lg text-slate-700" /></button>
                 <div className="flex justify-center col-span-2">
                     <div className="truncate">
@@ -187,7 +187,7 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
                 <button disabled={messages.length == 0 || deleteConversationProcessing.current} onClick={() => handleDeleteConversation()}
                     className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
             </div >
-            <ul ref={messageWindow} id="messageWindow" className="overflow-y-scroll min-h-20 max-h-80 scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
+            <ul ref={messageWindow} id="messageWindow" className="overflow-y-scroll h-[38vh] scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
                 {loading && <div className="flex justify-center"><Loading /></div>}
                 {messagesForRender}
                 {Object.keys(typingMesssage).length > 0 &&
@@ -200,15 +200,17 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
                     </li>
                 }
             </ul>
-            <form onSubmit={submit} className="relative flex gap-1 p-2">
-                <div ref={chatInput} className="overflow-y-scroll max-h-52 scrollbar-thumb-slate-700 scrollbar-track-blue-100 scrollbar-thin w-full whitespace-pre-wrap break-all text-sm py-1 pl-2 pr-14 rounded-md bg-blue-100" id="chat_input"
-                    onInput={(e) => { setMessageData(e.currentTarget.textContent); typing() }} onKeyDown={(e) => e.key == "Enter" && processing.current == false ? submit(e) : ""}
-                    contentEditable data-text={"Type your message here..."} />
-                <EmojiBox input={messageData} setInput={(val) => setMessageData(val)} componentRef={ref} isComponentVisible={isComponentVisible} setIsComponentVisible={setIsComponentVisible} />
-                <button disabled={processing.current} className="rounded-full h-fit bg-blue-300 hover:opacity-70 flex p-2 text-center align-middle">
-                    {isEdit && <i className="fa-regular fa-pen-to-square" />}
-                    {!isEdit && <i className="fa-regular fa-paper-plane" />}
-                </button>
+            <form onSubmit={submit}>
+                <div className="relative flex gap-1 p-2 min-h-[7vh]">
+                    <div ref={chatInput} className="overflow-y-scroll max-h-[10vh] scrollbar-thumb-slate-700 scrollbar-track-blue-100 scrollbar-thin w-full whitespace-pre-wrap break-all text-sm py-1 pl-2 pr-14 rounded-md bg-blue-100" id="chat_input"
+                        onInput={(e) => { setMessageData(e.currentTarget.textContent); typing() }} onKeyDown={(e) => e.key == "Enter" && processing.current == false ? submit(e) : ""}
+                        contentEditable data-text={"Type your message here..."} ></div>
+                    <EmojiBox input={messageData} setInput={(val) => setMessageData(val)} componentRef={ref} isComponentVisible={isComponentVisible} setIsComponentVisible={setIsComponentVisible} />
+                    <button disabled={processing.current} className="rounded-full h-fit bg-blue-300 hover:opacity-70 flex p-2 text-center align-middle">
+                        {isEdit && <i className="fa-regular fa-pen-to-square" />}
+                        {!isEdit && <i className="fa-regular fa-paper-plane" />}
+                    </button>
+                </div>
             </form>
             {errors.message && <div className="text-red-500 text-start px-5 text-sm">{errors.message}</div>}
         </div >

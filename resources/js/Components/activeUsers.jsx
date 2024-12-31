@@ -10,15 +10,15 @@ export default function ActiveUsers() {
     usersOnline.forEach((user, index) => {
         if (user.type == "user") {
             userCount += 1
-            if (users.length < 15) {
-                for (let i = 1; i < 15; i++) {
-                    users.push(
-                        <Link className='flex w-fit' href={route('user.show', user.id)} preserveState key={index}>
-                            <h1> {users.length > 0 ? "," : ""}&nbsp;</h1>
-                            <h1 className='hover:opacity-70 whitespace-nowrap'>{user.name}</h1>
+            if (users.length < 20) {
 
-                        </Link>)
-                }
+                users.push(
+                    <Link className='flex w-fit' href={route('user.show', user.id)} preserveState key={index}>
+                        <h1> {users.length > 0 ? "," : ""}&nbsp;</h1>
+                        <h1 className='hover:opacity-70 whitespace-nowrap'>{user.name}</h1>
+
+                    </Link>)
+
 
             }
         }
@@ -26,7 +26,6 @@ export default function ActiveUsers() {
             guestCount += 1
         }
     })
-    userCount = 100
     if (userCount > users.length) {
         users.push("...")
     }

@@ -13,9 +13,10 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Auth\Passwords\CanResetPassword as ResetPasswordTrait;
 use App\Notifications\ResetPasswordNotification;
+use Laravel\Scout\Searchable;
 class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 {
-    use HasApiTokens, HasFactory, Notifiable, ResetPasswordTrait;
+    use HasApiTokens, HasFactory, Notifiable, ResetPasswordTrait, Searchable;
 
     /**
      * The attributes that are mass assignable.
