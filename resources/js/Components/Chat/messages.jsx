@@ -44,7 +44,7 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
         return (
             <div key={index}>
                 {isMarked && <li className="text-center text-xs">{formatDate(message.created_at)}</li>}
-                <Message isSeen={seenIndicatorId == message.id} update={update} message={message} setIsEdit={setIsEdit} isEdit={isEdit} setShowEmoji={setIsComponentVisible} setInput={(val) => { setMessageData(val); chatInput.current.textContent = val }} setActiveMessage={setActiveMessage} isActive={activeMessage == message.id} />
+                <Message isSeen={seenIndicatorId == message.id} update={update} message={message} setIsEdit={setIsEdit} isEdit={isEdit} setInput={(val) => { setMessageData(val); chatInput.current.textContent = val }} setActiveMessage={setActiveMessage} isActive={activeMessage == message.id} />
                 {index == messages.length - 1 && prevDate != null && formatDate(prevDate) != moment(message.created_at).format("HH:mm") && <li className="text-center text-xs">{moment(message.created_at).format("HH:mm")}</li>}
             </div>
         )
@@ -187,7 +187,7 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
                 <button disabled={messages.length == 0 || deleteConversationProcessing.current} onClick={() => handleDeleteConversation()}
                     className="justify-self-end hover:opacity-70 mr-1"><i className="fa-solid fa-square-xmark text-lg text-slate-700" /></button>
             </div >
-            <ul ref={messageWindow} id="messageWindow" className="overflow-y-scroll h-[38vh] scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
+            <ul ref={messageWindow} id="messageWindow" className="overflow-y-scroll h-[39vh] scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin" >
                 {loading && <div className="flex justify-center"><Loading /></div>}
                 {messagesForRender}
                 {Object.keys(typingMesssage).length > 0 &&
@@ -201,7 +201,7 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
                 }
             </ul>
             <form onSubmit={submit}>
-                <div className="relative flex gap-1 p-2 min-h-[7vh]">
+                <div className="relative flex gap-1 p-2 min-h-[6vh]">
                     <div ref={chatInput} className="overflow-y-scroll max-h-[10vh] scrollbar-thumb-slate-700 scrollbar-track-blue-100 scrollbar-thin w-full whitespace-pre-wrap break-all text-sm py-1 pl-2 pr-14 rounded-md bg-blue-100" id="chat_input"
                         onInput={(e) => { setMessageData(e.currentTarget.textContent); typing() }} onKeyDown={(e) => e.key == "Enter" && processing.current == false ? submit(e) : ""}
                         contentEditable data-text={"Type your message here..."} ></div>
@@ -212,7 +212,7 @@ export default function Messages({ activeChat, setActiveChat, messages, setMessa
                     </button>
                 </div>
             </form>
-            {errors.message && <div className="text-red-500 text-start px-5 text-sm">{errors.message}</div>}
+            {errors.message && <div className="text-red-500 text-start px-5 py-2 text-sm">{errors.message}</div>}
         </div >
     )
 }

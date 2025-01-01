@@ -110,7 +110,7 @@ class UserController extends Controller
             'reply_to' => null,
 
         ]);
-        $paginator = collect()->merge($replies)->merge($posts)->sortByDesc('created_at')->paginate(10);
+        $paginator = collect()->merge($replies)->merge($posts)->sortByDesc('created_at')->paginate(10, pageName: "userActivity");
         $paginator = $paginator->onEachSide($paginator->lastPage());
         return Inertia::render('user', [
             'breadcrumbs' => [

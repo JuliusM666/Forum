@@ -3,7 +3,7 @@ import { ModalContext } from "../Context/modalContext"
 import { usePage } from "@inertiajs/react"
 import UserPicture from "../userPicture"
 
-export default function Message({ message, typing = false, isSeen, setActiveMessage, isActive, setInput, setShowEmoji, setIsEdit, isEdit, update }) {
+export default function Message({ message, typing = false, isSeen, setActiveMessage, isActive, setInput, setIsEdit, isEdit, update }) {
     const { setShowConfirm, confirmAction, confirmMessage } = useContext(ModalContext)
     const processing = useRef(false)
     const { auth } = usePage().props
@@ -20,7 +20,6 @@ export default function Message({ message, typing = false, isSeen, setActiveMess
             <div className="my-2">
                 {isActive &&
                     <div className="flex gap-3 justify-end w-5/6">
-                        <button onClick={() => setShowEmoji(true)} className="hover:opacity-70"><i className="fa-solid fa-circle-plus" /></button>
                         {message.deleted_at == null &&
                             <>
                                 <button onClick={() => { isEdit ? setIsEdit(false) : (setInput(message.message), setIsEdit(true)) }} className="hover:opacity-70"> <i className="fa-regular fa-pen-to-square" /></button>

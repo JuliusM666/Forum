@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Notifications\DeleteConversationNotification;
 use App\Notifications\MessageNotification;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class MessageController extends Controller
 {
@@ -61,7 +61,7 @@ class MessageController extends Controller
                     orWhere(function (Builder $query) {
                         $query->where("reciever_id", auth()->user()->id)->where("deleted_for_reciever", false);
                     });
-            })->groupByRaw("col1,col2")->with("sender", "reciever")->latest()->paginate(10, pageName: "chat_page");
+            })->groupByRaw("col1,col2")->with("sender", "reciever")->latest()->paginate(10, pageName: "chatPage");
         $messages->getCollection()->transform(function (Message $message) {
             $newMessage = $message->toArray();
             if ($message->trashed()) {
@@ -74,6 +74,7 @@ class MessageController extends Controller
         });
         return $messages;
     }
+
 
     public function getNotSeenCount()
     {
@@ -110,7 +111,7 @@ class MessageController extends Controller
     public function show($recipient_id)
     {
         $messages = $this->getConversation($recipient_id)->latest()->with("sender")
-            ->cursorPaginate(5, cursorName: "message_page");
+            ->cursorPaginate(5, cursorName: "messagePage");
         $messages->getCollection()->transform(function ($message) {
             if ($message->trashed()) {
                 $message->message = "deleted by user";
@@ -151,6 +152,37 @@ class MessageController extends Controller
         $message->reciever->notify(new MessageNotification($message->toArray()));
         $message->sender->notify(new MessageNotification($message->toArray()));
         return $message;
+    }
+
+    public function search(string $query = "")
+    {
+        $users = User::search($query)->query(fn(Builder $query) => $query->with(
+            [
+                'recievedMessages' => function (Builder $query) {
+                    $query->where('sender_id', auth()->user()->id)->latest();
+
+                },
+                'sentMessages' => function (Builder $query) {
+                    $query->where('reciever_id', auth()->user()->id)->latest();
+                }
+            ]
+        ))->paginate(10, pageName: "chatPage");
+        $users->getCollection()->transform(function (User $user) {
+            $user = $user->toArray();
+            $message = ["is_seen" => true, "message" => "", "created_at" => null];
+            $latestMessage = collect([head($user["sent_messages"]) == false ? null : head($user["sent_messages"]), head($user["recieved_messages"]) == false ? null : head($user["recieved_messages"])]);
+            $latestMessage = $latestMessage->where("created_at", $latestMessage->max("created_at"))->first();
+            if ($latestMessage != null) {
+                $message = $latestMessage;
+            }
+            $user["recieved_messages"] = null;
+            $user["sent_messages"] = null;
+            $newUser = collect($message)->merge(["sender" => $user]);
+            return $newUser;
+        });
+        return $users;
+
+
     }
 
 }

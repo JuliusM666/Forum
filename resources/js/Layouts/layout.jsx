@@ -49,18 +49,14 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
     const usersOnlineRef = useRef([])
     useEffect(() => { usersOnlineRef.current = usersOnline }, [usersOnline])
     useEffect(() => {
-        console.log("mount")
         window.Echo.join("users.online")
             .here((users) => {
-                console.log(users)
                 setUsersOnline(usersOnline => users)
             })
             .joining((user) => {
-                console.log("joining", user)
                 setUsersOnline(usersOnline => [...usersOnline, user])
             })
             .leaving((user) => {
-                console.log("leaving", user)
                 setUsersOnline(usersOnlineRef.current.filter((u =>
                     u.id !== user.id)))
             })
@@ -68,7 +64,6 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
                 console.error(error);
             })
         return () => {
-            console.log("unmount")
             window.Echo.leave("users.online")
         }
     }, [auth.user])

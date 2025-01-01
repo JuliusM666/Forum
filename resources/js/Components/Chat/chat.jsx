@@ -1,26 +1,34 @@
 import { usePage } from "@inertiajs/react"
-import { useState, useRef, useEffect, useContext } from "react"
+import { useState, useRef, useEffect } from "react"
 import Loading from "../loading"
 import UserPictureWithStatus from "../userPictureWithStatus"
 import formatDate from "@/utils/formatDate"
 
-export default function Chat({ setActiveChat, chats, setChats, nextPageUrl }) {
+export default function Chat({ setActiveChat, chats, setChats, nextPageUrl, query, setQuery }) {
     const { auth } = usePage().props
     const [loading, setLoading] = useState(false)
-    const [query, setQuery] = useState("")
+    const firstLoad = useRef(true)
     const chatWindow = useRef()
+    const abortController = useRef(new AbortController())
     function fetchChats() {
         setLoading(true)
-        axios.get(nextPageUrl.current)
+        let errorCode = null
+        axios.get(nextPageUrl.current, { signal: abortController.current.signal })
             .then(function (response) {
                 setChats(chats => [...chats, ...response.data.data])
                 nextPageUrl.current = response.data.next_page_url
             })
             .catch(function (error) {
-                console.log(error);
+                errorCode = error.code
+                if (error.code != "ERR_CANCELED") {
+                    console.log(error)
+                }
             })
             .finally(function () {
-                setLoading(false)
+                if (errorCode == null) {
+                    setLoading(false)
+                }
+
             });
     }
     useEffect(() => {
@@ -35,24 +43,41 @@ export default function Chat({ setActiveChat, chats, setChats, nextPageUrl }) {
             }
         }
     }, [])
+    useEffect(() => {
+        if (firstLoad.current) {
+            firstLoad.current = false
+        }
+        else if (query == "") {
+            abortController.current.abort()
+            abortController.current = new AbortController()
+            nextPageUrl.current = route("chats.index")
+            setChats([])
+            fetchChats()
+        }
+        else {
+            abortController.current.abort()
+            abortController.current = new AbortController()
+            nextPageUrl.current = route("chats.search", [query])
+            setChats([])
+            fetchChats()
+        }
+    }, [query])
     return (
         <div>
+            <div className="px-4">
+                <div className=" bg-slate-100 h-[10vh] border-b py-4 border-slate-300">
+                    <div className="relative align-middle ">
 
-            <div className="p-4 bg-slate-100 rounded-b-md h-[10vh]">
-
-                <div className="relative align-middle ">
-
-                    <input value={query} onChange={e => { setQuery(e.target.value) }} className="w-full shadow-sm rounded-2xl text-md py-1 pr-8 border-0 focus:ring-0 max-sm:border border-1" type="text" placeholder="search..." />
-                    <button disabled={query == ""} onClick={() => setQuery("")} className="h-full hover:opacity-70 text-sm absolute right-2">
-                        {query != "" && <i className="fa fa-x" />}
-                        {query == "" && <i className="fa fa-search" />}
-                    </button>
+                        <input value={query} onChange={e => { setQuery(e.target.value) }} className="w-full shadow-sm rounded-2xl text-md py-1 pr-8 border-0 focus:ring-0 max-sm:border border-1" type="text" placeholder="search..." />
+                        <button disabled={query == ""} onClick={() => setQuery("")} className="h-full hover:opacity-70 text-sm absolute right-2">
+                            {query != "" && <i className="fa fa-x" />}
+                            {query == "" && <i className="fa fa-search" />}
+                        </button>
+                    </div>
                 </div>
-
-
             </div>
 
-            <ul ref={chatWindow} className="overflow-y-scroll h-[40vh] scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin">
+            <ul ref={chatWindow} className="overflow-y-scroll h-[40.5vh] scrollbar-thumb-slate-700 scrollbar-track-slate-200 scrollbar-thin">
                 {chats.map((chat, index) => {
                     return (
                         <li key={index} className={`odd:bg-slate-100 even:bg-slate-200 ${chat.is_seen == false && auth.user.id != chat.sender_id ? "font-bold" : ""}`}>
@@ -67,7 +92,7 @@ export default function Chat({ setActiveChat, chats, setChats, nextPageUrl }) {
                                     <p className="truncate text-xs">{chat.message}</p>
 
                                 </div>
-                                <h1 className="text-xs text-end">{formatDate(chat.created_at)}</h1>
+                                <h1 className="text-xs text-end">{chat.created_at != null && formatDate(chat.created_at)}</h1>
                             </button>
                         </li>
                     )

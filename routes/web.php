@@ -60,6 +60,7 @@ Route::controller(NotificationController::class)->group(function () {
 Route::controller(MessageController::class)->group(function () {
     Route::get('/chats', 'index')->name("chats.index")->middleware('auth');
     Route::get('/chats/{message}', 'show')->name("chats.show")->middleware('auth');
+    Route::get('/chats/search/{query?}', 'search')->name('chats.search')->middleware('auth');
     Route::post('/chats', 'store')->name("chats.store")->middleware('auth');
     Route::post('/chats/seen/{message}', 'markAsSeen')->name("chats.seen")->middleware('auth');
     Route::patch('/chats/{message}', 'update')->name("chats.update")->middleware('auth');
