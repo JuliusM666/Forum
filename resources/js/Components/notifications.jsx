@@ -133,14 +133,22 @@ function Notification({ notification, markAsDeleted, showID, setShowID, index, p
                     <button className="hover:opacity-70 hover:bg-slate-300 rounded-full px-2 py-1" onClick={() => { setIsComponentVisible(!isComponentVisible) }}>
                         <i className="fa-solid fa-ellipsis font-semibold text-md" />
                     </button>
-                    {isComponentVisible && <div className="z-10 text-md absolute rounded-md right-0 top-14 grid grid-cols-1 shadow-xl bg-slate-100">
-                        <button className="hover:bg-slate-200 py-1 px-4" onClick={() => { deleteNotification(), showNotification(), setIsComponentVisible(false) }}>Open</button>
-                        <button disabled={processing.current} onClick={() => { deleteNotification(), setIsComponentVisible(false) }} className="hover:bg-slate-200 py-1 px-4">Delete</button>
+                    {isComponentVisible && <div className="z-10 text-md  absolute  right-0 top-14 shadow-xl grid">
+                        <div className="w-0 h-0 place-self-end mr-6
+                                    border-l-[5px] border-l-transparent
+                                    border-b-[5px] border-b-white
+                                    border-r-[5px] border-r-transparent">
+                        </div>
+                        <div className="bg-slate-100 p-1  grid grid-cols-1 rounded-md">
+                            <button className="hover:bg-slate-200 rounded-md py-1 px-4" onClick={() => { deleteNotification(), showNotification(), setIsComponentVisible(false) }}>Open</button>
+                            <button className="hover:bg-slate-200 rounded-md py-1 px-4" disabled={processing.current} onClick={() => { deleteNotification(), setIsComponentVisible(false) }} >Delete</button>
+                        </div>
                     </div>}
 
                 </div>
             </div>
-            {showID == index &&
+            {
+                showID == index &&
                 <div className="flex gap-2 border-t pt-2 border-slate-200 items-start">
                     <div className="size-8">
                         <UserPicture user_id={notification.data.user.id} user_img={notification.data.user.user_img} />
@@ -162,7 +170,7 @@ function Notification({ notification, markAsDeleted, showID, setShowID, index, p
 
                 </div>
             }
-        </li>
+        </li >
 
 
     )

@@ -4,15 +4,15 @@ export default function Footer() {
   return (
 
     <nav className="bg-transparent rounded-xl py-4 mt-5">
-      <div className="grid md:grid-cols-3 sm:grid-cols-1">
+      <div className="grid xl:grid-cols-3 sm:grid-cols-1">
 
-        <ul className="flex items-center justify-center lg:justify-start order-1">
+        <ul className="grid sm:grid-cols-6 max-md:gap-6 max-md:py-6 gap-2 justify-items-center items-center lg:justify-start order-1 overflow-hidden">
           <FooterLink text={"Forum"} href={route('home')} />
           <FooterLink text={"Activity Flow"} href={route('activity')} />
           <FooterLink text={"Search"} href={route('search')} />
           <FooterLink text={"Rules"} href={route('rules')} />
           <FooterLink text={"Membership"} href={route('membership')} />
-          <li className="text-xs text-slate-400 font-semibold mr-4">
+          <li className="text-xs text-slate-400 font-semibold">
             <a className="inline-block align-middle" href="https://github.com/JuliusM666">Github</a>
           </li>
         </ul>
@@ -34,7 +34,7 @@ export default function Footer() {
 
 function FooterLink({ text, href }) {
   return (
-    <li className="text-xs text-slate-400 font-semibold mr-4">
+    <li className="text-xs text-slate-400 font-semibold">
       <Link preserveScroll preserveState className="inline-block whitespace-nowrap align-middle" href={href}>{text}</Link>
     </li>
   )
