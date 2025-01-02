@@ -1,12 +1,14 @@
-import { isVisible } from 'ckeditor5';
 import { useState, useEffect, useRef } from 'react';
 
-export default function useModalVisible(initialIsVisible) {
+export default function useModalVisible(initialIsVisible, relatedElement = null) {
     const [isComponentVisible, setIsComponentVisible] = useState(initialIsVisible);
     const ref = useRef(null);
     const handleClickOutside = (event) => {
+
         if (ref.current && !ref.current.contains(event.target)) {
-            setIsComponentVisible(false);
+            if (!relatedElement || document.getElementsByClassName(relatedElement).length == 0 || !document.getElementsByClassName(relatedElement)[0].contains(event.target)) {
+                setIsComponentVisible(false);
+            }
         }
     };
     useEffect(() => {

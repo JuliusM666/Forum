@@ -1,8 +1,8 @@
 import { useState, useRef } from "react";
-import useComponentVisible from "./Hooks/useComponentVisible";
+import useModalVisible from "./Hooks/useModalVisible";
 import { router } from '@inertiajs/react'
 export default function PageSort({ children, sort }) {
-    const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false)
+    const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false)
     const [currentSort, setCurrentSort] = useState(sort.currentSort)
     const [loading, setLoading] = useState(false)
     async function changeSort(value) {

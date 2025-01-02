@@ -1,8 +1,7 @@
-import useComponentVisible from "./Hooks/useComponentVisible";
-import { useState } from "react";
+import useModalVisible from "./Hooks/useModalVisible";
 import { useForm } from "@inertiajs/react";
 export default function PageInput({ children, pagination }) {
-    const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
+    const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false);
     const { data, setData, get, processing, errors, clearErrors, reset } = useForm({
         page: pagination.current_page
     })

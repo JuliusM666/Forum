@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
-
 import {
     ClassicEditor,
     AccessibilityHelp,
@@ -28,18 +27,11 @@ import 'ckeditor5/ckeditor5.css';
 export default function TextEditor({ name, setData, data = '' }) {
     const editorContainerRef = useRef(null);
     const editorRef = useRef(null);
-    const [isLayoutReady, setIsLayoutReady] = useState(false);
-
-    useEffect(() => {
-        setIsLayoutReady(true);
-
-        return () => setIsLayoutReady(false);
-    }, []);
     return (
         <div className="ck-main-container">
             <div className="editor-container editor-container_classic-editor" ref={editorContainerRef}>
                 <div className="editor-container__editor">
-                    <div ref={editorRef}>{isLayoutReady &&
+                    <div ref={editorRef}>
                         <CKEditor
                             onChange={(event, editor) => {
 
@@ -120,7 +112,7 @@ export default function TextEditor({ name, setData, data = '' }) {
 
                             }}
 
-                        />}
+                        />
                     </div>
                 </div>
             </div>

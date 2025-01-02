@@ -8,8 +8,11 @@ export default function formatDate(date) {
         else if (currentDate.month() != messageDate.month() || currentDate.day() != messageDate.day()) {
             return messageDate.format("D MMM")
         }
-        else {
+        else if (currentDate.day()!=messageDate.day()){
             return messageDate.format("HH:mm")
+        }
+        else {
+            return messageDate.fromNow()
         }
 
     }

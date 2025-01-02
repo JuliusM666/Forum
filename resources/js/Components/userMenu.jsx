@@ -1,11 +1,11 @@
-import useComponentVisible from "./Hooks/useComponentVisible"
+import useModalVisible from "./Hooks/useModalVisible"
 import { usePage, Link } from "@inertiajs/react"
 import Notifications from "./notifications"
 import Chats from "./Chat/chats"
 import { useState, useContext } from "react"
 import { ModalContext } from "./Context/modalContext"
 export default function UserMenu() {
-    const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
+    const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false);
     const { notifications, auth, chatsNotSeen } = usePage().props
     const [notificationsData, setNotificationsData] = useState(notifications)
     const [showNotifications, setShowNotifications] = useState(false)

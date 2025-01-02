@@ -1,7 +1,7 @@
 import Button from "./button";
-import useComponentVisible from "./Hooks/useComponentVisible";
+import useModalVisible from "./Hooks/useModalVisible";
 export default function ShareButton({ url }) {
-    const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false)
+    const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false)
     function openInNewTab(url) {
         window.open(url, '_blank').focus();
     }

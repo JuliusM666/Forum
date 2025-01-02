@@ -1,9 +1,9 @@
-import AddModal from "../Components/addModal"
+import AddPostModal from "./addPostModal"
 import { createPortal } from "react-dom"
 import useModalVisible from "./Hooks/useModalVisible";
 import { useEffect } from "react";
 export default function AddNewPostButton({ topics, defaultID }) {
-    const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false);
+    const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false, "ck-body-wrapper");
     useEffect(() => {
         if (isComponentVisible) {
             document.getElementById('layout').style.filter = "opacity(50%)"
@@ -19,7 +19,7 @@ export default function AddNewPostButton({ topics, defaultID }) {
             </div>
             {
                 createPortal(
-                    <AddModal isVisible={isComponentVisible} componentRef={ref} close={() => setIsComponentVisible(false)} topics={topics} defaultID={defaultID} />,
+                    <AddPostModal isVisible={isComponentVisible} componentRef={ref} close={() => setIsComponentVisible(false)} topics={topics} defaultID={defaultID} />,
                     document.body
 
                 )

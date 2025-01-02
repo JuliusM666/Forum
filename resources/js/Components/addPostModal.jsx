@@ -1,12 +1,12 @@
 import Card from "./card"
 import FadeWrapper from "./fadeWrapper";
 import CloseButton from './closeButton';
-import FormInput from "../Components/formInput";
-import TextEditor from "../Components/textEditor";
-import ValidationError from "../Components/validationError";
+import FormInput from "./formInput";
+import TextEditor from "./textEditor";
+import ValidationError from "./validationError";
 import { useForm } from '@inertiajs/react';
 import { useEffect, useState } from "react";
-export default function AddModal({ topics, defaultID, isVisible, close, componentRef }) {
+export default function AddPostModal({ topics, defaultID, isVisible, close, componentRef }) {
     const [activeTheme, setActiveTheme] = useState('')
     const { data, setData, post, processing, errors, clearErrors, reset } = useForm({
         title: '',

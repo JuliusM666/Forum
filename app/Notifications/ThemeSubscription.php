@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Models\Post;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 class ThemeSubscription extends Notification implements ShouldQueue
 {
     use Queueable;
@@ -60,14 +61,19 @@ class ThemeSubscription extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'data' => [
-                'data' => [
-                    'title' => 'theme subscription',
-                    'message' => 'User ' . $this->post->user->name . " has posted in theme: " . $this->post->theme->title
-                ]
-
-            ]
+            'user' => $this->post->user->only(["name", "id", "user_img"]),
+            'title' => 'theme subscription',
+            'theme' => $this->post->theme->only(["title", "id", "topic_id"]),
+            'type' => "theme_subscription",
         ];
+
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            "data" => $this->toArray($notifiable)
+        ]);
     }
 
 }

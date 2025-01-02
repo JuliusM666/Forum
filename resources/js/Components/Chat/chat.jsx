@@ -87,12 +87,12 @@ export default function Chat({ setActiveChat, chats, setChats, nextPageUrl, quer
                                         <UserPictureWithStatus user_id={chat.sender.id} user_img={chat.sender.user_img} />
                                     </div>
                                 </div>
-                                <div className="col-span-4 text-start">
+                                <div className="col-span-3 text-start">
                                     <h1 className="font-semibold truncate">{chat.sender.name}</h1>
                                     <p className="truncate text-xs">{chat.message}</p>
 
                                 </div>
-                                <h1 className="text-xs text-end">{chat.created_at != null && formatDate(chat.created_at)}</h1>
+                                <h1 className="text-xs col-span-2 text-end">{chat.created_at != null && formatDate(chat.created_at)}</h1>
                             </button>
                         </li>
                     )

@@ -1,9 +1,9 @@
-import useComponentVisible from "./Hooks/useComponentVisible"
+import useModalVisible from "./Hooks/useModalVisible"
 import { ModalContext } from "./Context/modalContext"
 import { router } from "@inertiajs/react"
 import { useContext } from "react"
 export default function CrudMenu({ item, handleEdit, isPost }) {
-    const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false)
+    const [ref, isComponentVisible, setIsComponentVisible] = useModalVisible(false)
     const { setShowConfirm, confirmAction, confirmMessage } = useContext(ModalContext)
 
     return (
