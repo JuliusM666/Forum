@@ -1,5 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
+import {
+    Emoji, EmojiActivity, EmojiFlags, EmojiFood, EmojiNature, EmojiObjects, EmojiPeople,
+    EmojiPlaces, EmojiSymbols
+} from '@/utils/emojiCkeditor/src';
 import {
     ClassicEditor,
     AccessibilityHelp,
@@ -53,6 +57,7 @@ export default function TextEditor({ name, setData, data = '' }) {
                                         'bulletedList',
                                         'numberedList',
                                         '|',
+                                        'emoji',
 
                                     ],
                                     shouldNotGroupWhenFull: false
@@ -78,7 +83,15 @@ export default function TextEditor({ name, setData, data = '' }) {
                                     SelectAll,
                                     SpecialCharacters,
                                     Undo,
-
+                                    Emoji,
+                                    EmojiPeople,
+                                    EmojiNature,
+                                    EmojiPlaces,
+                                    EmojiFood,
+                                    EmojiActivity,
+                                    EmojiObjects,
+                                    EmojiSymbols,
+                                    EmojiFlags,
                                 ],
                                 htmlSupport: {
                                     allow: [
@@ -107,7 +120,7 @@ export default function TextEditor({ name, setData, data = '' }) {
                                     }
                                 },
                                 placeholder: 'Type or paste your content here!',
-                                licenseKey: 'ZFZMWlg4Y0ZtTnBzcEx2ZWVsZnI1UHR3UWs3d1NzN3o0am5wN2JjRUk2bFY1SEhwNEc2R1NKbGI3MjZyZlE9PS1NakF5TkRBNU1UVT0=',
+                                licenseKey: import.meta.env.VITE_CKEDITOR5_KEY,
                                 initialData: data,
 
                             }}

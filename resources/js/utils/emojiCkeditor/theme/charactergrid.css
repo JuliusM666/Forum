@@ -1,0 +1,28 @@
+/*
+ * Copyright (c) 2003-2021, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ */
+
+.ck.ck-character-custom-grid {
+   
+   
+}
+
+div.ck.ck-character-custom-grid__tiles {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    max-height: 20vh;
+    overflow-y: scroll;
+    overflow-x:hidden;
+}
+
+button.ck.ck-button.ck-character-grid__tile  {
+    width:  2vw;
+    height: 2vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+   padding: 0;
+
+}
