@@ -12,10 +12,10 @@ return new class extends Migration {
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->default('');
+            $table->string('name');
             $table->string('email')->unique();
-            $table->string('user_img');
-            $table->string('banner_img');
+            $table->string('user_img')->default('/public/user_profile_pictures/user.png');
+            $table->string('banner_img')->default('/public/user_banners/banner.jpg');
             $table->dateTime('last_seen')->default(now());
             $table->boolean('email_notifications')->default(true);
             $table->timestamp('email_verified_at')->nullable();

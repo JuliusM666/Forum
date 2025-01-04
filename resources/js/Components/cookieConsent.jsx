@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 export default function CookieConsent() {
     const [consent, setConsent] = useState(localStorage.getItem("cookieConsent"))
     useEffect(() => {
-        localStorage.setItem("cookieConsent", consent)
+        if (consent) {
+            localStorage.setItem("cookieConsent", consent)
+        }
     }, [consent])
     return (
         <>

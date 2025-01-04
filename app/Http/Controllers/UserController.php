@@ -55,8 +55,6 @@ class UserController extends Controller
             'name' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'user_img' => Storage::url('user_profile_pictures/user.png'),
-            'banner_img' => Storage::url('user_banners/banner.jpg'),
         ]);
         event(new Registered($user));
         Auth::login($user);

@@ -28,7 +28,6 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
     const [resetPasswordEmailRef, showResetPasswordEmail, setShowResetPasswordEmail] = useModalVisible(isPasswordResetEmail);
     const [resetPasswordRef, showResetPassword, setShowResetPassword] = useModalVisible(token != '' ? true : false);
     const [confirmRef, showConfirm, setShowConfrim] = useModalVisible(false);
-
     const [showChats, setShowChats] = useState(false)
     const [activeChat, setActiveChat] = useState(null)
 

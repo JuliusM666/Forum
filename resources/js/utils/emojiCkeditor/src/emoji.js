@@ -121,12 +121,14 @@ export default class Emoji extends Plugin {
 	}
 
 	_updateGrid( currentGroupName, gridView ) {
-			setTimeout(()=>{gridView.tiles.clear();
+			gridView.tiles.clear();
 				const characterTitles = this.getCharactersForGroup( currentGroupName );
 				for ( const title of characterTitles ) {
+					setTimeout(()=>{
 					const character = this.getCharacter( title );
 					gridView.tiles.add( gridView.createTile( character, title ) );
-				}},0)
+				},0);
+				}
 	}
 	_createDropdownPanelContent( locale, dropdownView ) {
 		const specialCharsGroups = [ ...this.getGroups() ];

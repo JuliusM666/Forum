@@ -9,7 +9,6 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Illuminate\Auth\Events\Registered;
 class SocialiteController extends Controller
 {
     public function loginSocial(Request $request, string $provider): RedirectResponse
@@ -25,22 +24,19 @@ class SocialiteController extends Controller
 
         $response = Socialite::driver($provider)->user();
 
-        $user = User::firstOrCreate(
-            ['email' => $response->getEmail()],
-            ['password' => Str::password()]
-        );
-        $data = [$provider . '_id' => $response->getId()];
-
-        if ($user->wasRecentlyCreated) {
-            $data['name'] = $response->getName() ?? $response->getNickname();
-
-            event(new Registered($user));
+        $user = User::where("email", $response->getEmail())->orWhere($provider . '_id', $response->getId())->first();
+        if ($user == null) {
+            $user = User::create([
+                'email' => $response->getEmail(),
+                'name' => $response->getName(),
+                'user_img' => $response->getAvatar(),
+                'password' => Str::password(),
+            ]);
         }
-
-        $user->update($data);
-
-        Auth::login($user, remember: true);
-
+        $user[$provider . '_id'] = $response->getId();
+        $user->email_verified_at = now();
+        $user->save();
+        Auth::login($user);
         return redirect()->route('home');
     }
 
