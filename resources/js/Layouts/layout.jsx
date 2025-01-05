@@ -17,7 +17,7 @@ import Message from '../Components/message';
 import { ModalContext } from '../Components/Context/modalContext'
 import useModalVisible from '../Components/Hooks/useModalVisible';
 import { UsersOnlineContext } from '@/Components/Context/usersOnlineContext';
-import { usePage } from '@inertiajs/react';
+import { usePage, router } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
 export default function Layout({ children, breadcrumbs, token = "", isPasswordResetEmail = false }) {
     const [registrationRef, showRegistration, setShowRegistration] = useModalVisible(false);
@@ -43,7 +43,19 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
             }
         }
     }, [modals])
+    const isReloading = useRef(false)
     const { auth } = usePage().props
+    useEffect(() => {
+        const intervalID = setInterval(() => {
+            if (auth.user != null && localStorage.getItem("logged_out") == "true" && isReloading.current == false) {
+                isReloading.current = true
+                router.get(route("home"), {}, { onSuccess: () => { isReloading.current = false } })
+            }
+        }, 1000)
+        return () => { clearInterval(intervalID) }
+    }, [auth])
+
+
     const [usersOnline, setUsersOnline] = useState([])
     const usersOnlineRef = useRef([])
     useEffect(() => { usersOnlineRef.current = usersOnline }, [usersOnline])

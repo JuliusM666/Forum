@@ -1,5 +1,5 @@
 import useModalVisible from "./Hooks/useModalVisible"
-import { usePage, Link } from "@inertiajs/react"
+import { usePage, Link, router } from "@inertiajs/react"
 import Notifications from "./notifications"
 import Chats from "./Chat/chats"
 import { useState, useContext } from "react"
@@ -57,10 +57,10 @@ export default function UserMenu() {
                                                 }
                                             </li>
                                         </button>
-                                        <Link onClick={() => setActiveChat(null)} as="button" method="post" href='/logout'>
+                                        <button onClick={() => router.post("/logout", {}, { onSuccess: () => { setActiveChat(null); localStorage.setItem("logged_out", true) } })} as="button" method="post" href='/logout' >
                                             <li className="text-right block px-4 rounded-md py-2 hover:bg-slate-200 hover:text-slate-500">
                                                 <i className="fa-solid fa-right-from-bracket" /> </li>
-                                        </Link>
+                                        </button>
 
 
 

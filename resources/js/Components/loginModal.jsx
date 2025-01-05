@@ -28,7 +28,7 @@ export default function LoginModal({ isVisible, componentRef, close }) {
         e.preventDefault()
         post('/login', {
             preserveScroll: true,
-            onSuccess: () => { clearForm(), close() }
+            onSuccess: () => { clearForm(), close(), localStorage.setItem("logged_out", false) }
 
         })
     }

@@ -29,7 +29,6 @@ class SocialiteController extends Controller
             $user = User::create([
                 'email' => $response->getEmail(),
                 'name' => $response->getName(),
-                'user_img' => $response->getAvatar(),
                 'password' => Str::password(),
             ]);
         }
