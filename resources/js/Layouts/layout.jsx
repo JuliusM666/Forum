@@ -19,6 +19,7 @@ import useModalVisible from '../Components/Hooks/useModalVisible';
 import { UsersOnlineContext } from '@/Components/Context/usersOnlineContext';
 import { usePage, router } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
+import idleTime from '@/utils/idleTime';
 export default function Layout({ children, breadcrumbs, token = "", isPasswordResetEmail = false }) {
     const [registrationRef, showRegistration, setShowRegistration] = useModalVisible(false);
     const [loginRef, showLogin, setShowLogin] = useModalVisible(false);
@@ -46,13 +47,22 @@ export default function Layout({ children, breadcrumbs, token = "", isPasswordRe
     const isReloading = useRef(false)
     const { auth } = usePage().props
     useEffect(() => {
-        const intervalID = setInterval(() => {
-            if (auth.user != null && localStorage.getItem("logged_out") == "true" && isReloading.current == false) {
-                isReloading.current = true
-                router.get(route("home"), {}, { onSuccess: () => { isReloading.current = false } })
-            }
-        }, 1000)
-        return () => { clearInterval(intervalID) }
+        let isLoggedOutID = null
+        if (auth.user != null) {
+            idleTime.initializeIdleTime(setActiveChat)
+            isLoggedOutID = setInterval(() => {
+                if (auth.user != null && localStorage.getItem("logged_out") == "true" && isReloading.current == false) {
+                    isReloading.current = true
+                    router.get(route("home"), {}, { onSuccess: () => { isReloading.current = false } })
+                }
+            }, 1000)
+
+        }
+        else {
+            clearInterval(isLoggedOutID)
+            idleTime.clearIdleTime()
+        }
+        return () => { clearInterval(isLoggedOutID), idleTime.clearIdleTime() }
     }, [auth])
 
 
