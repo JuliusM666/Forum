@@ -32,7 +32,7 @@ export default function RegistrationModal({ isVisible, componentRef, close }) {
         if (data.rules == true) {
             post('/user', {
                 preserveScroll: true,
-                onSuccess: () => { clearForm(), close(), window.scrollTo(0, 0) }
+                onSuccess: () => { clearForm(), close(), window.scrollTo(0, 0), localStorage.setItem("logged_out", false) }
 
             })
         }
